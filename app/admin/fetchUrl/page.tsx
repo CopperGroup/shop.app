@@ -4,10 +4,9 @@ const Page = async () => {
 
 
   return (
-    <section>
-      <div className="px-7">
-        <FetchUrl/>
-      </div>
+    <section className="w-full px-10 py-20 h-screen"> 
+      <h2 className="text-heading1-bold pr-2 drop-shadow-text-blue">Додайте товар посиланням</h2>
+      <FetchUrl/>
     </section>
   )
 }

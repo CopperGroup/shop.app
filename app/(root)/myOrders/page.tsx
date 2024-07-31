@@ -26,7 +26,7 @@ const myOrders = async() => {
     <section className="max-grid1:px-2  w-full">
     <h1 className="text-heading1-bold drop-shadow-text-blue">Мої замовлення</h1>
     {orders.length > 0 ? (
-      <div className="grid grid-cols-2 max-lg:grid-cols-1   max-lg:w-fit max-lg:mx-auto xx:grid-cols-3 max-xl:gap-16 gap-32 mt-28 w-full">
+      <div className="w-full gap-16 grid grid-cols-3 mt-16 max-[1900px]:gap-10 max-[1850px]:grid-cols-2 max-[1250px]:grid-cols-1">
         {orders.map((order) => (
           <OrderCard
             key={order.id}

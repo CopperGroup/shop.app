@@ -94,10 +94,10 @@ export function DataTable<TData extends Product, TValue>({
     <div className="w-full mt-7">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Id..."
-          value={(table.getColumn("id")?.getFilterValue() as string | undefined) ?? ""}
+          placeholder="Username..."
+          value={(table.getColumn("username")?.getFilterValue() as string | undefined) ?? ""}
           onChange={(event) =>
-            table.getColumn("id")?.setFilterValue(event.target.value)
+            table.getColumn("username")?.setFilterValue(event.target.value)
           }
         />
       </div>

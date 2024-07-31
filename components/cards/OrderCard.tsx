@@ -40,11 +40,14 @@ const OrderCard = ({ id, products, user, value, name, surname, phoneNumber, emai
     
 
     return (
-        <article className="w-[500px] max-sm:w-[400px] max-grid1:w-[330px] max max-sm:h-auto h-72 flex border rounded-3xl shadow-xl">
-            <div className="w-[90%] h-full flex flex-1 flex-col">
-                <div className="w-full pt-2 px-5">
-                    <h4 className="w-full text-center text-heading4-medium font-medium">{name} {surname}</h4>
-                    <div className="w-full flex flex-col">
+        <article className="h-72 flex flex-col border rounded-3xl shadow-xl min-[1851px]:w-[31rem] max-[440px]:h-60 max-[375px]:h-fit">
+            <div className="w-full h-[15%] flex justify-center items-center bg-green-500 rounded-t-3xl">
+                <p className="text-heading4-medium tracking-widest text-dark-4">{id}</p>
+            </div>
+            <div className="w-full h-90% flex flex-1 flex-col">
+                <div className="w-full h-full pt-2 px-5">
+                    <h4 className="w-full text-center text-heading4-medium font-medium max-[375px]:hidden">{name} {surname}</h4>
+                    <div className="w-full flex flex-col items-baseline">
                         <div className="flex mt-3">
                             <Image
                                 src="/assets/clock.svg"
@@ -72,7 +75,7 @@ const OrderCard = ({ id, products, user, value, name, surname, phoneNumber, emai
                             />
                             <p className="text-body-normal ml-2">Загальна вартість: <span className="text-green-500 font-medium">{value}</span> гривень</p>
                         </div>
-                        <div className="flex mt-3">
+                        {/* <div className="flex mt-3">
                             <Image
                                 src="/assets/at-symbol.svg"
                                 height={24}
@@ -85,8 +88,8 @@ const OrderCard = ({ id, products, user, value, name, surname, phoneNumber, emai
                                     {email}
                                 </Link>
                             </div>
-                        </div>
-                        <div className="flex mt-3">
+                        </div> */}
+                        <div className="flex mt-3 max-[440px]:hidden">
                             <Image
                                 src="/assets/call.svg"
                                 height={24}
@@ -100,7 +103,7 @@ const OrderCard = ({ id, products, user, value, name, surname, phoneNumber, emai
                                 </Link>
                             </div>
                         </div>
-                        <div className="w-full flex gap-5 pl-8 max-grid1:pl-0">
+                        <div className="w-full flex gap-5 pl-8 max-grid1:pl-0 max-[440px]:hidden">
                             <div className="w-full flex gap-1 items-center mt-3 text-subtle-medium">
                                 <p>Payment</p>
                                 {paymentStatus === "Pending" ? (
@@ -140,12 +143,11 @@ const OrderCard = ({ id, products, user, value, name, surname, phoneNumber, emai
                                 )}
                             </div>
                         </div>
-                        <Link href={`${url}${id}`} className="text-right text-small-medium text-primary-experimental hover:underline underline-offset-2">Деталі</Link>
                     </div>
                 </div>
-            </div>
-            <div className="w-[10%] h-full flex justify-center items-center bg-green-500 rounded-r-3xl">
-                <p className="-rotate-90 text-heading4-medium tracking-widest text-dark-4">{id}</p>
+                <div className="w-full h-fit flex px-3 pb-2 justify-end items-start">
+                    <Link href={`${url}${id}`} className="w-full h-full text-right text-small-medium text-primary-experimental hover:underline underline-offset-2">Деталі</Link>
+                </div>
             </div>
         </article>
     )

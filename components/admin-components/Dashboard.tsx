@@ -288,7 +288,7 @@ const Dashboard = ({ stringifiedData }: { stringifiedData: string }) => {
               </CarouselItem>
               <CarouselItem className="basis-1/3 h-64 flex justify-center items-center border-violet-500 cursor-grab active:cursor-grabbing max-[1352px]:basis-2/5 max-[1216px]:basis-1/2">
                   <article className="w-full h-40 shadow-2xl rounded-2xl border py-4 px-4">
-                    <div className="w-full h-2/5 flex justify-between items-end border border-indigo-500 px-2 max-[1352px]:items-start max-[1352px]:mt-3">
+                    <div className="w-full h-2/5 flex justify-between items-end border-indigo-500 px-2 max-[1352px]:items-start max-[1352px]:mt-3">
                       <p className="text-body-semibold">Найпопулярніший продукт</p>
                       <Image
                         src="/assets/arrow-right-up.svg"
@@ -320,7 +320,6 @@ const Dashboard = ({ stringifiedData }: { stringifiedData: string }) => {
 export default Dashboard;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
-  console.log(payload[0]);
 
   let totalProductsSold = 0;
 

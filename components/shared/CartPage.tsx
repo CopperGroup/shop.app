@@ -19,9 +19,6 @@ function hideCart(){
     document.body.style.overflow = "auto"
   }
 
-
-console.log(cartData);
-
 let together = 0
 
 const [toPay, setToPay] = useState(0);

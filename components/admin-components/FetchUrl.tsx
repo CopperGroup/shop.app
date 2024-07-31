@@ -20,12 +20,8 @@ const FetchUrl = () => {
 
   return (
     <>
-      <article className="w-full flex flex-1 gap-20 pt-12 mb-8 ">
-        <div className="flex">
-          <h2 className="text-heading2-semibold pr-2 drop-shadow-text-blue">Додайте товар посиланням</h2>
-          <Image src="/assets/thin-right-arrow.svg" width={32} height={32} alt="arrow-right" className="mt-1 max-[322px]:hidden" />
-        </div>
-        <div className="flex items-center space-x-2 mt-1 ">
+      <div className="w-full flex flex-col gap-2 flex-1 mt-16 mb-4">
+        <div className="flex items-center space-x-2">
           <Input
             placeholder="Link"
             className="max-w-md"
@@ -33,11 +29,10 @@ const FetchUrl = () => {
             onChange={handleChange}
           />
           <Button onClick={handleFetchStart}>Отримати товари</Button>
-          <p className="text-small-regular max-w-lg">
-            Вставте посилання з вашим XML кодом, щоб передати товари до бази данних
-          </p>
+          <p className="text-small-regular max-w-lg max-[1265px]:hidden">Вставте посилання з вашим XML кодом, щоб передати товари до бази данних</p>
         </div>
-      </article>
+        <p className="text-small-regular w-full min-[1266px]:hidden">Вставте посилання з вашим XML кодом, щоб передати товари до бази данних</p>
+      </div>
       <div className="w-full h-[2px] bg-dark-1 shadow-md"></div>
       
       <GatherProductsInfo url={url}/>

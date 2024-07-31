@@ -126,15 +126,17 @@ const GetParams = ({ productId }: { productId: string }) => {
                             )}
                         />
                     ))}
-
+                    <h3 className="text-heading2-semibold mt-10">Створіть власні властивості</h3>
                     {fields.map((field, index) => (
                         <FormItem key={field.id} className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
                             <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
+                                <p className="min-[1441px]:hidden">Назва</p>
                                 <Input
                                     placeholder="Custom Parameter Name"
                                     {...form.register(`customParams.${index}.name` as const)}
                                     className="mt-2"
                                 />
+                                <p className="min-[1441px]:hidden mt-3 -mb-3">Значення</p>
                             </FormLabel>
                             <FormControl>
                                 <Input
@@ -143,9 +145,10 @@ const GetParams = ({ productId }: { productId: string }) => {
                                     {...form.register(`customParams.${index}.value` as const)}
                                 />
                             </FormControl>
-                            <Button type="button" onClick={() => remove(index)}>
+                            <Button type="button" onClick={() => remove(index)} variant="outline" className="border-red-500 text-red-600 hover:bg-red-500 hover:text-white focus:bg-red-500 focus:text-white">
                                 Видалити
                             </Button>
+                            <div className="w-full h-[2px] bg-neutral-500 rounded-full"></div>
                             <FormMessage />
                         </FormItem>
                     ))}

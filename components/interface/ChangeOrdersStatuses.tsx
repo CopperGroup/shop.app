@@ -16,9 +16,9 @@ const ChangeOrdersStatuses = ({ id, paymentStatus, deliveryStatus }: { id: strin
   }
 
   return (
-    <div className="flex gap-5">
+    <div className="flex gap-5 max-[1100px]:flex-col max-[1100px]:gap-2">
       <Select defaultValue={paymentStatus} onValueChange={(value) => handlePaymentStatusChange(id, value)}>
-        <SelectTrigger className="w-72 h-9">
+        <SelectTrigger className="w-72 h-9 max-[1100px]:w-full">
           <SelectValue className="cursor-poiner flex gap-2"/>
         </SelectTrigger>
         <SelectContent className="cursor-poiner">
@@ -28,7 +28,7 @@ const ChangeOrdersStatuses = ({ id, paymentStatus, deliveryStatus }: { id: strin
         </SelectContent>
       </Select>
       <Select defaultValue={deliveryStatus} onValueChange={(value) => handleDeliveryStatusChange(id, value)}>
-        <SelectTrigger className="w-80 h-9">
+        <SelectTrigger className="w-80 h-9 max-[1100px]:w-full">
           <SelectValue className="cursor-poiner flex gap-2"/>
         </SelectTrigger>
         <SelectContent className="cursor-poiner">

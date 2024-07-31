@@ -26,7 +26,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
     console.log(order.products);
 
     return (
-        <section className="px-10 py-20 w-full">
+        <section className="px-10 py-20 w-full max-[1100px]:pb-5">
             <div className="w-full flex gap-2 items-center">
                 <h1 className="text-heading2-bold">Замовлення №{order.id}</h1>
                 <Image
@@ -62,9 +62,11 @@ const Page = async ({ params }: { params: { id: string } }) => {
                     </>
                 )}
             </div>
-            <div className="w-full flex justify-end gap-2">
+            <div className="w-full flex justify-end gap-2 mt-5 max-[1100px]:hidden">
                 <ChangeOrdersStatuses id={params.id} paymentStatus={order.paymentStatus} deliveryStatus={order.deliveryStatus}/>
-                <DeleteOrderButton id={params.id}/>
+                <div className="w-full h-fit">
+                    <DeleteOrderButton id={params.id}/>
+                </div>
             </div>
             <h3 className="text-heading3-bold font-medium mt-10">Ім&apos;я: {order.name} {order.surname}</h3>
             <Link href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.adress}, ${order.city}, ${order.postalCode}`)}`} target="_blank" rel="noopener noreferrer">
@@ -79,7 +81,10 @@ const Page = async ({ params }: { params: { id: string } }) => {
             {order.comment !== "" && (
                 <p className="text-body-medium mt-5">Коментар клієнта: {order.comment}</p>
             )}
-            <p className="text-body-medium mt-20">Замовлена продукція</p>
+            <div className="w-full flex-col justify-end gap-2 mt-12 min-[1101px]:hidden">
+                <ChangeOrdersStatuses id={params.id} paymentStatus={order.paymentStatus} deliveryStatus={order.deliveryStatus}/>
+            </div>
+            <p className="text-body-medium mt-20 max-[1100px]:mt-10">Замовлена продукція</p>
             <div className="w-full flex flex-col gap-7 mt-4 h-[700px] overflow-y-scroll px-2">
                 {order.products.map((product: Product) => (
                     <OrderedProductCard
@@ -135,6 +140,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
                             </>
                         )}
                 </div>
+            </div>
+            <div className="w-full h-fit mt-20 min-[1101px]:hidden">
+                <DeleteOrderButton id={params.id}/>
             </div>
         </section>
     )

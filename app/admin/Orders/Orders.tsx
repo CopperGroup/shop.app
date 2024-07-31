@@ -181,7 +181,7 @@ const Orders = ({orders}:{orders:string}) => {
 
 
         {filtredOrders.length > 0 ? (
-        <div className="grid grid-cols-3 gap-20 mt-16">
+        <div className="w-full gap-16 grid grid-cols-3 mt-16 max-[1900px]:gap-10 max-[1850px]:grid-cols-2 max-[1250px]:grid-cols-1">
           {filtredOrders.map((order:Order) => (
             <OrderCard
               key={order.id}

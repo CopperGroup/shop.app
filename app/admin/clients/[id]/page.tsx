@@ -34,10 +34,10 @@ const Page = async ({ params }: { params: { id: string } }) => {
                         </Link>
                     )}
                 </div>
-                <div className="w-full mt-20 border-green-500 mb-20">
-                    <h2 className="text-heading2-semibold">Замовлення</h2>
+                <div className="w-full mt-20 border-green-500 mb-20 pb-10">
+                    <h2 className="text-heading2-semibold mb-5">Замовлення</h2>
                     {usersOrders.length > 0 ? (
-                        <div className="w-full h-fit grid grid-cols-2 max-lg:grid-cols-1   max-lg:w-fit max-lg:mx-auto xx:grid-cols-3 max-xl:gap-16 gap-16 mt-20">
+                        <div className="w-full gap-16 grid grid-cols-3 mt-16max-[1900px]:gap-10 max-[1850px]:grid-cols-2 max-[1250px]:grid-cols-1">
                             {usersOrders.map((order) => (
                                 <OrderCard
                                     key={order.id}

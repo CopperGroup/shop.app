@@ -84,7 +84,7 @@ const GetImagesLinks = ({ productId }: { productId: string }) => {
                 </div>
             )}
             {addedImages.length > 0 && (
-                <div className={`w-full grid grid-cols-7 gap-2 mt-4 px-2 py-2`}>
+                <div className={`w-full grid grid-cols-7 gap-2 mt-4 px-3 py-2 max-[1845px]:grid-cols-6 max-[1850px]:gap-10 max-[1800px]:gap-5 max-[1650px]:grid-cols-5 max-[1650px]:gap-10 max-[1535px]:gap-5 max-[1440px]:grid-cols-4 max-[1440px]:gap-10 max-[1300px]:gap-5 max-[1250px]:grid-cols-3 max-[1250px]:gap-10 max-[1050px]:gap-5`}>
                     {addedImages.map((addedImage, index) => (
                         <div 
                          className="w-52 h-52 flex justify-center items-center bg-glass border rounded-2xl overflow-hidden hover:border-dark-4 shadow-lg"

@@ -16,3 +16,15 @@
 16. components/admin-componets/Dashboard.tsx
 17. app/admin/clients/page.tsx
 18. components/admin-components/FetchUrl.tsx
+19. app/admin/fetchUrl/page.tsx
+20. components/admin-compoents/create-product/GetImagesLinks.tsx
+21. components/admin-components/create-product/GetParams.tsx
+22. components/cards/OrderCard.tsx
+23. app/admin/Orders/Orders.tsx
+24. app/admin/Orders/[id]/page.tsx
+25. components/interface/ChangeOrdersStatuses.tsx
+26. components/interface/DeleteOrderButton.tsx
+27. app/admin/clients/data-table.tsx
+28. app/admin/clients/[id]/page.tsx
+29. app/(root)/myOrders/page.tsx
+30. components/admin-components/create-product/ListProduct.tsx
