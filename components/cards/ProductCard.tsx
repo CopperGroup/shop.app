@@ -49,7 +49,7 @@ const ProductCard = ({ id, productId, email, priceToShow, price, name, imageUrl,
                     <p className="text-base-medium text-gray-700 line-through">{price != priceToShow?'₴' + price:<></>}</p>
                     <p className="text-base-semibold">₴{priceToShow}</p>
                 </div>
-                <AddToCart id={id} image={imageUrl} name={name} price={priceToShow} />
+                <AddToCart id={id} image={imageUrl} name={name} price={priceToShow} priceWithoutDiscount={price}/>
             </div>
         </div>
     </article>

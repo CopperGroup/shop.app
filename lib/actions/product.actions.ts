@@ -80,7 +80,7 @@ export async function createUrlProduct({ id, name, isAvailable, quantity, url, p
             description: description,
             params: params,
             isFetched: isFetched,
-            category:category
+            category:category,
         })
         
     } catch (error: any) {
@@ -102,7 +102,6 @@ export async function createProduct({ id, name, quantity, url, price, priceToSho
             category: category ? category : "",
             vendor: vendor,
             description: description,
-         
         })
 
   
@@ -368,6 +367,22 @@ export async function listProduct(productId: string) {
         product.save();
     } catch (error: any) {
         throw new Error(`Error listing product: ${error.message}`)
+    }
+}
+
+export async function productAddedToCart(id: string) {
+    try {
+        connectToDB();
+
+        const product = await Product.findById(id);
+
+        await product.addedToCart.push(Date.now())
+
+        await product.save();
+
+        console.log(product);
+    } catch (error: any) {
+        throw new Error(`Error adding prduct to cart: ${error.message}`)
     }
 }
 

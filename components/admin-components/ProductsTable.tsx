@@ -117,7 +117,7 @@ const ProductsTable =  ({stringifiedProducts}:{stringifiedProducts:string}) => {
         <Table className="mt-5">
         <TableHeader>
           <TableRow>
-            <TableHead >Номер</TableHead>
+            <TableHead>ID</TableHead>
             <TableHead>Постачальник</TableHead>
             <TableHead>Назва</TableHead>
             <TableHead>Доступний</TableHead>
@@ -131,7 +131,7 @@ const ProductsTable =  ({stringifiedProducts}:{stringifiedProducts:string}) => {
           {filtredProducts
           .slice(first,last).map((product:any)=>(
           
-          <TableRow key={product.id} className='cursor-pointer' onClick={()=>router.push(`/admin/createProduct/list/${product.id}`)}>
+          <TableRow key={product.id} className="cursor-pointer hover:bg-slate-50 transition-all" onClick={()=>router.push(`/admin/createProduct/list/${product.id}`)}>
              
             <TableCell className="font-medium">{product.id}</TableCell>
             <TableCell>{product.vendor}</TableCell>

@@ -43,7 +43,7 @@ const CreateOrder = ({ userId, email }: { userId: string, email: string}) => {
   const {cartData, priceToPay, setCartData} = useAppContext();
   const data = cartData;
 
-  const products = cartData.map((product: string[]) => ({product: product[0], amount: product[4]}))
+  const products = cartData.map((product: {id: string, name: string, image: string, price: number, priceWithoutDiscount: number, quantity: number}) => ({product: product.id, amount: product.quantity}))
 
   console.log(products);
 

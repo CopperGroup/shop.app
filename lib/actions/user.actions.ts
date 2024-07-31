@@ -38,3 +38,15 @@ export async function fetchUserById(userId: string) {
         throw new Error(`Error fetching user by id, ${error.message}`)
     }
 }
+
+export async function fetchUsers() {
+    try {
+        connectToDB();
+
+        const users = await User.find();
+
+        return users;
+    } catch (error: any) {
+        throw new Error(`Error fetching users: ${error.message}`)
+    }
+}

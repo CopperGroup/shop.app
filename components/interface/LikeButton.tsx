@@ -46,7 +46,7 @@ const LikeButton = ({ productId, likedBy, email}: { productId: string,  likedBy:
     }
 
     return (
-        <Image src={`/assets/heart-${isLiked ? "filled" : "gray"}.svg`} width={24} height={24} alt="Like" className="cursor-pointer relative z-50" onClick={(e)=>handleAddingLike(e)}/> 
+        <Image src={`/assets/heart-${isLiked ? "filled" : "gray"}.svg`} width={24} height={24} alt="Like" className="cursor-pointer relative z-10" onClick={(e)=>handleAddingLike(e)}/> 
     )
 }
 

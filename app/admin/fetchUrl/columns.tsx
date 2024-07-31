@@ -74,7 +74,7 @@ export const columns: ColumnDef<Product, unknown>[] = [
   },
   {
     accessorKey: "isAvailable",
-    header: "Є на складі",
+    header: "Додати",
     cell: ({ row }) => (
       <div className="capitalize ">{row.getValue("isAvailable") ? "Так" : "Ні"}</div>
     ),

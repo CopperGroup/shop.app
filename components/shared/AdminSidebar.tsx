@@ -18,7 +18,7 @@ const AdminSidebar = () => {
         <section className="custom-scrollbar leftsidebar">
             <div className="flex w-full flex-1 flex-col gap-3 pl-5">
                 <div className="flex gap-2 items-center">
-                    <h3 className="text-heading3-bold pl-3">SANTEHVAN</h3>
+                    <Link href="/" className="text-heading3-bold pl-3">SANTEHVAN</Link>
                 </div>
                 <p className="text-small-x-semibold text-dark-4 pl-3 mt-10">Admin</p>
                 {sidebarLinks.map((link) => {

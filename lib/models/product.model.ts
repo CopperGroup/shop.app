@@ -32,10 +32,6 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String
     },
-
-    // category:{
-    //     type:String
-    // },
     params: [
         {
             name: {
@@ -69,8 +65,13 @@ const productSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         }
-    ]
+    ],
 
+    addedToCart: [
+        {
+            type: Date
+        }
+    ]
 
 })
 

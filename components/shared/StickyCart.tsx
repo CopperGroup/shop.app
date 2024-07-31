@@ -19,7 +19,7 @@ const StickyCart = () => {
    
     //@ts-ignore
     cartRef.current.style.right = "0";
-    document.body.style.overflow = "hidden"
+    document.body.style.overflow = "hidden";
   }
 
   return (
@@ -31,7 +31,7 @@ const StickyCart = () => {
         </Button>
     </div>
 
-    <div ref={cartRef} className="fixed duration-700 transition-all h-full right-[-100%] bg-white max-w-[370px] w-full  mx-auto z-50 rounded-sm  top-0 border-l-2 border-l-gray-700">
+    <div ref={cartRef} className="fixed duration-700 transition-all h-full right-[-100%] bg-white max-w-[400px] w-full  mx-auto z-50 rounded-sm  top-0 border-l-2 border-l-gray-700">
       <CartPage cartRef={cartRef}/>
     </div>
     

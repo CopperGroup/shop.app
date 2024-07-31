@@ -122,6 +122,13 @@
     @apply h-full pt-16;
   }
 
+  .gradient-1{
+    background: rgb(29,39,55);
+    background: -moz-linear-gradient(60deg, rgba(29,39,55,1) 0%, rgba(17,25,38,1) 100%);
+    background: -webkit-linear-gradient(60deg, rgba(29,39,55,1) 0%, rgba(17,25,38,1) 100%);
+    background: linear-gradient(60deg, rgba(29,39,55,1) 0%, rgba(17,25,38,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#1d2737",endColorstr="#111926",GradientType=1);
+  }
 }
 
 @layer utilities {
@@ -164,6 +171,7 @@
     transition-timing-function: ease-in-out;
     transition-duration: 500ms; 
   }
+  
   .page-transition {
     overflow: hidden;
     opacity: 0;
