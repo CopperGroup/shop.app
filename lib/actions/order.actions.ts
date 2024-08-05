@@ -7,6 +7,7 @@ import User from "../models/user.model";
 import mongoose from 'mongoose';
 import { revalidatePath } from "next/cache";
 import moment from "moment";
+import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
 
 interface CreateOrderParams {
     products: {
@@ -43,26 +44,28 @@ interface Product {
 }
 
 interface Order {
-    products: {
-        product: string,
-        amount: number
-    } [],
-    userId: string;
-    value: number;
-    name: string;
-    surname: string;
-    phoneNumber: string;
-    email: string;
-    paymentType: string;
-    deliveryMethod: string;
-    city: string;
-    adress: string;
-    postalCode: string;
-    comment: string | undefined;
-    paymentStatus: string;
-    deliveryStatus: string;
-    data: Date;
+  id: string,
+  products: {
+      product: string,
+      amount: number
+  } [],
+  userId: string;
+  value: number;
+  name: string;
+  surname: string;
+  phoneNumber: string;
+  email: string;
+  paymentType: string;
+  deliveryMethod: string;
+  city: string;
+  adress: string;
+  postalCode: string;
+  comment: string | undefined;
+  paymentStatus: string;
+  deliveryStatus: string;
+  data: Date;
 }
+
 interface TimePeriod {
     dateName: string;
     orders: Order[];
@@ -382,9 +385,13 @@ export async function getDashboardData() {
         const filteredOrders = orders.filter(order => order.data >= oneYearAgo);
 
         const today = moment();
+        const currentMonthStart = moment().startOf('month');
+        const currentMonthEnd = moment().endOf('month');
         const yesterday = moment().subtract(1, "days");
         const lastWeek = moment().subtract(1, "weeks").startOf('isoWeek');
         const lastMonth = moment().subtract(1, "months").startOf('month');
+        const previousMonthStart = moment().subtract(1, "months").startOf('month');
+        const previousMonthEnd = moment().subtract(1, "months").endOf('month');
         const lastThreeMonthsStart = moment().subtract(3, "months").startOf('month');
         const lastSixMonthsStart = moment().subtract(6, "months").startOf('month');
         const lastYear = moment().subtract(1, "years").startOf('year');
@@ -594,31 +601,32 @@ export async function getDashboardData() {
 
             // Day of the month
             const dayIndex = orderDate.date() - 1;
-            if (dayIndex >= 0 && dayIndex < month.length && orderDate.month() === moment().month()) {
+            if (dayIndex >= 0 && dayIndex < month.length && orderDate.isBetween(currentMonthStart, currentMonthEnd, 'day', '[]')) {
               month[dayIndex].orders.push(order);
               month[dayIndex].totalValue += orderValue;
-              month[dayIndex]. totalOrders += 1;
+              month[dayIndex].totalOrders += 1;
               monthTotalValue += orderValue;
               monthTotalOrders += 1;
               order.products.forEach((product: { product: string, amount: number; }) => {
                 monthTotalProductsSold += product.amount,
                 monthPopularProducts[product.product] = (monthPopularProducts[product.product] || 0) + product.amount
-              })
+              });
+            }
+            
+
+            const prevDayIndex = orderDate.date() - 1;
+            if (prevDayIndex >= 0 && prevDayIndex < previousMonth.length && orderDate.isBetween(previousMonthStart, previousMonthEnd, 'day', '[]')) {
+              previousMonth[prevDayIndex].orders.push(order);
+              previousMonth[prevDayIndex].totalValue += orderValue;
+              previousMonth[prevDayIndex].totalOrders += 1;
+              previousMonthTotalValue += orderValue;
+              previousMonthTotalOrders += 1;
+              order.products.forEach((product: { product: string, amount: number; }) => {
+                previousMonthTotalProductsSold += product.amount,
+                previousMonthPopularProducts[product.product] = (previousMonthPopularProducts[product.product] || 0) + product.amount
+              });
             }
 
-            const previousDayIndex = orderDate.date() - 1;
-            if (previousDayIndex >= 0 && previousDayIndex < previousMonth.length && orderDate.month() === lastMonth.month()) {
-                previousMonth[previousDayIndex].orders.push(order);
-                previousMonth[previousDayIndex].totalValue += orderValue;
-                previousMonth[previousDayIndex].totalOrders += 1;
-                previousMonthTotalValue += orderValue;
-                previousMonthTotalOrders += 1;
-                order.products.forEach((product: { product: string, amount: number; }) => {
-                    previousMonthTotalProductsSold += product.amount;
-                    previousMonthPopularProducts[product.product] = (previousMonthPopularProducts[product.product] || 0) + product.amount;
-                });
-            }
-        
               threeMonths.forEach((period, index) => {
                 const [start, end] = period.dateName.split(' - ').map(dateStr => moment(dateStr, 'D MMM'));
                 if (orderDate.isSameOrAfter(start) && orderDate.isBefore(end.clone().add(1, 'day'))) {
@@ -933,3 +941,869 @@ export async function getDashboardData() {
         throw new Error(`Error getting dashboard data: ${error.message}`)
     }
 }
+
+function calculatePeriods(from: Date | undefined, to: Date | undefined) {
+  if (!from) return [];
+
+  const periods: { dateName: string }[] = [];
+
+  if (to) {
+    const startMoment = moment(from);
+    const endMoment = moment(to);
+
+    const startYear = startMoment.year();
+    const startMonth = startMoment.month();
+    const endYear = endMoment.year();
+    const endMonth = endMoment.month();
+
+    const monthsDuration = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+    const durationInDays = endMoment.diff(startMoment, 'days') + 1;
+    const durationInHours = endMoment.diff(startMoment, 'hours') + 24;
+
+    console.log(durationInDays);
+    console.log(durationInHours);
+    console.log(monthsDuration);
+
+    if (durationInDays > 5) {
+      if (durationInDays <= 31) {
+        // Return time period of subperiods = number of selected days
+        for (let i = 0; i < durationInDays; i++) {
+          const start = startMoment.clone().add(i, 'days');
+          periods.push({ dateName: start.format('YYYY-MM-DD') });
+        }
+
+        //Should return a dateName of a single time (Already correct)
+      } else {
+        if (durationInDays <= 91) {
+          if (durationInDays % 2 === 0 && durationInDays / 2 <= 31) {
+            // Return the time period of the length of division result, subperiods consist of two days
+            for (let i = 0; i < durationInDays; i += 2) {
+              const start = startMoment.clone().add(i, 'days');
+              const end = start.clone().add(1, 'days');
+              periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+            }
+            //Should return a range of time
+          } else if (durationInDays % 3 === 0) {
+            // Return the time period of the length of division result, subperiods consist of three days
+            for (let i = 0; i < durationInDays; i += 3) {
+              const start = startMoment.clone().add(i, 'days');
+              const end = start.clone().add(2, 'days');
+              periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+            }
+            //Should return a range of time
+          } else {
+            const adjustedDurationInDays = durationInDays - 1;
+          
+            if (adjustedDurationInDays % 2 === 0 && adjustedDurationInDays / 2 <= 30) {
+              // Return the time period of the length of division result, subperiods consist of two days
+              for (let i = 0; i < adjustedDurationInDays; i += 2) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(1, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+              }
+            } else {
+              // Return the time period of the length of division result, subperiods consist of three days
+              for (let i = 0; i < adjustedDurationInDays; i += 3) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(2, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+              }
+            }
+          
+            // Add the last day as a single period
+            periods.push({ dateName: endMoment.format('YYYY-MM-DD') });          
+          }
+        } else {
+          if (durationInDays <= 182) {
+            if (durationInDays % 4 === 0 && durationInDays / 4 <= 31) {
+              // Return the time period of the length of division result, subperiods consist of 4 days
+              for (let i = 0; i < durationInDays; i += 4) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(3, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                //Should return a range of time
+              }
+            } else if (durationInDays % 5 === 0 && durationInDays / 5 <= 31) {
+              // Return the time period of the length of division result, subperiods consist of 5 days
+              for (let i = 0; i < durationInDays; i += 5) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(4, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+              }
+              //Should return a range of time
+            } else if (durationInDays % 6 === 0) {
+              // Return the time period of the length of division result, subperiods consist of 6 days
+              for (let i = 0; i < durationInDays; i += 6) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(5, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+              }
+              //Should return a range of time
+            } else if (durationInDays % 7 === 0) {
+              // Return the time period of the length of division result, subperiods consist of 7 days
+              for (let i = 0; i < durationInDays; i += 7) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(6, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+              }
+              //Should return a range of time
+            } else if (durationInDays % 10 === 0) {
+              // Return the time period of the length of division result, subperiods consist of 7 days
+              for (let i = 0; i < durationInDays; i += 10) {
+                const start = startMoment.clone().add(i, 'days');
+                const end = start.clone().add(9, 'days');
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+              }
+            } else {
+              if (durationInDays === 97 || 127 || 137 || 142) {
+                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
+                const adjustedDurationInDays = durationInDays - 2;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 5) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(4, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              } else if(durationInDays === 106 || 121 || 131 || 146 || 151) {
+                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
+                const adjustedDurationInDays = durationInDays - 1;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 5) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(4, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              } else if(durationInDays === 109 || 134 || 139 || 149) {
+                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
+                const adjustedDurationInDays = durationInDays - 4;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 5) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(4, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              } else if(durationInDays === 152 || 158 || 176) {
+                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
+                const adjustedDurationInDays = durationInDays - 2;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 6) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(5, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              } else if (durationInDays === 167 || 173 || 179) {
+                // Subtract 5 days from the end, and push them at the end, divide the 162 by 6 and create the subperiods of 6 days
+                const adjustedDurationInDays = durationInDays - 5;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 6) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(5, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(5, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              } else if (durationInDays === 163 || 169 || 181) {
+                // Subtract 5 days from the end, and push them at the end, divide the 162 by 6 and create the subperiods of 6 days
+                const adjustedDurationInDays = durationInDays - 1;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 6) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(5, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(5, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              }  else if (durationInDays === 166 || 172) {
+                // Subtract 5 days from the end, and push them at the end, divide the 162 by 6 and create the subperiods of 6 days
+                const adjustedDurationInDays = durationInDays - 4;
+            
+                for (let i = 0; i < adjustedDurationInDays; i += 6) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(5, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
+
+                const lastPeriodStart = endMoment.clone().subtract(5, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              } else {
+                const adjustedDurationInDays = durationInDays - 3;
+                
+                if (adjustedDurationInDays % 4 === 0 && adjustedDurationInDays / 4 <= 30) {
+                  // Return the time period of the length of division result, subperiods consist of four days
+                  for (let i = 0; i < adjustedDurationInDays; i += 4) {
+                    const start = startMoment.clone().add(i, 'days');
+                    const end = start.clone().add(3, 'days');
+                    periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  }
+                } else if (adjustedDurationInDays % 5 === 0 && adjustedDurationInDays / 5 <= 30) {
+                  // Return the time period of the length of division result, subperiods consist of five days
+                  for (let i = 0; i < adjustedDurationInDays; i += 5) {
+                    const start = startMoment.clone().add(i, 'days');
+                    const end = start.clone().add(4, 'days');
+                    periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  }
+                } else if (adjustedDurationInDays % 6 === 0) {
+                  // Return the time period of the length of division result, subperiods consist of six days
+                  for (let i = 0; i < adjustedDurationInDays; i += 6) {
+                    const start = startMoment.clone().add(i, 'days');
+                    const end = start.clone().add(5, 'days');
+                    periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  }
+                } else if (adjustedDurationInDays % 7 === 0) {
+                  // Return the time period of the length of division result, subperiods consist of seven days
+                  for (let i = 0; i < adjustedDurationInDays; i += 7) {
+                    const start = startMoment.clone().add(i, 'days');
+                    const end = start.clone().add(6, 'days');
+                    periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  }
+                }
+            
+                // Add the last three days as a single period
+                const lastPeriodStart = endMoment.clone().subtract(2, 'days');
+                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
+              }
+            }
+          } else {
+            if (monthsDuration <= 31) {
+              // Return the time period of the length of division result, number of subperiods equals to the amount of months
+              for (let i = 0; i < monthsDuration; i++) {
+                const start = startMoment.clone().add(i, 'months');
+                periods.push({ dateName: start.format('YYYY-MM') });
+              }
+              //Should return a dateName of a single time (Already correct)
+            } else {
+              if (monthsDuration <= 72) {
+                if (monthsDuration % 2 === 0 && monthsDuration / 2 <= 31) {
+                  // Return the time period of the length of division result, subperiods consist of two months
+                  for (let i = 0; i < monthsDuration; i += 2) {
+                    const start = startMoment.clone().add(i, 'months');
+                    const end = start.clone().add(1, 'months');
+                    periods.push({ dateName: `${start.format('YYYY-MM')} - ${end.format('YYYY-MM')}` });
+                  }
+                  //Should return a range of time
+                } else if (monthsDuration % 3 === 0) {
+                  // Return the time period of the length of division result, subperiods consist of three months
+                  for (let i = 0; i < monthsDuration; i += 3) {
+                    const start = startMoment.clone().add(i, 'months');
+                    const end = start.clone().add(2, 'months');
+                    periods.push({ dateName: `${start.format('YYYY-MM')} - ${end.format('YYYY-MM')}` });
+                  }
+                  //Should return a range of time
+                } else {
+                  // Try to separate the end period, if the results can be divided by 2 or 3 then go through previous algorithms starting at month's division section
+                  for (let i = 0; i < monthsDuration - 1; i += 2) {
+                    const start = startMoment.clone().add(i, 'months');
+                    const end = start.clone().add(1, 'months');
+                    periods.push({ dateName: `${start.format('YYYY-MM')} - ${end.format('YYYY-MM')}` });
+                  }
+                  periods.push({ dateName: endMoment.format('YYYY-MM') });
+                  //Should return a range of time, the last one should be the end month and be a single time
+                }
+              } else {
+                // Return the time period of the length of division result, the number of subperiods equals to the amount of years
+                const yearsDuration = Math.ceil((monthsDuration)/ 12);
+                for (let i = 0; i < yearsDuration; i++) {
+                  const start = startMoment.clone().add(i, 'years');
+                  periods.push({ dateName: start.format('YYYY') });
+                }
+                //Should return a dateName of a single time (Already correct)
+              }
+            }
+          }
+        }
+      }
+    } else {
+      if (durationInHours % 2 === 0 && durationInHours / 2 <= 31) {
+        // Return the time period of the length of division result, subperiods consist of 2 hours
+        for (let i = 0; i < durationInHours; i += 2) {
+          const start = startMoment.clone().add(i, 'hours');
+          const end = start.clone().add(1, 'hours');
+          periods.push({ dateName: `${start.format('YYYY-MM-DD HH:00')} - ${end.format('YYYY-MM-DD HH:00')}` });
+        }
+        //Should return a range of time
+      } else if (durationInHours % 3 === 0 && durationInHours / 3 <= 31) {
+        // Return the time period of the length of division result, subperiods consist of 3 hours
+        for (let i = 0; i < durationInHours; i += 3) {
+          const start = startMoment.clone().add(i, 'hours');
+          const end = start.clone().add(2, 'hours');
+          periods.push({ dateName: `${start.format('YYYY-MM-DD HH:00')} - ${end.format('YYYY-MM-DD HH:00')}` });
+        }
+        //Should return a range of time
+      } else if (durationInHours % 4 === 0) {
+        // Return the time period of the length of division result, subperiods consist of 4 hours
+        for (let i = 0; i < durationInHours; i += 4) {
+          const start = startMoment.clone().add(i, 'hours');
+          const end = start.clone().add(3, 'hours');
+          periods.push({ dateName: `${start.format('YYYY-MM-DD HH:00')} - ${end.format('YYYY-MM-DD HH:00')}` });
+        }
+        //Should return a range of time
+      } else {
+        // Try to separate the end period, if the results can be divided by 2 or 3 then go through previous algorithms starting at division section
+        for (let i = 0; i < durationInHours - 1; i += 2) {
+          const start = startMoment.clone().add(i, 'hours');
+          const end = start.clone().add(1, 'hours');
+          periods.push({ dateName: `${start.format('YYYY-MM-DD HH:00')} - ${end.format('YYYY-MM-DD HH:00')}` });
+        }
+        periods.push({ dateName: endMoment.format('YYYY-MM-DD HH:00') });
+        //Should return a range of time, the last one should be the end hour and be a single time
+      }
+    }
+  } else {
+    // The number of subperiods = 24 
+    for (let hour = 0; hour < 24; hour++) {
+      const start = moment(from).startOf('day').add(hour, 'hours');
+      periods.push({ dateName: start.format('YYYY-MM-DD HH:00') });
+      //Should return a dateName of a single time (Already correct)
+    }
+  }
+
+  return periods;
+}
+
+function determineDateFormat(dateString: string) {
+  if(/^\d{4}-\d{2}-\d{2} \d{2}:00$/.test(dateString)) {
+
+    return 'YYYY-MM-DD HH:00';
+  } else if(/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+
+    return 'YYYY-MM-DD';
+  } else if(/^\d{4}-\d{2}$/.test(dateString)) {
+
+    return 'YYYY-MM';
+  } else if(/^\d{4}$/.test(dateString)) {
+
+    return 'YYYY';
+  }
+}
+
+function groupOrdersByPeriods(orders: Order[], periods: { dateName: string}[]) {
+  const data: { [key: string]: Order[]} = {};
+
+  periods.forEach(period => {
+    const periodKey = period.dateName;
+    data[periodKey] = []; // Initialize period key here
+  });
+
+  orders.forEach(order => {
+    const orderDate = moment(order.data);
+
+    periods.forEach(period => {
+      const periodKey = period.dateName;
+
+      if(periodKey.includes(` - `)) {
+        const [start, end] = periodKey.split(' - ');
+  
+        // console.log("Start:", start);
+  
+        const format = determineDateFormat(start);
+
+        const startDate = moment(start, format);
+        let endDate = moment(end, format);
+
+        if(format === 'YYYY-MM-DD HH:00') {
+          endDate = endDate.endOf('hour');
+        } else if(format === 'YYYY-MM-DD') {
+          endDate = endDate.endOf('day');
+        } else if(format === 'YYYY-MM') {
+          endDate = endDate.endOf('month');
+        } else if(format === 'YYYY') {
+          endDate = endDate.endOf('year');
+        }
+  
+        if(orderDate.isBetween(startDate, endDate, undefined, '[]')) {
+          data[periodKey].push(order)
+        }
+      } else {
+        const format = determineDateFormat(periodKey);
+  
+        // console.log(format);
+
+        const date = moment(periodKey, format);
+
+        // console.log(orderDate, date, orderDate.isSame(date, 'day'));
+        if (
+          (format === 'YYYY-MM-DD HH:00' && orderDate.isSame(date, 'hour')) ||
+          (format === 'YYYY-MM-DD' && orderDate.isSame(date, 'day')) ||
+          (format === 'YYYY-MM' && orderDate.isSame(date, 'month')) ||
+          (format === 'YYYY' && orderDate.isSame(date, 'year'))
+        ) {
+          data[periodKey].push(order);
+        }
+        // console.log(periodKey);
+  
+        // console.log('Format:', format)
+      }
+    });
+  })
+
+  // console.log(data);
+
+  return data;
+}
+
+export async function findAverageOrderValue(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const averageData: { [key: string]: number} = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      if(ordersInPeriod.length > 0) {
+        const totalValue = ordersInPeriod.reduce((sum, order) => sum + order.value, 0);
+
+        const averageValue = totalValue !== 0 ? totalValue / ordersInPeriod.length : 0;
+
+        averageData[period] = averageValue;
+      } else {
+        averageData[period] = 0;
+      }
+    }
+
+    console.log(averageData);
+    return averageData;
+  } catch (error: any) {
+    throw new Error(`Error finding average order value: ${error.message}`)
+  }
+}
+
+export async function findTotalOrders(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const totalOrders: { [key: string]: number} = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      totalOrders[period] = ordersInPeriod.length;
+    }
+
+    console.log(totalOrders);
+
+    return totalOrders;
+  } catch (error: any) {
+    throw new Error(`Error finding total orders: ${error.message}`)
+  }
+}
+
+export async function findTotalRevenue(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const totalRevenue: { [key: string]: number} = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      if(ordersInPeriod.length > 0) {
+        const totalValue = ordersInPeriod.reduce((sum, order) => sum + order.value, 0);
+
+        totalRevenue[period] = totalValue;
+      } else {
+        totalRevenue[period] = 0;
+      }
+    }
+
+    console.log(totalRevenue);
+
+    return totalRevenue;
+  } catch (error: any) {
+    throw new Error(`Error finding total revenue: ${error.message}`)
+  }
+}
+
+export async function findTopSellingProduct(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const topSellingProduct: { [key: string]: { product: string, amount: number } } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      if(ordersInPeriod.length > 0) {
+        const productSales: { [key: string ]: number } = {};
+
+        ordersInPeriod.forEach(order => {
+          order.products.forEach(product => {
+            if(!productSales[product.product]) {
+              productSales[product.product] = 0;
+            }
+
+            productSales[product.product] += product.amount;
+          })
+        })
+
+        let topProduct = '';
+        let maxAmount = 0;
+
+        for(const product in productSales) {
+          if(productSales[product] > maxAmount) {
+            topProduct = product;
+            maxAmount = productSales[product];
+          }
+        }
+
+        topSellingProduct[period] = { product: topProduct, amount: maxAmount };
+      } else {
+        topSellingProduct[period] = { product: '', amount: 0 };
+      }
+    }
+
+    console.log(topSellingProduct);
+
+    return topSellingProduct;
+  } catch (error: any) {
+    throw new Error(`Error finding top-selling product: ${error.message}`)
+  }
+}
+
+export async function findLeastSellingProduct(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const leastSellingProducts: { [key: string]: { product: string, amount: number } } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      if(ordersInPeriod.length > 0) {
+        const productSales: { [key: string ]: number } = {};
+
+        ordersInPeriod.forEach(order => {
+          order.products.forEach(product => {
+            if(!productSales[product.product]) {
+              productSales[product.product] = 0;
+            }
+
+            productSales[product.product] += product.amount;
+          })
+        })
+
+        let topProduct = '';
+        let minAmount = Infinity;
+
+        for(const product in productSales) {
+          if(productSales[product] < minAmount) {
+            topProduct = product;
+            minAmount = productSales[product];
+          }
+        }
+
+        leastSellingProducts[period] = { product: topProduct, amount: minAmount };
+      } else {
+        leastSellingProducts[period] = { product: '', amount: Infinity};
+      }
+    }
+
+    console.log(leastSellingProducts);
+
+    return leastSellingProducts;
+  } catch (error: any) {
+    throw new Error(`Error finding least selling product: ${error.message}`)
+  }
+}
+
+export async function findSalesByCategory(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const salesByCategory: { [key: string]: { category: string, sales: number }[] } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      if(ordersInPeriod.length > 0) {
+        const categorySales: { [category: string]: number } = {};
+
+        ordersInPeriod.forEach(order => {
+          order.products.forEach(product => {
+            
+          })
+        })
+      } else {
+      }
+    }
+
+    console.log(salesByCategory);
+
+    return salesByCategory;
+  } catch (error: any) {
+    throw new Error(`Error finding sales by category: ${error.message}`)
+  }
+}
+
