@@ -1,0 +1,16 @@
+{
+	"Export Async Function": {
+	  "prefix": "eaf",
+	  "body": [
+		"export async function ${1:functionName}() {",
+		"  try {",
+		"    ",
+		"  } catch (error: any) {",
+		"    throw new Error(`${error.message}`)",
+		"  }",
+		"}"
+	  ],
+	  "description": "Create an export async function with try-catch block"
+	}
+  }
+  

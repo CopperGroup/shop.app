@@ -24,10 +24,19 @@ const userSchema = new mongoose.Schema({
     },
     orders: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Order'
+            order: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Order'
+            },
+            createdAt: {
+                type: Date,
+            }
         }
     ],
+    totalOrders: {
+        type: Number,
+        default: 0
+    },
     favourite: [
         {
             type: mongoose.Schema.Types.ObjectId,

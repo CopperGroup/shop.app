@@ -44,12 +44,13 @@ interface Product {
 }
 
 interface Order {
+  _id: string;
   id: string,
   products: {
       product: string,
       amount: number
-  } [],
-  userId: string;
+  } [];
+  user: string;
   value: number;
   name: string;
   surname: string;
@@ -117,13 +118,18 @@ export async function createOrder({ products, userId, value, name, surname, phon
 
         const user = await User.findById(userId);
 
-        await user.orders.push(createdOrder._id);
-
         await User.findById(userId).updateOne({
           name: name,
           surname: surname,
-          phoneNumber: phoneNumber
+          phoneNumber: phoneNumber,
         })
+
+        user.orders.push({
+          order: createdOrder._id,
+          createdAt: Date.now()
+        })
+
+        user.totalOrders += 1;
 
         await user.save();
 
@@ -134,6 +140,7 @@ export async function createOrder({ products, userId, value, name, surname, phon
 
             await orderedProduct.save();
         }
+
     } catch (error: any) {
         throw new Error(`Error creating order: ${error.message}`)
     }
@@ -942,15 +949,117 @@ export async function getDashboardData() {
     }
 }
 
+function adjustToDivisionBy5(duration: number) {
+  const lastDigit = duration % 10;
+
+  let daysToSubtract = 0;
+
+  switch (lastDigit) {
+    case 0: 
+    daysToSubtract = 0;
+    break;
+
+    case 1: 
+    daysToSubtract = 1;
+    break;
+
+    case 2: 
+    daysToSubtract = 2;
+    break;
+
+    case 3: 
+    daysToSubtract = 3;
+    break;
+
+    case 4: 
+    daysToSubtract = 4;
+    break;
+
+    case 5: 
+    daysToSubtract = 0;
+    break;
+
+    case 6: 
+    daysToSubtract = 1;
+    break;
+
+    case 7: 
+    daysToSubtract = 2;
+    break;
+
+    case 8: 
+    daysToSubtract = 3;
+    break;
+
+    case 9: 
+    daysToSubtract = 4;
+    break;
+
+    default: 
+      daysToSubtract = 0;
+  }
+
+  console.log(daysToSubtract);
+  return daysToSubtract;
+}
+
+function adjustToDivisionBy6(duration: number) {
+  let daysToSubtract = 0;
+  let nearestPrevious = 0;
+
+  const divisibleBy6Numbers = [150, 156, 162, 168, 174, 180];
+
+  for(let i = 0; i < divisibleBy6Numbers.length; i++) {
+    if(divisibleBy6Numbers[i] < duration) {
+      nearestPrevious = divisibleBy6Numbers[i];
+    } else {
+      break
+    }
+  }
+
+  if (nearestPrevious === 0) {
+    return 0;
+  }
+
+  console.log("Nearest previous:", nearestPrevious);
+  
+  return duration - nearestPrevious;
+}
+
+function adjustToDivisionBy3(duration: number) {
+  let daysToSubtract = 0;
+  let nearestPrevious = 0;
+
+  const divisibleBy6Numbers = [63, 66, 69, 72, 75, 78, 81, 84, 87];
+
+  for(let i = 0; i < divisibleBy6Numbers.length; i++) {
+    if(divisibleBy6Numbers[i] < duration) {
+      nearestPrevious = divisibleBy6Numbers[i];
+    } else {
+      break
+    }
+  }
+
+  if (nearestPrevious === 0) {
+    return 0;
+  }
+
+  console.log("Nearest previous:", nearestPrevious);
+  
+  return duration - nearestPrevious;
+}
+
 function calculatePeriods(from: Date | undefined, to: Date | undefined) {
   if (!from) return [];
 
   const periods: { dateName: string }[] = [];
 
   if (to) {
+    console.log(from, to);
     const startMoment = moment(from);
     const endMoment = moment(to);
-
+    console.log(startMoment, endMoment);
+    
     const startYear = startMoment.year();
     const startMonth = startMoment.month();
     const endYear = endMoment.year();
@@ -992,26 +1101,49 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
             }
             //Should return a range of time
           } else {
-            const adjustedDurationInDays = durationInDays - 1;
-          
-            if (adjustedDurationInDays % 2 === 0 && adjustedDurationInDays / 2 <= 30) {
-              // Return the time period of the length of division result, subperiods consist of two days
-              for (let i = 0; i < adjustedDurationInDays; i += 2) {
-                const start = startMoment.clone().add(i, 'days');
-                const end = start.clone().add(1, 'days');
-                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
-              }
-            } else {
-              // Return the time period of the length of division result, subperiods consist of three days
-              for (let i = 0; i < adjustedDurationInDays; i += 3) {
+
+            if(durationInDays >= 63 && durationInDays <= 89) {
+              const daysToSubtract = adjustToDivisionBy3(durationInDays);
+
+              const adjustedDurationInDays = durationInDays - daysToSubtract;
+
+              for(let i = 0; i < adjustedDurationInDays; i += 3) {
                 const start = startMoment.clone().add(i, 'days');
                 const end = start.clone().add(2, 'days');
-                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format(`YYYY-MM-DD`)}`});
+              }
+
+              const lastPeriodStart = endMoment.clone().subtract(daysToSubtract - 1, 'days');
+
+              if(daysToSubtract === 1) {
+                periods.push({ dateName: `${lastPeriodStart.format(`YYYY-MM-DD`)}` })
+              } else {
+                periods.push({ dateName: `${lastPeriodStart.format(`YYYY-MM-DD`)} - ${endMoment.format('YYYY-MM-DD')}` });
+              }
+            } else {
+              const adjustedDurationInDays = durationInDays - 1;
+            
+              if (adjustedDurationInDays % 2 === 0 && adjustedDurationInDays / 2 <= 30) {
+                // Return the time period of the length of division result, subperiods consist of two days
+                for (let i = 0; i < adjustedDurationInDays; i += 2) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(1, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  
+                }
+                
+                periods.push({ dateName: endMoment.format('YYYY-MM-DD') });          
+              } else {
+                // Return the time period of the length of division result, subperiods consist of three days
+                for (let i = 0; i < adjustedDurationInDays; i += 3) {
+                  const start = startMoment.clone().add(i, 'days');
+                  const end = start.clone().add(2, 'days');
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                }
               }
             }
           
             // Add the last day as a single period
-            periods.push({ dateName: endMoment.format('YYYY-MM-DD') });          
           }
         } else {
           if (durationInDays <= 182) {
@@ -1055,91 +1187,47 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
                 periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
               }
             } else {
-              if (durationInDays === 97 || 127 || 137 || 142) {
-                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
-                const adjustedDurationInDays = durationInDays - 2;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 5) {
+              console.log("Else");
+
+              if(durationInDays <= 154) {
+                const daysToSubtract = adjustToDivisionBy5(durationInDays);
+
+                const adjustedDurationInDays = durationInDays - daysToSubtract;
+
+                for(let i = 0; i < adjustedDurationInDays; i += 5) {
                   const start = startMoment.clone().add(i, 'days');
                   const end = start.clone().add(4, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format(`YYYY-MM-DD`)}`});
                 }
 
-                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
-              } else if(durationInDays === 106 || 121 || 131 || 146 || 151) {
-                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
-                const adjustedDurationInDays = durationInDays - 1;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 5) {
-                  const start = startMoment.clone().add(i, 'days');
-                  const end = start.clone().add(4, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
-                }
+                const lastPeriodStart = endMoment.clone().subtract(daysToSubtract - 1, 'days');
 
-                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
-              } else if(durationInDays === 109 || 134 || 139 || 149) {
-                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
-                const adjustedDurationInDays = durationInDays - 4;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 5) {
-                  const start = startMoment.clone().add(i, 'days');
-                  const end = start.clone().add(4, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                if(daysToSubtract === 1) {
+                  periods.push({ dateName: `${lastPeriodStart.format(`YYYY-MM-DD`)}` })
+                } else {
+                  periods.push({ dateName: `${lastPeriodStart.format(`YYYY-MM-DD`)} - ${endMoment.format('YYYY-MM-DD')}` });
                 }
+              } else if(durationInDays > 155) {
+                const daysToSubtract = adjustToDivisionBy6(durationInDays);
 
-                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
-              } else if(durationInDays === 152 || 158 || 176) {
-                // Subtract 2 days from the end, and push them at the end, divide the 140 by 5 and create the subperiods of 5 days
-                const adjustedDurationInDays = durationInDays - 2;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 6) {
+                
+                const adjustedDurationInDays = durationInDays - daysToSubtract;
+
+                for(let i = 0; i < adjustedDurationInDays; i += 6) {
                   const start = startMoment.clone().add(i, 'days');
                   const end = start.clone().add(5, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format(`YYYY-MM-DD`)}`});
                 }
 
-                const lastPeriodStart = endMoment.clone().subtract(1, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
-              } else if (durationInDays === 167 || 173 || 179) {
-                // Subtract 5 days from the end, and push them at the end, divide the 162 by 6 and create the subperiods of 6 days
-                const adjustedDurationInDays = durationInDays - 5;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 6) {
-                  const start = startMoment.clone().add(i, 'days');
-                  const end = start.clone().add(5, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
-                }
+                const lastPeriodStart = endMoment.clone().subtract(daysToSubtract - 1, 'days');
 
-                const lastPeriodStart = endMoment.clone().subtract(5, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
-              } else if (durationInDays === 163 || 169 || 181) {
-                // Subtract 5 days from the end, and push them at the end, divide the 162 by 6 and create the subperiods of 6 days
-                const adjustedDurationInDays = durationInDays - 1;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 6) {
-                  const start = startMoment.clone().add(i, 'days');
-                  const end = start.clone().add(5, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
+                if(daysToSubtract === 1) {
+                  periods.push({ dateName: `${lastPeriodStart.format(`YYYY-MM-DD`)}` })
+                } else {
+                  periods.push({ dateName: `${lastPeriodStart.format(`YYYY-MM-DD`)} - ${endMoment.format('YYYY-MM-DD')}` });
                 }
-
-                const lastPeriodStart = endMoment.clone().subtract(5, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
-              }  else if (durationInDays === 166 || 172) {
-                // Subtract 5 days from the end, and push them at the end, divide the 162 by 6 and create the subperiods of 6 days
-                const adjustedDurationInDays = durationInDays - 4;
-            
-                for (let i = 0; i < adjustedDurationInDays; i += 6) {
-                  const start = startMoment.clone().add(i, 'days');
-                  const end = start.clone().add(5, 'days');
-                  periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
-                }
-
-                const lastPeriodStart = endMoment.clone().subtract(5, 'days');
-                periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
               } else {
+                console.log("Else 2");
                 const adjustedDurationInDays = durationInDays - 3;
                 
                 if (adjustedDurationInDays % 4 === 0 && adjustedDurationInDays / 4 <= 30) {
@@ -1149,6 +1237,7 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
                     const end = start.clone().add(3, 'days');
                     periods.push({ dateName: `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}` });
                   }
+                  
                 } else if (adjustedDurationInDays % 5 === 0 && adjustedDurationInDays / 5 <= 30) {
                   // Return the time period of the length of division result, subperiods consist of five days
                   for (let i = 0; i < adjustedDurationInDays; i += 5) {
@@ -1173,7 +1262,7 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
                 }
             
                 // Add the last three days as a single period
-                const lastPeriodStart = endMoment.clone().subtract(2, 'days');
+                const lastPeriodStart = endMoment.clone().subtract(3, 'days');
                 periods.push({ dateName: `${lastPeriodStart.format('YYYY-MM-DD')} - ${endMoment.format('YYYY-MM-DD')}` });
               }
             }
@@ -1271,6 +1360,7 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
     }
   }
 
+  console.log(periods.length);
   return periods;
 }
 
@@ -1288,6 +1378,126 @@ function determineDateFormat(dateString: string) {
 
     return 'YYYY';
   }
+}
+
+function reformat(transformedData: { dateName: string, value: any }[]) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+  function getDaySuffix(day: number) {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  }
+
+
+  return transformedData.map((item, index, array) => {
+    const [startDate, endDate] = item.dateName.split(" - ");
+
+    const format = determineDateFormat(startDate);
+
+    if(format === "YYYY-MM-DD"){
+      if (!item.dateName.includes(" - ")) {
+        // Single date
+        const [year, month, day] = item.dateName.split("-");
+        let formattedDate = `${months[parseInt(month) - 1]} ${parseInt(day)}`;
+  
+        if(index === 0 || index === array.length - 1) {
+          formattedDate = `${year} ${formattedDate}`;
+        } 
+  
+        return {
+          dateName: `${formattedDate}`,
+          value: item.value
+        };
+      } else {
+        // Date range
+  
+        const [startYear, startMonth, startDay] = startDate.split("-");
+        const [endYear, endMonth, endDay] = endDate.split("-");
+  
+        let formattedStartDate = `${months[parseInt(startMonth) - 1]} ${parseInt(startDay)}`;
+        let formattedEndDate = `${months[parseInt(endMonth) - 1]} ${parseInt(endDay)}`;
+  
+        if (index === 0) {
+          formattedStartDate = `${startYear} ${formattedStartDate}`;
+        }
+  
+        if (index === array.length - 1) {
+          formattedEndDate = `${endYear} ${formattedEndDate}`;
+        }
+  
+        return {
+          dateName: `${formattedStartDate} - ${formattedEndDate}`,
+          value: item.value
+        };
+      }
+    } else if(format === "YYYY-MM-DD HH:00") {
+      if (!item.dateName.includes(" - ")) {
+        // Single date
+        const [date, time] = item.dateName.split(" ");
+        const [year, month, day] = date.split("-").map(Number);
+
+        const dateObject = new Date(year, month - 1, day);
+        const dayOfWeek = daysOfWeek[dateObject.getDay()];
+        const dayWithSuffix = `${day}${getDaySuffix(day)}`; 
+  
+        return {
+          dateName: `${time}`,
+          value: item.value
+        };
+      } else {
+        const [startDateDay, startTime] = startDate.split(" ");
+        const [startYear, startMonth, startDay] = startDateDay.split("-").map(Number);
+
+        const startDateObject = new Date(startYear, startMonth - 1, startDay);
+        const startDayOfWeek = daysOfWeek[startDateObject.getDay()];
+
+        const [endDateDay, endTime] = endDate.split(" ");
+        const [endYear, endMonth, endDay] = endDateDay.split("-").map(Number);
+
+        const endDateObject = new Date(endYear, endMonth - 1, endDay);
+        const endDayOfWeek = daysOfWeek[endDateObject.getDay()];
+
+        return {
+          dateName: `${startDayOfWeek} ${startTime} - ${endTime}`,
+          value: item.value
+        }
+      }
+    } else if(format === "YYYY-MM") {
+      if (!item.dateName.includes(" - ")) {
+        // Single date
+        const [year, month, day] = item.dateName.split("-");
+        let formattedDate = `${year} ${months[parseInt(month) - 1]}`;
+        return {
+          dateName: `${formattedDate}`,
+          value: item.value
+        };
+      } else {
+        // Date range
+  
+        const [startYear, startMonth, startDay] = startDate.split("-");
+        const [endYear, endMonth, endDay] = endDate.split("-");
+  
+        let formattedStartDate = `${startYear} ${months[parseInt(startMonth) - 1]}`;
+        let formattedEndDate = `${endYear} ${months[parseInt(endMonth) - 1]}`;
+  
+        return {
+          dateName: `${formattedStartDate} - ${formattedEndDate}`,
+          value: item.value
+        };
+      }
+    } else {
+      return {
+        dateName: item.dateName,
+        value: item.value
+      }
+    }
+  });
 }
 
 function groupOrdersByPeriods(orders: Order[], periods: { dateName: string}[]) {
@@ -1314,6 +1524,8 @@ function groupOrdersByPeriods(orders: Order[], periods: { dateName: string}[]) {
         const startDate = moment(start, format);
         let endDate = moment(end, format);
 
+        console.log("Start date", startDate);
+
         if(format === 'YYYY-MM-DD HH:00') {
           endDate = endDate.endOf('hour');
         } else if(format === 'YYYY-MM-DD') {
@@ -1334,6 +1546,7 @@ function groupOrdersByPeriods(orders: Order[], periods: { dateName: string}[]) {
 
         const date = moment(periodKey, format);
 
+        console.log("Start date", date);
         // console.log(orderDate, date, orderDate.isSame(date, 'day'));
         if (
           (format === 'YYYY-MM-DD HH:00' && orderDate.isSame(date, 'hour')) ||
@@ -1365,7 +1578,7 @@ export async function findAverageOrderValue(from: Date | undefined, to: Date | u
 
     if(from && to) {
       const startDay = new Date(from);
-      startDay.setDate(startDay.getDate() + 1);
+      // startDay.setDate(startDay.getDate() + 1);
 
       console.log(startDay);
 
@@ -1419,7 +1632,18 @@ export async function findAverageOrderValue(from: Date | undefined, to: Date | u
     }
 
     console.log(averageData);
-    return averageData;
+    const transformedData = Object.entries(averageData).map(([dateName, averageValue]) => ({
+      dateName,
+      value: averageValue
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
   } catch (error: any) {
     throw new Error(`Error finding average order value: ${error.message}`)
   }
@@ -1435,7 +1659,7 @@ export async function findTotalOrders(from: Date | undefined, to: Date | undefin
 
     if(from && to) {
       const startDay = new Date(from);
-      startDay.setDate(startDay.getDate() + 1);
+      // startDay.setDate(startDay.getDate() + 1);
 
       console.log(startDay);
 
@@ -1482,7 +1706,18 @@ export async function findTotalOrders(from: Date | undefined, to: Date | undefin
 
     console.log(totalOrders);
 
-    return totalOrders;
+    const transformedData = Object.entries(totalOrders).map(([dateName, orders]) => ({
+      dateName,
+      value: orders
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
   } catch (error: any) {
     throw new Error(`Error finding total orders: ${error.message}`)
   }
@@ -1498,7 +1733,6 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
 
     if(from && to) {
       const startDay = new Date(from);
-      startDay.setDate(startDay.getDate() + 1);
 
       console.log(startDay);
 
@@ -1551,7 +1785,18 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
 
     console.log(totalRevenue);
 
-    return totalRevenue;
+    const transformedData = Object.entries(totalRevenue).map(([dateName, revenue]) => ({
+      dateName,
+      value: revenue
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
   } catch (error: any) {
     throw new Error(`Error finding total revenue: ${error.message}`)
   }
@@ -1567,7 +1812,7 @@ export async function findTopSellingProduct(from: Date | undefined, to: Date | u
 
     if(from && to) {
       const startDay = new Date(from);
-      startDay.setDate(startDay.getDate() + 1);
+      // startDay.setDate(startDay.getDate() + 1);
 
       console.log(startDay);
 
@@ -1604,7 +1849,9 @@ export async function findTopSellingProduct(from: Date | undefined, to: Date | u
 
     const data = groupOrdersByPeriods(orders, periods);
 
-    const topSellingProduct: { [key: string]: { product: string, amount: number } } = {};
+    const topSellingProduct: { [key: string]: { product: {name: string, image: string, searchParam: string | null}, amount: number } } = {};
+
+    let totalTopSellingProduct: { [key: string]: number } = {};
 
     for(const period in data) {
       const ordersInPeriod = data[period];
@@ -1616,9 +1863,11 @@ export async function findTopSellingProduct(from: Date | undefined, to: Date | u
           order.products.forEach(product => {
             if(!productSales[product.product]) {
               productSales[product.product] = 0;
+              totalTopSellingProduct[product.product] = 0;
             }
 
             productSales[product.product] += product.amount;
+            totalTopSellingProduct[product.product] += product.amount;
           })
         })
 
@@ -1632,15 +1881,49 @@ export async function findTopSellingProduct(from: Date | undefined, to: Date | u
           }
         }
 
-        topSellingProduct[period] = { product: topProduct, amount: maxAmount };
+        const topProductInfo = await Product.findById(topProduct);
+
+
+        topSellingProduct[period] = { product: { name: topProductInfo.name, image: topProductInfo.images[0], searchParam: topProductInfo.params[0].value }, amount: maxAmount };
       } else {
-        topSellingProduct[period] = { product: '', amount: 0 };
+        topSellingProduct[period] = { product: { name: 'No sales', image: "", searchParam: null}, amount: 0 };
       }
+    }
+
+    let totalTopProduct = '';
+    let totalMaxAmount = 0
+
+    for(const product in totalTopSellingProduct) {
+      if(totalTopSellingProduct[product] > totalMaxAmount) {
+        totalTopProduct = product;
+        totalMaxAmount = totalTopSellingProduct[product];
+      }
+    }
+
+    let totalTopSellingProductInfo = {
+      name: "No sales",
+      images: [""],
+      params: [{ value: null }],
+    }
+
+    if(totalTopProduct !== '') {
+      totalTopSellingProductInfo = await Product.findById(totalTopProduct) as any;
     }
 
     console.log(topSellingProduct);
 
-    return topSellingProduct;
+    const transformedData = Object.entries(topSellingProduct).map(([dateName, product]) => ({
+      dateName,
+      value: product
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return { data: reformatedData, topProduct: { name: totalTopSellingProductInfo.name, image: totalTopSellingProductInfo.images[0], searchParam: totalTopSellingProductInfo.params[0].value, amount: totalMaxAmount } };
   } catch (error: any) {
     throw new Error(`Error finding top-selling product: ${error.message}`)
   }
@@ -1656,7 +1939,7 @@ export async function findLeastSellingProduct(from: Date | undefined, to: Date |
 
     if(from && to) {
       const startDay = new Date(from);
-      startDay.setDate(startDay.getDate() + 1);
+      // startDay.setDate(startDay.getDate() + 1);
 
       console.log(startDay);
 
@@ -1695,6 +1978,11 @@ export async function findLeastSellingProduct(from: Date | undefined, to: Date |
 
     const leastSellingProducts: { [key: string]: { product: string, amount: number } } = {};
 
+    const totalProductSales: { [key: string]: number } = {};
+
+    let totalLowProduct = "";
+    let totalMinAmount = Infinity;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
@@ -1705,31 +1993,53 @@ export async function findLeastSellingProduct(from: Date | undefined, to: Date |
           order.products.forEach(product => {
             if(!productSales[product.product]) {
               productSales[product.product] = 0;
+              totalProductSales[product.product] = 0;
             }
 
             productSales[product.product] += product.amount;
+            totalProductSales[product.product] += product.amount;
           })
         })
 
-        let topProduct = '';
+        let lowProduct = '';
         let minAmount = Infinity;
 
         for(const product in productSales) {
           if(productSales[product] < minAmount) {
-            topProduct = product;
+            lowProduct = product;
             minAmount = productSales[product];
           }
         }
 
-        leastSellingProducts[period] = { product: topProduct, amount: minAmount };
+        leastSellingProducts[period] = { product: lowProduct, amount: minAmount };
       } else {
         leastSellingProducts[period] = { product: '', amount: Infinity};
       }
     }
 
+    for(const product in totalProductSales) {
+      if(totalProductSales[product] < totalMinAmount) {
+        totalLowProduct = product;
+        totalMinAmount = totalProductSales[product];
+      }
+    }
+
+    console.log(totalLowProduct);
+
     console.log(leastSellingProducts);
 
-    return leastSellingProducts;
+    const transformedData = Object.entries(leastSellingProducts).map(([dateName, product]) => ({
+      dateName,
+      value: product,
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return {data: reformatedData, totalLowProduct};
   } catch (error: any) {
     throw new Error(`Error finding least selling product: ${error.message}`)
   }
@@ -1745,7 +2055,81 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
 
     if(from && to) {
       const startDay = new Date(from);
-      startDay.setDate(startDay.getDate() + 1);
+      // startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        }
+      }).populate({
+        path: "products.product"
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        }
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const salesByCategory: { [key: string]: { category: string, sales: number }[] } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      if(ordersInPeriod.length > 0) {
+        const categorySales: { [category: string]: number } = {};
+
+        ordersInPeriod.forEach(order => {
+          order.products.forEach(product => {
+            console.log(product)
+          })
+        })
+      } else {
+      }
+    }
+
+    console.log(salesByCategory);
+
+    return salesByCategory;
+  } catch (error: any) {
+    throw new Error(`Error finding sales by category: ${error.message}`)
+  }
+}
+
+export async function findMostPopularRegion(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      // startDay.setDate(startDay.getDate() + 1);
 
       console.log(startDay);
 
@@ -1782,28 +2166,633 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
 
     const data = groupOrdersByPeriods(orders, periods);
 
-    const salesByCategory: { [key: string]: { category: string, sales: number }[] } = {};
+    const postalCodeToRegion: { [key: string]: string } = {
+      '01': 'Kyiv',
+      '02': 'Kyiv Oblast',
+      '04': 'Kyiv',
+      '08': 'Kyiv Oblast',
+      '09': 'Kyiv Oblast',
+      '10': 'Zhytomyr Oblast',
+      '11': 'Zhytomyr Oblast',
+      '12': 'Zhytomyr Oblast',
+      '13': 'Zhytomyr Oblast',
+      '14': 'Chernihiv Oblast',
+      '15': 'Chernihiv Oblast',
+      '16': 'Chernihiv Oblast',
+      '17': 'Chernihiv Oblast',
+      '18': 'Cherkasy Oblast',
+      '19': 'Cherkasy Oblast',
+      '20': 'Cherkasy Oblast',
+      '21': 'Vinnytsia Oblast',
+      '22': 'Vinnytsia Oblast',
+      '23': 'Vinnytsia Oblast',
+      '24': 'Vinnytsia Oblast',
+      '25': 'Kirovohrad Oblast',
+      '26': 'Kirovohrad Oblast',
+      '27': 'Kirovohrad Oblast',
+      '28': 'Kirovohrad Oblast',
+      '29': 'Khmelnytskyi Oblast',
+      '30': 'Khmelnytskyi Oblast',
+      '31': 'Khmelnytskyi Oblast',
+      '32': 'Khmelnytskyi Oblast',
+      '33': 'Rivne Oblast',
+      '34': 'Rivne Oblast',
+      '35': 'Rivne Oblast',
+      '36': 'Poltava Oblast',
+      '37': 'Poltava Oblast',
+      '38': 'Poltava Oblast',
+      '39': 'Poltava Oblast',
+      '40': 'Sumy Oblast',
+      '41': 'Sumy Oblast',
+      '42': 'Sumy Oblast',
+      '43': 'Volyn Oblast',
+      '44': 'Volyn Oblast',
+      '45': 'Volyn Oblast',
+      '46': 'Ternopil Oblast',
+      '47': 'Ternopil Oblast',
+      '48': 'Ternopil Oblast',
+      '49': 'Dnipropetrovsk Oblast',
+      '50': 'Dnipropetrovsk Oblast',
+      '51': 'Dnipropetrovsk Oblast',
+      '52': 'Dnipropetrovsk Oblast',
+      '53': 'Dnipropetrovsk Oblast',
+      '54': 'Mykolaiv Oblast',
+      '55': 'Mykolaiv Oblast',
+      '56': 'Mykolaiv Oblast',
+      '57': 'Mykolaiv Oblast',
+      '58': 'Chernivtsi Oblast',
+      '59': 'Chernivtsi Oblast',
+      '60': 'Chernivtsi Oblast',
+      '61': 'Kharkiv Oblast',
+      '62': 'Kharkiv Oblast',
+      '63': 'Kharkiv Oblast',
+      '64': 'Kharkiv Oblast',
+      '65': 'Odesa Oblast',
+      '66': 'Odesa Oblast',
+      '67': 'Odesa Oblast',
+      '68': 'Odesa Oblast',
+      '69': 'Zaporizhzhia Oblast',
+      '70': 'Zaporizhzhia Oblast',
+      '71': 'Zaporizhzhia Oblast',
+      '72': 'Zaporizhzhia Oblast',
+      '73': 'Kherson Oblast',
+      '74': 'Kherson Oblast',
+      '75': 'Kherson Oblast',
+      '76': 'Ivano-Frankivsk Oblast',
+      '77': 'Ivano-Frankivsk Oblast',
+      '78': 'Ivano-Frankivsk Oblast',
+      '79': 'Lviv Oblast',
+      '80': 'Lviv Oblast',
+      '81': 'Lviv Oblast',
+      '82': 'Lviv Oblast',
+      '83': 'Donetsk Oblast',
+      '84': 'Donetsk Oblast',
+      '85': 'Donetsk Oblast',
+      '86': 'Donetsk Oblast',
+      '87': 'Donetsk Oblast',
+      '88': 'Zakarpattia Oblast',
+      '89': 'Zakarpattia Oblast',
+      '90': 'Zakarpattia Oblast',
+      '91': 'Luhansk Oblast',
+      '92': 'Luhansk Oblast',
+      '93': 'Luhansk Oblast',
+      '94': 'Luhansk Oblast',
+      '95': 'Crimea',
+      '96': 'Crimea',
+      '97': 'Crimea',
+      '98': 'Crimea'
+    };
+
+    const regionOrders: { [key: string]: { region: string, number: number } } = {};
+
+    const totalMostPopularRegion: { [region: string]: number } = {};
 
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       if(ordersInPeriod.length > 0) {
-        const categorySales: { [category: string]: number } = {};
+        const regionSales: { [region: string]: number } = {};
 
         ordersInPeriod.forEach(order => {
-          order.products.forEach(product => {
-            
-          })
+          const postalCode = order.postalCode.substring(0, 2);
+          const region = postalCodeToRegion[postalCode] || "Else";
+
+          if(!regionSales[region]) {
+            regionSales[region] = 0;
+            totalMostPopularRegion[region] = totalMostPopularRegion[region] || 0;
+          }
+
+          regionSales[region] += 1;
+          totalMostPopularRegion[region] += 1
         })
+
+        const mostPopularRegion = Object.keys(regionSales).reduce((current, previous) => regionSales[current] > regionSales[previous] ? current : previous);
+
+        regionOrders[period] = {
+          region: mostPopularRegion,
+          number: regionSales[mostPopularRegion]
+        }
+
       } else {
+        regionOrders[period] = {
+          region: "None",
+          number: 0
+        }
       }
     }
 
-    console.log(salesByCategory);
+    const mostPopularRegionOverall = Object.keys(totalMostPopularRegion).reduce(
+      (current, previous) => totalMostPopularRegion[current] > totalMostPopularRegion[previous] ? current : previous,
+      Object.keys(totalMostPopularRegion)[0] || "None"
+    );
+  
+    console.log(`Most popular region overall: ${mostPopularRegionOverall}`);
 
-    return salesByCategory;
+    console.log(regionOrders);
+
+    const transformedData = Object.entries(regionOrders).map(([dateName, orders]) => ({
+      dateName,
+      value: {
+        region: orders.region,
+        number: orders.number
+      }
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return {data: reformatedData, topRegion: mostPopularRegionOverall};
   } catch (error: any) {
-    throw new Error(`Error finding sales by category: ${error.message}`)
+    throw new Error(`Error finding most popular region: : ${error.message}`)
   }
 }
 
+export async function findSuccessfulOrders(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      // startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        },
+        paymentStatus: "Success",
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        },
+        paymentStatus: "Success"
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const successfulOrders: { [key: string]: number } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      successfulOrders[period] = ordersInPeriod.length;
+    }
+
+    console.log(successfulOrders);
+
+    const transformedData = Object.entries(successfulOrders).map(([dateName, orders]) => ({
+      dateName,
+      value: orders
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
+  } catch (error: any) {
+    throw new Error(`Error finding successful orders: ${error.message}`)
+  }
+}
+
+
+export async function findDeclinedOrders(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      // startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        },
+        paymentStatus: "Declined",
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        },
+        paymentStatus: "Declined"
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const declinedOrders: { [key: string]: number } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      declinedOrders[period] = ordersInPeriod.length;
+    }
+
+    console.log(declinedOrders);
+
+    const transformedData = Object.entries(declinedOrders).map(([dateName, orders]) => ({
+      dateName,
+      value: orders
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
+  } catch (error: any) {
+    throw new Error(`Error finding declined orders: ${error.message}`)
+  }
+}
+
+export async function findFulfilledOrders(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      // startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        },
+        deliveryStatus: "Fulfilled",
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        },
+        deliveryStatus: "Fulfilled"
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const fulfilledOrders: { [key: string]: number } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      fulfilledOrders[period] = ordersInPeriod.length;
+    }
+
+    console.log(fulfilledOrders);
+
+    const transformedData = Object.entries(fulfilledOrders).map(([dateName, orders]) => ({
+      dateName,
+      value: orders
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
+  } catch (error: any) {
+    throw new Error(`Error finding fulfilled orders: ${error.message}`)
+  }
+}
+
+export async function findCanceledOrders(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    
+    let orders = [];
+
+
+    if(from && to) {
+      const startDay = new Date(from);
+      // startDay.setDate(startDay.getDate() + 1);
+
+      console.log(startDay);
+
+      const endDay = new Date(to);
+      endDay.setDate(endDay.getDate() + 1);
+
+      console.log(endDay);
+
+      orders = await Order.find({
+        data: {
+          $gte: startDay,
+          $lte: endDay
+        },
+        deliveryStatus: "Canceled",
+      });
+
+    } else if(from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      orders = await Order.find({
+        data: {
+          $gte: startOfDay,
+          $lt: endOfDay
+        },
+        deliveryStatus: "Canceled"
+      });
+    } else {
+      orders = [];
+    }
+
+    const periods = calculatePeriods(from, to);
+
+    const data = groupOrdersByPeriods(orders, periods);
+
+    const canceledOrders: { [key: string]: number } = {};
+
+    for(const period in data) {
+      const ordersInPeriod = data[period];
+
+      canceledOrders[period] = ordersInPeriod.length;
+    }
+
+    console.log(canceledOrders);
+
+    const transformedData = Object.entries(canceledOrders).map(([dateName, orders]) => ({
+      dateName,
+      value: orders
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
+  } catch (error: any) {
+    throw new Error(`Error finding canceled orders: ${error.message}`)
+  }
+}
+
+export async function findAddedToCart(from: Date | undefined, to: Date | undefined) {
+  try {
+    connectToDB();
+
+    const products = await Product.find();
+
+    const periods = calculatePeriods(from, to);
+
+    const productsAddedToCart: { [key: string]: number } = {};
+
+    periods.forEach(period => {
+      const periodKey = period.dateName;
+      productsAddedToCart[periodKey] = 0;
+    })
+
+    products.forEach(product => {
+      product.addedToCart.forEach((addedTime: Date) => {
+        const addedDate= moment(addedTime);
+
+        periods.forEach(period => {
+          const periodKey = period.dateName;
+
+          if(periodKey.includes(' - ')) {
+            const [start, end] = periodKey.split(' - ');
+            const format = determineDateFormat(start);
+  
+            const startDate = moment(start, format);
+            let endDate = moment(end, format);
+
+            if (format === 'YYYY-MM-DD HH:00') {
+              endDate = endDate.endOf('hour');
+            } else if (format === 'YYYY-MM-DD') {
+              endDate = endDate.endOf('day');
+            } else if (format === 'YYYY-MM') {
+              endDate = endDate.endOf('month');
+            } else if (format === 'YYYY') {
+              endDate = endDate.endOf('year');
+            }
+
+            if(addedDate.isBetween(startDate, endDate, undefined, '[]')) {
+              productsAddedToCart[periodKey] += 1;
+            }
+          } else {
+            const format = determineDateFormat(periodKey);
+  
+    
+            const date = moment(periodKey, format);
+    
+            if (
+              (format === 'YYYY-MM-DD HH:00' && addedDate.isSame(date, 'hour')) ||
+              (format === 'YYYY-MM-DD' && addedDate.isSame(date, 'day')) ||
+              (format === 'YYYY-MM' && addedDate.isSame(date, 'month')) ||
+              (format === 'YYYY' && addedDate.isSame(date, 'year'))
+            ) {
+              productsAddedToCart[periodKey] += 1;
+            }
+          }
+        })
+      })
+    })
+
+    console.log(productsAddedToCart);
+
+    const transformedData = Object.entries(productsAddedToCart).map(([dateName, addedToCart]) => ({
+      dateName,
+      value: addedToCart
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
+  } catch (error: any) {
+    throw new Error(`Error finding products added to cart: ${error.message}`)
+  }
+}
+
+export async function findNewCustomers(from: Date | undefined, to: Date | undefined) {
+  try {
+    await connectToDB();
+
+    let users = [];
+
+    if (from && to) {
+      const startDay = new Date(from);
+      startDay.setHours(0, 0, 0, 0);
+
+      const endDay = new Date(to);
+      endDay.setHours(23, 59, 59, 999);
+
+      users = await User.find({
+        "orders.createdAt": {
+          $gte: startDay
+        },
+      }).populate({
+        path: 'orders.order'
+      });
+
+    } else if (from) {
+      const startOfDay = new Date(from);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(from);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      users = await User.find({
+        "orders.createdAt": {
+          $gte: startOfDay
+        }
+      }).populate({
+        path: 'orders.order'
+      });
+
+    } else {
+      return []; //Return empty object if no date range is provided
+    }
+
+
+    console.log(users);
+
+    let firstOrders: Order[] = [];
+    
+    users.forEach((user) => {
+      if(user.orders.length > 0) {
+        const sortedOrders = user.orders.sort((current: { order: Order, createdAt: Date }, previous: { order: Order, createdAt: Date }) => current.createdAt.getTime() - previous.createdAt.getTime());
+
+        firstOrders.push(sortedOrders[0].order);
+      }
+    })
+    const periods = calculatePeriods(from, to);
+    const data = groupOrdersByPeriods(firstOrders, periods);
+
+    const newCustomerOrders: { [key: string]: number } = {};
+
+    for (const period in data) {
+      const ordersInPeriod = data[period];
+
+      newCustomerOrders[period] = ordersInPeriod.length;
+    }
+
+    console.log("New customers", newCustomerOrders);
+
+    const transformedData = Object.entries(newCustomerOrders).map(([dateName, customer]) => ({
+      dateName,
+      value: customer
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return reformatedData;
+  } catch (error: any) {
+    throw new Error(`Error finding new customers: ${error.message}`);
+  }
+}

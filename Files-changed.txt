@@ -7,3 +7,9 @@
 7. components/statistics/TotalOrders.tsx
 8. components/statistics/TotalRevenue.tsx
 9. components/statistics/TopSellingProduct.tsx
+10. components/statistics/MostPopularRegion.tsx
+11. components/statistics/SuccessfulOrders.tsx
+12. components/statistics/DeclinedOrders.tsx
+13. components/statistics/AddedToCart.tsx
+14. lib/models/user.model.ts
+15. components/statistics/NewCustomers.tsx

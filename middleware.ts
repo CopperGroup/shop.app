@@ -1,5 +1,5 @@
 import { withAuth, NextRequestWithAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+import { NextResponse, userAgent } from "next/server"
 
 export default withAuth(
     // `withAuth` augments your `Request` with the user's token.
@@ -14,7 +14,9 @@ export default withAuth(
             )
          }
 
-        
+         const url = request.nextUrl;
+         const { device } = userAgent(request);
+         console.log("Device", device)
     },
     {
         callbacks: {

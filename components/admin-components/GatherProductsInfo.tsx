@@ -1,7 +1,7 @@
 "use client";
 
-import { columns } from "@/app/(admin)/fetchUrl/columns";
-import { DataTable } from "@/app/(admin)/fetchUrl/data-table";
+import { columns } from "@/app/admin/fetchUrl/columns";
+import { DataTable } from "@/app/admin/fetchUrl/data-table";
 import { useState, useEffect } from 'react';
 import { Skeleton } from "../ui/skeleton";
 import axios from "axios";
