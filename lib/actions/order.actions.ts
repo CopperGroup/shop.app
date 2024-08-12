@@ -31,6 +31,7 @@ interface CreateOrderParams {
 interface Product {
     id: string;
     productId: string; 
+    category: string;
     priceToShow:number; 
     price:number; 
     name:string;
@@ -1617,11 +1618,17 @@ export async function findAverageOrderValue(from: Date | undefined, to: Date | u
 
     const averageData: { [key: string]: number} = {};
 
+    let totalOrders = 0;
+    let totalRevenue = 0;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       if(ordersInPeriod.length > 0) {
         const totalValue = ordersInPeriod.reduce((sum, order) => sum + order.value, 0);
+
+        totalOrders += ordersInPeriod.length;
+        totalRevenue += totalValue;
 
         const averageValue = totalValue !== 0 ? totalValue / ordersInPeriod.length : 0;
 
@@ -1643,7 +1650,9 @@ export async function findAverageOrderValue(from: Date | undefined, to: Date | u
 
     console.log(reformatedData);
 
-    return reformatedData;
+    const averageOverall = totalRevenue !== 0  ? totalRevenue / totalOrders : 0;
+
+    return { data: reformatedData, overall: averageOverall };
   } catch (error: any) {
     throw new Error(`Error finding average order value: ${error.message}`)
   }
@@ -1698,10 +1707,14 @@ export async function findTotalOrders(from: Date | undefined, to: Date | undefin
 
     const totalOrders: { [key: string]: number} = {};
 
+    let ordersOverall = 0;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       totalOrders[period] = ordersInPeriod.length;
+
+      ordersOverall += ordersInPeriod.length;
     }
 
     console.log(totalOrders);
@@ -1717,7 +1730,7 @@ export async function findTotalOrders(from: Date | undefined, to: Date | undefin
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return {data: reformatedData, overall: ordersOverall};
   } catch (error: any) {
     throw new Error(`Error finding total orders: ${error.message}`)
   }
@@ -1771,6 +1784,8 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
 
     const totalRevenue: { [key: string]: number} = {};
 
+    let revenueOverall = 0;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
@@ -1778,6 +1793,7 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
         const totalValue = ordersInPeriod.reduce((sum, order) => sum + order.value, 0);
 
         totalRevenue[period] = totalValue;
+        revenueOverall += totalValue;
       } else {
         totalRevenue[period] = 0;
       }
@@ -1796,7 +1812,7 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return {data: reformatedData, overall: revenueOverall};
   } catch (error: any) {
     throw new Error(`Error finding total revenue: ${error.message}`)
   }
@@ -2050,7 +2066,7 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
     connectToDB();
 
     
-    let orders = [];
+    let orders: Order[] = [];
 
 
     if(from && to) {
@@ -2085,6 +2101,8 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
           $gte: startOfDay,
           $lt: endOfDay
         }
+      }).populate({
+        path: "products.product"
       });
     } else {
       orders = [];
@@ -2094,7 +2112,9 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
 
     const data = groupOrdersByPeriods(orders, periods);
 
-    const salesByCategory: { [key: string]: { category: string, sales: number }[] } = {};
+    const salesByCategory: { [key: string]: { category: string, sales: number } } = {};
+
+    const totalMostPopularCategory: { [category: string]: number } = {};
 
     for(const period in data) {
       const ordersInPeriod = data[period];
@@ -2103,17 +2123,53 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
         const categorySales: { [category: string]: number } = {};
 
         ordersInPeriod.forEach(order => {
-          order.products.forEach(product => {
-            console.log(product)
+          order.products.forEach((orderedProduct: { product: any, amount:number }) => {
+            if(!categorySales[orderedProduct.product.category]) {
+              categorySales[orderedProduct.product.category] = 0;
+              totalMostPopularCategory[orderedProduct.product.category] = 0;
+            }
+
+            categorySales[orderedProduct.product.category] = orderedProduct.amount;
+            totalMostPopularCategory[orderedProduct.product.category] = orderedProduct.amount;
           })
+
+          const mostPopularCategory = Object.keys(categorySales).reduce((current, previous) => categorySales[current] > categorySales[previous] ? current : previous);
+
+          salesByCategory[period] = {
+            category: mostPopularCategory,
+            sales: categorySales[mostPopularCategory]
+          }
         })
       } else {
+        salesByCategory[period] = {
+          category: "No sales",
+          sales: 0
+        }
       }
     }
 
+    const mostPopularCategoryOverall = Object.keys(totalMostPopularCategory).reduce(
+      (current, previous) => totalMostPopularCategory[current] > totalMostPopularCategory[previous] ? current : previous,
+      Object.keys(totalMostPopularCategory)[0] || "None"
+    );
+
     console.log(salesByCategory);
 
-    return salesByCategory;
+    const transformedData = Object.entries(salesByCategory).map(([dateName, sales]) => ({
+      dateName,
+      value: {
+        category: sales.category,
+        number: sales.sales
+      }
+    }))
+
+    console.log(transformedData);
+
+    const reformatedData = reformat(transformedData);
+
+    console.log(reformatedData);
+
+    return {data: reformatedData, topCategory: mostPopularCategoryOverall};
   } catch (error: any) {
     throw new Error(`Error finding sales by category: ${error.message}`)
   }
@@ -2381,10 +2437,14 @@ export async function findSuccessfulOrders(from: Date | undefined, to: Date | un
 
     const successfulOrders: { [key: string]: number } = {};
 
+    let successfulOrdersOverall = 0;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       successfulOrders[period] = ordersInPeriod.length;
+
+      successfulOrdersOverall += ordersInPeriod.length;
     }
 
     console.log(successfulOrders);
@@ -2400,7 +2460,7 @@ export async function findSuccessfulOrders(from: Date | undefined, to: Date | un
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return { data: reformatedData, overall: successfulOrdersOverall };
   } catch (error: any) {
     throw new Error(`Error finding successful orders: ${error.message}`)
   }
@@ -2458,10 +2518,13 @@ export async function findDeclinedOrders(from: Date | undefined, to: Date | unde
 
     const declinedOrders: { [key: string]: number } = {};
 
+    let declinedOrdersOverall = 0;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       declinedOrders[period] = ordersInPeriod.length;
+      declinedOrdersOverall += ordersInPeriod.length;
     }
 
     console.log(declinedOrders);
@@ -2477,7 +2540,7 @@ export async function findDeclinedOrders(from: Date | undefined, to: Date | unde
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return { data: reformatedData, overall: declinedOrdersOverall };
   } catch (error: any) {
     throw new Error(`Error finding declined orders: ${error.message}`)
   }
@@ -2534,10 +2597,13 @@ export async function findFulfilledOrders(from: Date | undefined, to: Date | und
 
     const fulfilledOrders: { [key: string]: number } = {};
 
+    let fulfilledOrdersOverall = 0;
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       fulfilledOrders[period] = ordersInPeriod.length;
+      fulfilledOrdersOverall += ordersInPeriod.length;
     }
 
     console.log(fulfilledOrders);
@@ -2553,7 +2619,7 @@ export async function findFulfilledOrders(from: Date | undefined, to: Date | und
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return { data: reformatedData, overall: fulfilledOrdersOverall };
   } catch (error: any) {
     throw new Error(`Error finding fulfilled orders: ${error.message}`)
   }
@@ -2610,10 +2676,15 @@ export async function findCanceledOrders(from: Date | undefined, to: Date | unde
 
     const canceledOrders: { [key: string]: number } = {};
 
+    let canceledOrdersOverall = 0;
+
+
     for(const period in data) {
       const ordersInPeriod = data[period];
 
       canceledOrders[period] = ordersInPeriod.length;
+
+      canceledOrdersOverall += ordersInPeriod.length;
     }
 
     console.log(canceledOrders);
@@ -2629,7 +2700,7 @@ export async function findCanceledOrders(from: Date | undefined, to: Date | unde
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return { data: reformatedData, overall: canceledOrdersOverall };
   } catch (error: any) {
     throw new Error(`Error finding canceled orders: ${error.message}`)
   }
@@ -2644,6 +2715,8 @@ export async function findAddedToCart(from: Date | undefined, to: Date | undefin
     const periods = calculatePeriods(from, to);
 
     const productsAddedToCart: { [key: string]: number } = {};
+
+    let addedToCartOverall = 0;
 
     periods.forEach(period => {
       const periodKey = period.dateName;
@@ -2676,6 +2749,7 @@ export async function findAddedToCart(from: Date | undefined, to: Date | undefin
 
             if(addedDate.isBetween(startDate, endDate, undefined, '[]')) {
               productsAddedToCart[periodKey] += 1;
+              addedToCartOverall += 1;
             }
           } else {
             const format = determineDateFormat(periodKey);
@@ -2690,6 +2764,7 @@ export async function findAddedToCart(from: Date | undefined, to: Date | undefin
               (format === 'YYYY' && addedDate.isSame(date, 'year'))
             ) {
               productsAddedToCart[periodKey] += 1;
+              addedToCartOverall += 1;
             }
           }
         })
@@ -2709,7 +2784,7 @@ export async function findAddedToCart(from: Date | undefined, to: Date | undefin
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return { data: reformatedData, overall: addedToCartOverall };
   } catch (error: any) {
     throw new Error(`Error finding products added to cart: ${error.message}`)
   }
@@ -2752,14 +2827,16 @@ export async function findNewCustomers(from: Date | undefined, to: Date | undefi
       });
 
     } else {
-      return []; //Return empty object if no date range is provided
+      return { data: [], overall: 0 }; //Return empty object if no date range is provided
     }
 
 
     console.log(users);
 
     let firstOrders: Order[] = [];
-    
+
+    let newCustomersOverall = 0;
+
     users.forEach((user) => {
       if(user.orders.length > 0) {
         const sortedOrders = user.orders.sort((current: { order: Order, createdAt: Date }, previous: { order: Order, createdAt: Date }) => current.createdAt.getTime() - previous.createdAt.getTime());
@@ -2776,6 +2853,7 @@ export async function findNewCustomers(from: Date | undefined, to: Date | undefi
       const ordersInPeriod = data[period];
 
       newCustomerOrders[period] = ordersInPeriod.length;
+      newCustomersOverall += ordersInPeriod.length;
     }
 
     console.log("New customers", newCustomerOrders);
@@ -2791,7 +2869,7 @@ export async function findNewCustomers(from: Date | undefined, to: Date | undefi
 
     console.log(reformatedData);
 
-    return reformatedData;
+    return { data: reformatedData, overall: newCustomersOverall };
   } catch (error: any) {
     throw new Error(`Error finding new customers: ${error.message}`);
   }

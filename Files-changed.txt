@@ -13,3 +13,5 @@
 13. components/statistics/AddedToCart.tsx
 14. lib/models/user.model.ts
 15. components/statistics/NewCustomers.tsx
+16. components/statistics/SalesByCategory.tsx
+17. middleware.ts

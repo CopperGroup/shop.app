@@ -16,7 +16,8 @@ import {
 import { ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, Rectangle, XAxis, YAxis } from "recharts"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { findSuccessfulOrders } from "@/lib/actions/order.actions"
+import { findSalesByCategory } from "@/lib/actions/order.actions"
+import Link from "next/link"
 
 const chartConfig = {
   desktop: {
@@ -30,25 +31,25 @@ interface Data {
   value: number,
 }
 
-export function SuccessfulOrders() {
+export function SalesByCategory() {
   const [ data, setData ] = React.useState<Data[]>();
   const [ date, setDate ] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: undefined
   });
   const [ chartType, setChartType ] = React.useState("BarChart");
-  const [ totalSuccessfulOrders, setTotalSuccessfulOrders ] = React.useState(0);
+  const [ topCategory, setTopCategory ] = React.useState("");
   const [ screenWidth, setScreenWidth ] = React.useState(0);
 
 
   React.useEffect(() => {
-    const fetchSuccessfulOrders = async () => {
-      const {data, overall} = await findSuccessfulOrders(date?.from, date?.to);
+    const fetchSalesByCategory = async () => {
+      const {data, topCategory} = await findSalesByCategory(date?.from, date?.to);
 
       setData(data);
-      setTotalSuccessfulOrders(overall);
+      setTopCategory(topCategory);
     }
-    fetchSuccessfulOrders();
+    fetchSalesByCategory();
   }, [date])
   
   React.useEffect(() => {
@@ -56,13 +57,14 @@ export function SuccessfulOrders() {
 
     setScreenWidth(screenWidth);
   }, [screenWidth])
-  
+
   return (
     <section className="w-full h-[25rem] mt-10 max-[1300px]:mt-24">
       <div className="w-full h-full">
         <div className="w-full h-fit flex gap-2 justify-end max-[1300px]:flex-col">
           <div className="w-full h-full">
-            <h3 className="text-heading3-bold font-semibold">Оплачені замовлення <span className="text-green-500 text-heading4-medium">+{totalSuccessfulOrders}</span></h3>
+            <h3 className="text-heading3-bold font-semibold">Найпопулярніша категорія</h3>
+            <Link href={`/catalog?page=1&sort=default&category=${topCategory.replace(/ /g, "_")}`} target="_blank">За весь час: <span className={`${topCategory !== "None" && "text-blue underline"}`}>{topCategory}</span></Link>
           </div>
           <div className="flex gap-1 max-[1300px]:mt-2">
             <div className={cn("grid gap-2 justify-items-end")}>
@@ -139,7 +141,7 @@ export function SuccessfulOrders() {
                     <CustomTooltip timePeriod={data} />
                   }
                 />
-                <Bar dataKey="value" fill="#2563eb" radius={[36, 36, 0, 0]} minPointSize={2}></Bar>
+                <Bar dataKey="value.number" fill="#2563eb" radius={[36, 36, 0, 0]} minPointSize={2}></Bar>
               </BarChart>
             ): (
               <LineChart
@@ -166,7 +168,7 @@ export function SuccessfulOrders() {
                     <CustomTooltip timePeriod={data} />
                   }
                 />
-              <Line type="monotone" dataKey="value" stroke="#2563eb" activeDot={{ r: 4 }} />
+              <Line type="monotone" dataKey="value.number" stroke="#2563eb" activeDot={{ r: 4 }} />
             </LineChart>
             )}
           </ChartContainer>
@@ -182,7 +184,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className={`bg-white/70 rounded-xl shadow-lg p-3`}>
         <p className="text-small-semibold">{label}</p>
-        <p className="text-subtle-medium mt-1">Оплачені замовлення: <span className={`${payload[0].value > 0 && "text-green-500"}`}>{payload[0].value}</span></p>
+        <p className="text-subtle-medium mt-1">Продано з категорії: <span className={`${payload[0].value > 0 && "text-green-500"}`}>+{payload[0].value}</span></p>
+        <p className="text-subtle-medium">Найпопулярніша категорія: {payload[0].payload.value.category}</p>
       </div>
     );
   }

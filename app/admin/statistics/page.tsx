@@ -6,6 +6,7 @@ import { FulfilledOrders } from "@/components/admin-components/statistics/Fulfil
 import { LeastSellingProduct } from "@/components/admin-components/statistics/LeastSellingProduct";
 import { MostPopularRegion } from "@/components/admin-components/statistics/MostPopuarRegion";
 import { NewCustomers } from "@/components/admin-components/statistics/NewCustomers";
+import { SalesByCategory } from "@/components/admin-components/statistics/SalesByCategory";
 import { SuccessfulOrders } from "@/components/admin-components/statistics/SuccessfulOrders";
 import { TopSellingProduct } from "@/components/admin-components/statistics/TopSellingProduct";
 import { TotalOrders } from "@/components/admin-components/statistics/TotalOrders";
@@ -24,8 +25,9 @@ const Page = () => {
           <CanceledOrders/>
           <SuccessfulOrders/>
           <DeclinedOrders/>
-          <TopSellingProduct/>
           <MostPopularRegion/>
+          <SalesByCategory/>
+          <TopSellingProduct/>
           {/* <LeastSellingProduct/> */}
           <div className="w-full h-1 pb-16"></div>
     </section>

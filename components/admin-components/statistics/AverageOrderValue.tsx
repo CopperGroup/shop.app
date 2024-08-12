@@ -31,79 +31,89 @@ interface Data {
 }
 
 export function AverageOrderValue() {
-  const [ data, setData ] = React.useState<Data[]>()
+  const [ data, setData ] = React.useState<Data[]>();
   const [ date, setDate ] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: undefined
-  })
-  const [ chartType, setChartType ] = React.useState("BarChart")
+  });
+  const [ chartType, setChartType ] = React.useState("BarChart");
+  const [ totalAverage, setTotalAverage ] = React.useState(0);
+  const [ screenWidth, setScreenWidth ] = React.useState(0);
 
 
   React.useEffect(() => {
     const fetchAverageOrderValue = async () => {
-      const receivedData = await findAverageOrderValue(date?.from, date?.to);
+      const {data, overall} = await findAverageOrderValue(date?.from, date?.to);
 
-      setData(receivedData);
+      setData(data);
+      setTotalAverage(overall);
     }
     fetchAverageOrderValue();
-  }, [date])
-  
+  }, [date]) 
+
+  React.useEffect(() => {
+    const screenWidth = window.screen.width;
+
+    setScreenWidth(screenWidth);
+  }, [screenWidth])
 
   return (
-    <section className="w-full h-[25rem] mt-16">
+    <section className="w-full h-[25rem] mt-16 max-[1300px]:mt-24">
       <div className="w-full h-full">
-        <div className="w-full h-fit flex gap-2 justify-end">
+        <div className="w-full h-fit flex gap-2 justify-end max-[1300px]:flex-col">
           <div className="w-full h-full">
-            <h3 className="text-heading3-bold font-semibold">Середня вартість замовлення</h3>
+            <h3 className="text-heading3-bold font-semibold">Середня вартість замовлення <span className="text-green-500 text-heading4-medium">{totalAverage.toFixed(2)}₴</span></h3>
           </div>
-          <div className={cn("grid gap-2 justify-items-end")}>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date"
-                  variant={"outline"}
-                  className={cn(
-                    "w-[300px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date?.from ? (
-                    date.to ? (
-                      <>
-                        {format(date.from, "LLL dd, y")} -{" "}
-                        {format(date.to, "LLL dd, y")}
-                      </>
+          <div className="flex gap-1 max-[1300px]:mt-2">
+            <div className={cn("grid gap-2 justify-items-end")}>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "w-[300px] justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )
                     ) : (
-                      format(date.from, "LLL dd, y")
-                    )
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 rounded-lg">
-                <Calendar
-                  className="bg-white shadow-lg rounded-lg"
-                  initialFocus
-                  mode="range"
-                  defaultMonth={date?.from}
-                  selected={date}
-                  onSelect={setDate}
-                  numberOfMonths={2}
-                />
-              </PopoverContent>
-            </Popover>
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 rounded-lg" align={screenWidth <= 1300 ? "start" : 'center'}>
+                  <Calendar
+                    className="bg-white shadow-lg rounded-lg"
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <Select defaultValue={"BarChart"} onValueChange={(value) => setChartType(value)}>
+              <SelectTrigger className="w-72 h-full">
+                <SelectValue className="cursor-poiner flex gap-2"/>
+              </SelectTrigger>
+              <SelectContent className="cursor-poiner">
+                <SelectItem value="BarChart" className="w-full cursor-poiner">Стовбці</SelectItem>
+                <SelectItem value="LineChart" className="cursor-poiner">Графік</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select defaultValue={"BarChart"} onValueChange={(value) => setChartType(value)}>
-            <SelectTrigger className="w-72 h-full max-[1100px]:w-full">
-              <SelectValue className="cursor-poiner flex gap-2"/>
-            </SelectTrigger>
-            <SelectContent className="cursor-poiner">
-              <SelectItem value="BarChart" className="w-full cursor-poiner">Стовбці</SelectItem>
-              <SelectItem value="LineChart" className="cursor-poiner">Графік</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
         <div className="w-full h-[90%] overflow-visible mt-3">
           <ChartContainer config={chartConfig} className="w-full h-full text-subtle-medium overflow-visible pt-1">
