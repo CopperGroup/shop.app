@@ -2,16 +2,17 @@
 
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
-export default function GoogleSignIn() {
+export default function GoogleSignIn({ className, label }: { className: string | undefined, label: string }) {
   return (
     <button
       onClick={() => signIn("google")}
-      className="flex items-center gap-4 border border-gray-300 rounded-lg pl-3"
+      className={cn("w-full flex justify-center items-center gap-4 text-dark-4 border border-dark-4 shadow-dark-4 shadow-extrasmall rounded-lg pl-3 px-1", className)}
     >
-      <Image src="/google-logo.png" height={30} width={30} alt={""} />
-      <span className="bg-blue-500 text-black px-4 py-3">
-        Sign in with Google
+      <Image src="/google-logo.png" height={24} width={24} alt={"Google logo"} />
+      <span className="font-[575] py-3">
+        {label}
       </span>
     </button>
   );

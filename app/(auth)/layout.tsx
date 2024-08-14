@@ -20,8 +20,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <Provider>
            
-          <section className = "main-container">
-            <div className = "w-full max-w-screen-2xl px-3">
+          <section>
+            <div className="w-full">
                 {children}
             </div>
           </section>

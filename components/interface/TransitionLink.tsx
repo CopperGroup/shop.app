@@ -9,12 +9,14 @@ interface Props extends LinkProps {
     children: ReactNode;
     href: string;
     className?: string;
+    type?: string | "right" | "left"
 }
 
 export const TransitionLink = ({
     children,
     href,
     className,
+    type,
     ...props
 }: Props) => {
     const router = useRouter();
@@ -22,9 +24,17 @@ export const TransitionLink = ({
     const handleTransition = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         e.preventDefault();
 
+        let transition = "page-transition";
+
+        if(type === "right") {
+            transition = "page-transition-right";
+        } else if(type === "left") {
+            transition = "page-transition-left"
+        }
+        
         const body = document.querySelector("body");
 
-        body?.classList.add("page-transition");
+        body?.classList.add(transition);
 
         await sleep(500);
 
@@ -32,7 +42,7 @@ export const TransitionLink = ({
 
         await sleep(500);
 
-        body?.classList.remove("page-transition");
+        body?.classList.remove(transition);
     }
     return (
         <Link onClick={(e) => handleTransition(e)} href={href} className={className ? className : ""}{...props}>{children}</Link>

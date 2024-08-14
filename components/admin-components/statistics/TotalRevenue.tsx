@@ -38,7 +38,7 @@ export function TotalRevenue() {
   });
   const [ chartType, setChartType ] = React.useState("BarChart");
   const [ totalRevenue, setTotalRevenue ] = React.useState(0);
-  const [ screenWidth, setScreenWidth ] = React.useState(0)
+  const [ screenWidth, setScreenWidth ] = React.useState(0);
 
 
   React.useEffect(() => {

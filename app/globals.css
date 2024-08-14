@@ -179,6 +179,26 @@
     transform: translateY(40px);
     filter: blur(12px);
   }
+
+  .page-transition-right {
+    overflow: hidden;
+    opacity: 0;
+    background: #000000;
+    transform: translateX(-100px);
+    filter: blur(12px);
+  }
+
+  .page-transition-left {
+    overflow: hidden;
+    opacity: 0;
+    background: #000000;
+    transform: translateX(200px);
+    filter: blur(12px);
+  }
+
+  .shadow-extrasmall {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0);
+  }
 }
 
 /* Clerk Responsive fix */
