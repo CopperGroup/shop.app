@@ -67,7 +67,7 @@ export default function SignupPage() {
                  ?
                  <div>
                      <h1 className="text-heading1-semibold text-dark-3 font-[550] mt-5 mb-1">Лист Відправлено!</h1>
-                     <p className="text-gray-700 text-[17px] mt-3">Перевірте вашу електронну адресу на наявність листа! <br/>Не забудьте подивитися у папці "Спам"!</p>
+                     <p className="text-gray-700 text-[17px] mt-3">Перевірте вашу електронну адресу на наявність листа! <br/>Не забудьте подиввитися у папці &quot;Спам&quot;!</p>
                      <Image src='assets/mail.svg' width={100} height={100} alt="" className="mx-auto my-10"></Image>
                  </div>
                  :
@@ -130,7 +130,7 @@ export default function SignupPage() {
                  ?
                  <div>
                      <h1 className="w-full text-heading1-semibold text-center text-slate-200 font-[550] mt-5 mb-1">Лист Відправлено!</h1>
-                     <p className="w-full text-slate-200 text-center mb-8">Перевірте вашу електронну адресу на наявність листа! <br/>Не забудьте подивитися у папці "Спам"!</p>
+                     <p className="w-full text-slate-200 text-center mb-8">Перевірте вашу електронну адресу на наявність листа! <br/>Не забудьте подиввитися у папці &quot;Спам&quot;!</p>
                       <Image src="/assets/mail-white.svg" width={100} height={100} alt="" className="mx-auto my-10"></Image>
                  </div>
                  :
