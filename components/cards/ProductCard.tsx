@@ -28,7 +28,7 @@ interface Props {
 
 const ProductCard = ({ id, productId, email, priceToShow, price, name, imageUrl, description, url, likedBy}: Props) => {
   return (
-    <article className="w-[100%] h-96 border-[1.5px] border-black rounded-2xl flex items-center justify-center  mx-auto" >     
+    <article className="w-[100%] h-96 bg-neutral-100 rounded-2xl flex items-center justify-center  mx-auto" >     
         <div className="w-11/12 h-[90%]">
             <TransitionLink href={`/catalog/${url}`}>
                 <div className="w-full h-56 flex justify-center">

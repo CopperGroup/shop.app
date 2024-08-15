@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useAppContext } from '@/app/(root)/context'
+import Image from 'next/image'
 
 
 const Search = ({searchParams}:any) => {
@@ -41,7 +42,15 @@ const Search = ({searchParams}:any) => {
     
 
   return (<>
-    <div className='w-3/5 flex mr-5 max-md:text-black '><Input type='text' onChange={textFromInput}  placeholder='Пошук товару' /></div>
+    <div className='w-full flex gap-3 mr-5 max-md:text-black'>
+      <Image
+        src="/assets/search.svg"
+        width={24}
+        height={24}
+        alt="Seacrh"
+      />
+      <Input type='text' onChange={textFromInput}  placeholder='Пошук товару' />
+    </div>
     <Select onValueChange={(element)=>setSort(element)} >
               <SelectTrigger className="w-[240px]">
                 <SelectValue placeholder="Звичайне" />

@@ -181,8 +181,8 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
   return (
     <>
     <Button onClick={(e)=>toggleOverflow(e)} className="fixed duration-300 left-0 top-36 rounded-none rounded-r md:hidden transition-all"><i className="fa fa-filter pointer-events-none"></i></Button>
-    <div ref={divRef} className='transition-all duration-300 w-[300px] border-r-2 border-gray-700 max-md:w-[270px]  max-md:fixed max-md:bg-white  max-md:flex max-md:flex-col justify-center z-50 items-center max-md:overflow-y-scroll overflow-x-hidden max-md:h-full  max-md:translate-x-[-100%] top-0  left-0 ' >
-      <div className='h-full max-md:w-[300px] max-md:pl-10 pt-10 '>
+    <div ref={divRef} className='transition-all duration-300 w-[25%] border-[1.5px] shadow-small pl-7 rounded-3xl max-md:w-[270px]  max-md:fixed max-md:bg-white  max-md:flex max-md:flex-col justify-center z-50 items-center max-md:overflow-y-scroll overflow-x-hidden max-md:h-full  max-md:translate-x-[-100%] top-0  left-0 ' >
+      <div className='h-full max-md:w-[300px] max-md:pl-10 py-10'>
             <h2 className='text-[28px]'>{category?category.replace(/_/g, ' '):'Фільтр'}</h2>
             <div className='mt-4 max-md:w-[90%]'>
                 <h3 className='text-[23px]'>Ціна</h3>
@@ -194,8 +194,8 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   step={1}
                   className={cn("w-[80%] mt-4")}/>
                   <div className='flex justify-between mt-4 w-[80%]'>
-                    <div className='w-20 h-8 border flex items-center justify-center'>{filter.price[0]}</div>
-                    <div className='w-20 h-8 border flex items-center justify-center'>{filter.price[1]}</div>
+                    <input className='w-20 h-8 text-center border flex items-center justify-center' onChange={(e) => setFilter({...filter, price: [e.target.value !== "" ? parseFloat(e.target.value) : 0, maxPrice]})} value={filter.price[0]}/>
+                    <input className='w-20 h-8 text-center border flex items-center justify-center' onChange={(e) => setFilter({...filter, price: [minPrice, e.target.value !== "" ? parseFloat(e.target.value): 0]})} value={filter.price[1]}/>
                   </div>
             </div>
             

@@ -24,8 +24,8 @@ const StickyCart = () => {
 
   return (
     <>
-    <div className="fixed bottom-8 right-8 z-40 max-sm:bottom-4 max-sm:right-4">
-        <Button onClick={showCart} className="bg-white rounded-full shadow-xl h-16 w-16 flex items-center justify-center border-2 border-white hover:bg-white hover:border-black max-sm:h-14 max-sm:w-14">
+    <div className="fixed bottom-8 right-8 z-[100] max-sm:bottom-4 max-sm:right-4">
+        <Button onClick={showCart} className="size-16 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-white hover:bg-white hover:border-black hover:size-[4.2rem] transition-all max-sm:size-14">
             <div className="bg-black rounded-full absolute top-[-5px] right-2 w-6">{cartData.length>0?cartData.length:''}</div>
             <Image src="/assets/cart.svg" width={32} height={32} alt="cart-icon" className="drop-shadow-text-blue"/>
         </Button>

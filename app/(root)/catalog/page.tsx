@@ -13,6 +13,7 @@ import Loading from '@/components/loadings/Loading'
 import { fetchAllProducts } from '@/lib/actions/product.actions'
 import Link from 'next/link'
 import { getSession } from '@/lib/getServerSession'
+import BannerSmall from '@/components/banner/BannerSmall'
 
 
   
@@ -157,16 +158,17 @@ const catalog = async ({searchParams,data}:any) => {
  
 
   return (
-    <section className='flex'>
-        
+    <section className="-mt-12">
+      <BannerSmall/>
+      <div className="flex mt-12">
         <Filter categories={category} category={searchParams.category} minPrice={minPrice} maxPrice={maxPrice} maxMin={maxMinRes} vendors={vendors} series={series} color={color} Type={Type}/>
         <div className='w-full'>
-          <div className='flex w-4/5 max-md:w-full ml-auto justify-between'>
+          <div className='w-full flex justify-center items-center px-6 ml-auto max-md:w-full max-[600px]:flex-col max-[600px]:gap-2'>
             <Search searchParams={searchParams} />
             
           </div> 
         
-          <div className='grid  auto-cols-max gap-4 mt-8 grid-cols-4 px-4 max-2xl:grid-cols-3 max-lg:grid-cols-2 max-grid1:grid-cols-1 '>
+          <div className='grid auto-cols-max gap-4 mt-8 grid-cols-4 px-4 max-2xl:grid-cols-3 max-lg:grid-cols-2 max-grid1:grid-cols-1'>
             {filtredProducts
             .slice(min, max)
             .map((product) =>(
@@ -199,6 +201,7 @@ const catalog = async ({searchParams,data}:any) => {
           <PaginationForCatalog searchParams={searchParams} countOfPages={countOfPages } />
           
         </div>
+      </div>
     </section>
   )
 };

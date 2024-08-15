@@ -25,3 +25,7 @@
 25. app/(auth)/newPass
 26. components/interface/TransitionLink.tsx
 27. app/(auth)/verifyemail/page.tsx
+28. components/shared/Filter.tsx
+29. components/badges/Badge.tsx
+30. components/cards/ProductCard.tsx
+31. components/interface/StickyCart.tsx
