@@ -83,7 +83,7 @@ export default function SignupPage() {
                     <div className="flex flex-col text-center">
                         <label htmlFor="username"></label>
                         <input 
-                            className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
+                            className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
                             id="username"
                             type="text"
                             value={user.username}
@@ -92,7 +92,7 @@ export default function SignupPage() {
                         />
                         <label htmlFor="email"></label>
                         <input 
-                        className="bg-transparent eborder-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
+                        className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
                             id="email"
                             type="text"
                             value={user.email}
@@ -101,7 +101,7 @@ export default function SignupPage() {
                         />
                         <label htmlFor="password"></label>
                         <input 
-                            className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
+                            className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
                             id="password"
                             type="password"
                             value={user.password}
@@ -146,7 +146,7 @@ export default function SignupPage() {
                   <div className="flex flex-col text-center">
                     <label htmlFor="username"></label>
                     <input 
-                        className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
+                        className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
                         id="username"
                         type="text"
                         value={user.username}
@@ -155,7 +155,7 @@ export default function SignupPage() {
                     />
                     <label htmlFor="email"></label>
                     <input 
-                      className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
+                      className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
                         id="email"
                         type="text"
                         value={user.email}
@@ -164,7 +164,7 @@ export default function SignupPage() {
                     />
                     <label htmlFor="password"></label>
                     <input 
-                        className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
+                        className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
                         id="password"
                         type="password"
                         value={user.password}

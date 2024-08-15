@@ -63,7 +63,7 @@ const ResetPass = () => {
                     <p className="text-dark-4 mb-8">На вашу пошту прийде лист для змінення пароля.</p>
                     <form onSubmit={handleSubmit} className="flex flex-col text-center"> 
                       <input 
-                       className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
+                       className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
                        onChange={(e) => setEmail(e.target.value)}
                        type="email"
                        placeholder="Email"

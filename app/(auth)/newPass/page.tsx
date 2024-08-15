@@ -75,7 +75,7 @@ export default function VerifyEmailPage() {
                     <p className="text-dark-4 mb-8">Введіть новий пароль.</p>
                     <form onSubmit={handleSubmit} className="flex flex-col text-center"> 
                         <input
-                            className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
+                            className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-gray-600 text-black placeholder-slate-600 p-2 mb-4"
                             onChange={(e) => setPassword(e.target.value)}
                             type="password"
                             placeholder="Новий пароль"
@@ -104,7 +104,7 @@ export default function VerifyEmailPage() {
                   <p className="text-slate-200 mb-8">Введіть новий пароль.</p>
                   <form onSubmit={handleSubmit} className="flex flex-col text-center">
                     <input
-                        className="bg-transparent border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
+                        className="bg-transparent appearance-none rounded-none border-b-2 border-stone-200 font-medium focus:outline-none focus:border-white text-slate-200 placeholder-slate-300 p-2 mb-4"
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
                         placeholder="Новий пароль"
