@@ -41,29 +41,30 @@ const Search = ({searchParams}:any) => {
 
     
 
-  return (<>
-    <div className='w-full flex gap-3 mr-5 max-md:text-black'>
-      <Image
-        src="/assets/search.svg"
-        width={24}
-        height={24}
-        alt="Seacrh"
-      />
-      <Input type='text' onChange={textFromInput}  placeholder='Пошук товару' />
-    </div>
-    <Select onValueChange={(element)=>setSort(element)} >
-              <SelectTrigger className="w-[240px]">
-                <SelectValue placeholder="Звичайне" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="default" >Звичайне</SelectItem>
-                  <SelectItem value="low_price" >Ціна(низька)</SelectItem>
-                  <SelectItem value="hight_price">Ціна(Висока)</SelectItem>
-                  
-                </SelectGroup>
-              </SelectContent>
-            </Select></>
+  return (
+    <>
+      <div className='w-full flex gap-3 max-md:text-black'>
+        <Image
+          src="/assets/search.svg"
+          width={24}
+          height={24}
+          alt="Seacrh"
+        />
+        <Input type='text' onChange={textFromInput}  placeholder='Пошук товару' />
+      </div>
+      <Select onValueChange={(element)=>setSort(element)} >
+        <SelectTrigger className="w-[240px] max-[600px]:hidden">
+          <SelectValue placeholder="Звичайне" />
+        </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="default" >Звичайне</SelectItem>
+              <SelectItem value="low_price" >Ціна(низька)</SelectItem>
+              <SelectItem value="hight_price">Ціна(Висока)</SelectItem>   
+            </SelectGroup>
+          </SelectContent>
+      </Select>
+    </>
   )
 }
 

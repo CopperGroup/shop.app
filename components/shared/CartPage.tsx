@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 
 
-const CartPage = (cartRef:any) => {
+const CartPage = (cartRef:any, setIsOpened: any) => {
 //@ts-ignore
 const {cartData, setCartData, setPriceToPay} = useAppContext();
 
@@ -17,6 +17,7 @@ function hideCart(){
    
     cartRef.cartRef.current.style.right = "-100%";
     document.body.style.overflow = "auto"
+    setIsOpened(false);
   }
 
 let together = 0

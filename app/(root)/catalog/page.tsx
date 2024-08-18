@@ -35,9 +35,53 @@ const catalog = async ({searchParams,data}:any) => {
   }  
 
 
+  let vendorCount: { [key: string]: number } = {};
 
+  filtredProducts.forEach(product => {
+    const vendor = product.vendor;
+    if (vendor) {
+      vendorCount[vendor] = (vendorCount[vendor] || 0) + 1;
+    }
+  });
 
+  let categoryCount: { [key: string]: number } = {"Всі категорії": filtredProducts.length}
 
+  filtredProducts.forEach(product => {
+    const category = product.category;
+    if (category) {
+      categoryCount[category] = (categoryCount[category] || 0) + 1;
+    }
+  });
+
+  let typeCount: { [key: string]: number } = {};
+
+  filtredProducts.forEach(product => {
+    const type = product.params[4]?.value;
+    if (type) {
+      typeCount[type] = (typeCount[type] || 0) + 1;
+    }
+  });
+
+  let seriesCount: { [key: string]: number } = {};
+
+  filtredProducts.forEach(product => {
+    const series = product.params[0]?.value.split('_')[0].split('-')[0];
+    if (series) {
+      seriesCount[series] = (seriesCount[series] || 0) + 1;
+    }
+  });
+
+  let colorCount: { [key: string]: number} = {};
+
+  filtredProducts.forEach(product => {
+    const color = product.params[5]?.value;
+    if (color) {
+      colorCount[color] = (colorCount[color] || 0) + 1;
+    }
+  });
+
+  console.log("Vendor count:", vendorCount);
+   
   if(searchParams.sort === 'low_price'){
     filtredProducts = filtredProducts.sort((a,b) => a.price - b.price)
   }else if(searchParams.sort == 'hight_price'){
@@ -129,7 +173,7 @@ const catalog = async ({searchParams,data}:any) => {
   const Type = Array.from(new Set (filtredProducts.map(item => item.params[4]?.value))).filter(function(item) {return item !== '';});
 
   if(searchParams.series){
-    filtredProducts =filtredProducts.filter(obj => searchParams.series?.includes(obj.params[0]?.value))
+    filtredProducts =filtredProducts.filter(obj => searchParams.series?.includes(obj.params[0]?.value.split('_')[0].split('-')))
   }
 
   if(searchParams.color){
@@ -161,14 +205,14 @@ const catalog = async ({searchParams,data}:any) => {
     <section className="-mt-12">
       <BannerSmall/>
       <div className="flex mt-12">
-        <Filter categories={category} category={searchParams.category} minPrice={minPrice} maxPrice={maxPrice} maxMin={maxMinRes} vendors={vendors} series={series} color={color} Type={Type}/>
+        <Filter categories={category} category={searchParams.category} minPrice={minPrice} maxPrice={maxPrice} maxMin={maxMinRes} vendors={vendors} series={series} color={color} Type={Type} counts={{ vendorCount: vendorCount, categoryCount: categoryCount, typeCount: typeCount, seriesCount: seriesCount, colorCount: colorCount}}/>
         <div className='w-full'>
-          <div className='w-full flex justify-center items-center px-6 ml-auto max-md:w-full max-[600px]:flex-col max-[600px]:gap-2'>
+          <div className='w-full flex gap-2 justify-center items-center px-6 ml-auto max-md:w-full max-[560px]:px-10 max-[450px]:px-4'>
             <Search searchParams={searchParams} />
             
           </div> 
         
-          <div className='grid auto-cols-max gap-4 mt-8 grid-cols-4 px-4 max-2xl:grid-cols-3 max-lg:grid-cols-2 max-grid1:grid-cols-1'>
+          <div className='grid auto-cols-max gap-4 mt-8 grid-cols-4 px-4 max-2xl:grid-cols-3 max-lg:grid-cols-2 max-[560px]:grid-cols-1 max-[560px]:px-10 max-[450px]:px-4'>
             {filtredProducts
             .slice(min, max)
             .map((product) =>(

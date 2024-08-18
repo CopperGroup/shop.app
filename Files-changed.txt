@@ -29,3 +29,7 @@
 29. components/badges/Badge.tsx
 30. components/cards/ProductCard.tsx
 31. components/interface/StickyCart.tsx
+32. components/ui/slider.tsx
+31. app/(root)/catalog/page.tsx
+32. components/shared/Search.tsx
+33. components/shared/CartPage.tsx
