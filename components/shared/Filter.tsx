@@ -268,7 +268,7 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Сортування</AccordionTrigger>
                   <AccordionContent className="px-3">
                   <Select onValueChange={(element)=>setSort(element)} >
-                    <SelectTrigger className="mt-2 border-0 border-b rounded-none">
+                    <SelectTrigger className="mborder-0 border-b rounded-none">
                       <SelectValue placeholder="Звичайне" />
                     </SelectTrigger>
                       <SelectContent>
@@ -290,8 +290,8 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Виробник</AccordionTrigger>
                   <AccordionContent className="pl-3">
                     {vendors.map((vendor, index)=>(
-                      <div className="w-full h-fit flex justify-between items-center">
-                      <div className="flex items-center space-x-2 mt-4" key={index}>
+                      <div key={index} className="w-full h-fit flex justify-between items-center">
+                      <div className="flex items-center space-x-2 mt-4">
                         <Checkbox id={vendor} onCheckedChange={(e)=> handleCheckboxChange(vendor)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={vendor}
@@ -337,8 +337,8 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Вид</AccordionTrigger>
                   <AccordionContent className="pl-3">
                     {Type.map((type, index)=>(
-                      <div className="w-full h-fit flex justify-between items-center">
-                        <div className="flex items-center space-x-2 mt-4" key={index} >
+                      <div key={index} className="w-full h-fit flex justify-between items-center">
+                        <div className="flex items-center space-x-2 mt-4">
                         <Checkbox id={type} onCheckedChange={()=>handleType(type)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={type}
@@ -361,8 +361,8 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Серія</AccordionTrigger>
                   <AccordionContent className="pl-3">
                     {series.map((seria, index)=>(
-                      <div className="w-full h-fit flex justify-between items-center">
-                        <div className="flex items-center space-x-2 mt-4" key={index}>
+                      <div key={index} className="w-full h-fit flex justify-between items-center">
+                        <div className="flex items-center space-x-2 mt-4">
                         <Checkbox id={seria} onCheckedChange={()=>handleSeries(seria)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={seria}
@@ -385,8 +385,8 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Колір</AccordionTrigger>
                   <AccordionContent className="pl-3">
                     {color.map((color, index)=>(
-                      <div className="w-full h-fit flex justify-between items-center">
-                        <div className="flex items-center space-x-2 mt-4" key={index}>
+                      <div key={index} className="w-full h-fit flex justify-between items-center">
+                        <div className="flex items-center space-x-2 mt-4">
                         <Checkbox id={color} onCheckedChange={()=>handleColor(color)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={color}

@@ -248,7 +248,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className={`bg-white/70 rounded-xl shadow-lg p-3`}>
         <p className="text-small-semibold">{label}</p>
-        <p className="text-subtle-medium mt-1">Всього продано: <span className={`${payload[0].value > 0 && "text-green-500"}`}>+{payload[0].value}</span></p>
+        <p className="text-subtle-medium mt-1">Всього продано: <span className={`${payload[0].value > 0 && "text-green-500"}`}>{payload[0].value}</span></p>
       </div>
     );
   }

@@ -33,3 +33,4 @@
 31. app/(root)/catalog/page.tsx
 32. components/shared/Search.tsx
 33. components/shared/CartPage.tsx
+34. components/shared/Footer.tsx
