@@ -249,17 +249,14 @@ const EditProduct = ({ productId }: { productId: string }) => {
             console.log("Fetched params", fetchedParams);
 
             setParams((prevParams) => {
-              // Create a new array to update state
               const updatedParams = [...prevParams];
     
               fetchedParams.forEach(({ name, value }: { name: string, value: string }) => {
                 const valueName = mapFieldName(name);
     
-                // Find the index of the param to update
                 const paramIndex = updatedParams.findIndex(param => param.name === valueName);
     
                 if (paramIndex !== -1) {
-                  // Update the param's value
                   updatedParams[paramIndex] = { ...updatedParams[paramIndex], value };
                 }
               });
@@ -731,8 +728,8 @@ const EditProduct = ({ productId }: { productId: string }) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem value={category.name}>{category.name}</SelectItem>
+                          {categories.map((category, index) => (
+                            <SelectItem key={index} value={category.name}>{category.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
