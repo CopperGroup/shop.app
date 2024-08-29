@@ -5,6 +5,7 @@ import { connectToDB } from "../mongoose"
 import User from "../models/user.model";
 import { revalidatePath } from "next/cache";
 import Value from "../models/value.model";
+import { ProductType } from "../types/types";
 
 interface CreateUrlParams {
     id: string | null,
@@ -300,13 +301,17 @@ export async function getProductParams(productId: string) {
     }
 }
 
-export async function getProduct(productId: string){
+export async function getProduct(productId: string, type?: "json"){
     try {
         connectToDB();
 
         const product = await Product.findOne({ id: productId });
 
-        return product;
+        if(type === "json") {
+            return JSON.stringify(product);
+        } else {
+            return product;
+        }
     } catch (error: any) {
         throw new Error(`Error fetching product: ${error.message}`)
     }
@@ -386,6 +391,39 @@ export async function productAddedToCart(id: string) {
         throw new Error(`Error adding prduct to cart: ${error.message}`)
     }
 }
+
+export async function findAllProductsCategories(type?: "json") {
+  try {
+    connectToDB();
+
+    let allCategories: { [key: string]: number } = {};
+
+    const products = await Product.find({});
+
+    for(const product of products) {
+
+        if(product.category){
+            if(!allCategories[`${product.category}`]) {
+                allCategories[`${product.category}`] = 0
+            }
+    
+            allCategories[`${product.category}`] = product.id;
+        }
+    }
+
+    const categories = Object.entries(allCategories).map(([name, amount]) => ({
+        name,
+        amount,
+    }))
+
+    console.log("Categories", allCategories);
+
+    return categories
+  } catch (error: any) {
+    throw new Error(`${error.message}`)
+  }
+}
+
 
 
 

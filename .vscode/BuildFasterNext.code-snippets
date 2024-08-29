@@ -11,6 +11,24 @@
 		"}"
 	  ],
 	  "description": "Create an export async function with try-catch block"
-	}
+	},
+	"Export async function json": {
+		"prefix": "eafj",
+		"body": [
+		  "export async function ${1:functionName}(type?: 'json') {",
+		  "  try {",
+		  "    if(type === 'json'){",
+		  "       return JSON.stringify('result')",
+		  "    } else {",
+		  "       return'result'",
+		  "    }",
+		  "    ",
+		  "  } catch (error: any) {",
+		  "    throw new Error(`${error.message}`)",
+		  "  }",
+		  "}"
+		],
+		"description": "Create an export async function with try-catch block"
+	  }
   }
   

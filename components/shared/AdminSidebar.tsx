@@ -51,27 +51,7 @@ const AdminSidebar = () => {
                             </div>
                         </Link>
                     );
-                })}
-                <div className="w-11/12 absolute right-0 rounded-l-lg bottom-5 px-4 hover:bg-muted-normal hover:border-black hover:border-r-[3px]">
-                    <div className="flex gap-2">
-                        <Image
-                            src="/assets/user.svg"
-                            width={54}
-                            height={54}
-                            alt="Profile picture"
-                        />
-                        <div className="w-full flex justify-between">
-                            <div className="h-full flex flex-col justify-center">
-                                {/*@ts-ignore*/}
-                                <p className="text-base-semibold">{session.data?.user.username}</p>
-                                <p className="text-small-medium text-dark-4">Admin</p>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-
-                
+                })}     
             </div>
         </section>
     );

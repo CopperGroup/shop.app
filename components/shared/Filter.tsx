@@ -26,6 +26,8 @@ import { Select,
   SelectTrigger, 
   SelectValue 
 } from '../ui/select'
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
+import { Label } from '../ui/label'
 
 interface Props {
   maxPrice:number,
@@ -267,18 +269,20 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                 <AccordionItem value="item-1">
                   <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Сортування</AccordionTrigger>
                   <AccordionContent className="px-3">
-                  <Select onValueChange={(element)=>setSort(element)} >
-                    <SelectTrigger className="mborder-0 border-b rounded-none">
-                      <SelectValue placeholder="Звичайне" />
-                    </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="default" >Звичайне</SelectItem>
-                          <SelectItem value="low_price" >Ціна(низька)</SelectItem>
-                          <SelectItem value="hight_price">Ціна(Висока)</SelectItem>   
-                        </SelectGroup>
-                      </SelectContent>
-                  </Select>
+                  <RadioGroup className="py-3" onValueChange={(element)=>setSort(element)} defaultValue="default">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="default" id="default" />
+                      <Label htmlFor="default">Default</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="low_price" id="low_price" />
+                      <Label htmlFor="low_price">Ціна(низька)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="hight_price" id="hight_price" />
+                      <Label htmlFor="hight_price">Ціна(Висока)</Label>
+                    </div>
+                  </RadioGroup>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

@@ -34,3 +34,12 @@
 32. components/shared/Search.tsx
 33. components/shared/CartPage.tsx
 34. components/shared/Footer.tsx
+35. components/shared/AdminSidebar.tsx
+36. app/admin/categories/page.tsx
+37. app/admin/createProduct/edit-product/[id]/page.tsx
+38. components/forms/EditProduct.tsx
+39. components/ui/checkbox.tsx
+40. lib/models/category.model.ts
+41. lib/actions/product.actions.ts
+42. lib/types/types.ts
+43. lib/validations/product.ts
