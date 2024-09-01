@@ -50,12 +50,25 @@ interface CreateParams {
     id: string,
     name: string,
     quantity: number,
+    images: string[],
     url: string,
     price: number,
     priceToShow: number,
     vendor: string,
     category?: string,
     description: string,
+    params: {
+        Model: string,
+        Width: string,
+        Height: string,
+        Depth: string,
+        Type: string,
+        Color: string,
+    },
+    customParams?: {
+        name: string,
+        value:string,
+    }[]
 }
 
 
@@ -295,6 +308,8 @@ export async function getProductParams(productId: string) {
 
         const productParams = await product.params;
 
+        console.log("Fetching params");
+
         return JSON.stringify(productParams);
     } catch (error: any) {
         throw new Error(`Error getting product params: ${error.message}`)
@@ -317,29 +332,72 @@ export async function getProduct(productId: string, type?: "json"){
     }
 }
 
-export async function getProductsProperities(productId: string) {
+export async function getProductsProperities(productId: string, type?: "json") {
     try {
         connectToDB();
 
-        const product = await Product.findOne({ id: productId })
+        const products = await Product.find({});
+        const product = await Product.findOne({ id: productId });
 
-        return [
-            { name: "id", value: productId }, 
-            { name: "name", value: product.name }, 
-            { name: "price", value: `${product.price}`}, 
-            { name: "priceToShow",  value: `${product.priceToShow}`}, 
-            { name: "description", value: product.description }, 
-            { name: "url", value: product.url }, 
-            { name: "quantity", value: `${product.quantity}` }, 
-            { name: "category", value: product.category }, 
-            { name: "vendor", value: product.vendor }
-        ]
+        let allCategories: { [key: string]: number } = {};
+
+        for(const product of products) {
+
+            if(product.category){
+                if(!allCategories[`${product.category}`]) {
+                    allCategories[`${product.category}`] = 0
+                }
+        
+                allCategories[`${product.category}`] = product.id;
+            }
+        }
+
+        const categories = Object.entries(allCategories).map(([name, amount]) => ({
+            name,
+            amount,
+        }))
+
+        if(type === "json") {
+            return JSON.stringify({
+            properities: [
+                { name: "id", value: productId }, 
+                { name: "name", value: product.name }, 
+                { name: "price", value: product.price.toString() }, 
+                { name: "priceToShow",  value: product.priceToShow.toString() }, 
+                { name: "description", value: product.description }, 
+                { name: "url", value: product.url }, 
+                { name: "quantity", value: product.quantity.toString() }, 
+                { name: "category", value: product.category }, 
+                { name: "vendor", value: product.vendor },
+                { name: "images", value: product.images },
+            ], 
+            params: product.params,
+            categories: categories
+        })
+        } else {
+            return {
+                properities: [
+                    { name: "id", value: productId }, 
+                    { name: "name", value: product.name }, 
+                    { name: "price", value: product.price.toString() }, 
+                    { name: "priceToShow",  value: product.priceToShow.toString() }, 
+                    { name: "description", value: product.description }, 
+                    { name: "url", value: product.url }, 
+                    { name: "quantity", value: product.quantity.toString() }, 
+                    { name: "category", value: product.category }, 
+                    { name: "vendor", value: product.vendor },
+                    { name: "images", value: product.images },
+                ], 
+                params: product.params,
+                categories: categories
+            }
+        }
     } catch (error: any) {
         throw new Error(`Error fetching product properities: ${error.message}`)
     }
 }
 
-export async function editProduct({ id, name, quantity, url, priceToShow, price, vendor, category, description}: CreateParams){
+export async function editProduct({ id, name, quantity, images, url, priceToShow, price, vendor, category, description, params, customParams }: CreateParams){
     try {
         connectToDB();
         
@@ -347,6 +405,7 @@ export async function editProduct({ id, name, quantity, url, priceToShow, price,
 
         createdProduct.name = name;
         createdProduct.quantity = quantity;
+        createdProduct.images = images;
         createdProduct.url = url;
         createdProduct.priceToShow = priceToShow;
         createdProduct.price = price;
@@ -354,7 +413,22 @@ export async function editProduct({ id, name, quantity, url, priceToShow, price,
         createdProduct.category = category ? category : "";
         createdProduct.description = description;
 
-        createdProduct.save();
+        createdProduct.params = [];
+        
+        createdProduct.params.push({ name: "Товар", value: params.Model.replace(/ /g, '_') });
+        createdProduct.params.push({ name: "Ширина, см", value: parseFloat(params.Width).toFixed(2).toString() });
+        createdProduct.params.push({ name: "Висота, см", value: parseFloat(params.Height).toFixed(2).toString() });
+        createdProduct.params.push({ name: "Глибина, см", value: parseFloat(params.Depth).toFixed(2).toString() });
+        createdProduct.params.push({ name: "Вид", value: params.Type });
+        createdProduct.params.push({ name: "Колір", value: params.Color });
+
+        if(customParams){
+            for(const customParam of customParams){
+                createdProduct.params.push({ name: customParam.name, value: customParam.value });
+            }
+        }
+
+        await createdProduct.save();
 
         revalidatePath(`/admin/createProduct/list/${id}`)
     } catch (error: any) {

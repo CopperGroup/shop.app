@@ -2,9 +2,9 @@
 
 import * as z from "zod";
 import Image from "next/image";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -51,13 +51,13 @@ const EditProduct = ({ productId }: { productId: string }) => {
   const [ categories, setCategories ] = useState<{name: string, amount: number}[]>([]);
   const [ isNewCategory, setIsNewCategory ] = useState<boolean>(false);
 
-  const [ params, setParams ] = useState([
-    { name: "Model", value: ""},
-    { name: "Width", value: ""},
-    { name: "Height", value: ""},
-    { name: "Depth", value: ""},
-    { name: "Type", value: ""},
-    { name: "Color", value: ""},
+  const [ params ] = useState([
+    { name: "Model"},
+    { name: "Width"},
+    { name: "Height"},
+    { name: "Depth"},
+    { name: "Type"},
+    { name: "Color"},
   ])
   const paramsNamesUa = ['Назва', 'Ширина', 'Висота', 'Глибина', 'Вид', 'Колір'];
 
@@ -124,7 +124,7 @@ const EditProduct = ({ productId }: { productId: string }) => {
 
   const handleImageAdding = () => {
       setImages([...images, inputValue]);
-      setInputValue(""); // Clear the input after adding
+      setInputValue("");
   }
 
   const handleDeleteImage = (index: number| null) => {
@@ -149,36 +149,68 @@ const EditProduct = ({ productId }: { productId: string }) => {
       id: values.id,
       name: values.name,
       quantity: parseFloat(values.quantity),
+      images: images,
       url: values.url,
       price: parseFloat(price),
       priceToShow: parseFloat(discountPrice),
       vendor: values.vendor,
       category: values.category,
-      description: values.description
+      description: values.description,
+      params: {
+        Model: values.Model,
+        Width: values.Width,
+        Height: values.Height,
+        Depth: values.Depth,
+        Type: values.Type,
+        Color: values.Color
+      },
+      customParams: values.customParams
     })
 
     router.back()
   }
 
+  
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "customParams",
+  });
+
   useEffect(() => {
     const fetchProductProperities = async () => {
         try {
-            const productProperities = await getProductsProperities(productId);
-            const product = await getProduct(productId, "json");
-            const parsedProduct = JSON.parse(product);
-            setImages(parsedProduct.images);
+            const productProperities = await getProductsProperities(productId, "json");
+            const { properities: parsedProductProperities, params: fetchedParams, categories } = JSON.parse(productProperities as string)
 
-            productProperities.forEach(({ name, value }: { name: string, value: string}) => {
-              form.setValue(name as keyof ProductFormValues, value)
+            parsedProductProperities.forEach(({ name, value }: { name: string, value: string | string[]}) => {
+              form.setValue(name as keyof ProductFormValues, value as string)
 
               if(name === "price") {
-                setPrice(value);
+                setPrice(value as string);
               }
               if(name === "priceToShow") {
-                setDiscountPrice(value);
+                setDiscountPrice(value as string);
+              }
+
+              if(name === "images") {
+                setImages(value as string[])
               }
             })
             
+            setCategories(categories);
+
+            remove();
+
+            fetchedParams.forEach(({ name, value }: { name: string, value: string }) => {
+                const valueName = mapFieldName(name);
+
+                if (params.some((param) => param.name === valueName)) {
+                    form.setValue(valueName as keyof ProductFormValues, value);
+                } else {
+                    append({ name, value });
+                }
+            });
+
           } catch (error: any) {
             throw new Error(`Error appending existing product properities: ${error.message}`)
           }
@@ -187,111 +219,113 @@ const EditProduct = ({ productId }: { productId: string }) => {
         fetchProductProperities();
   }, [productId])
 
-  useEffect(() => {
-    const fetchAllCategories = async () => {
-      const categories = await findAllProductsCategories();
+  
+  // useEffect(() => {
+  //   const fetchProductParams = async () => {
+  //       try {
+    //           const productParams = await getProductParams(productId);
+    //           const fetchedParams = JSON.parse(productParams);
+    
+  //           remove();
+  
+  //           fetchedParams.forEach(({ name, value }: { name: string, value: string }) => {
+  //               const valueName = mapFieldName(name);
+  
+  //               if (params.some((param) => param.name === valueName)) {
+  //                   form.setValue(valueName as keyof ProductFormValues, value);
+  //               } else {
+  //                   append({ name, value });
+  //               }
+  //           });
+  //       } catch (error) {
+  //           console.error("Error fetching product parameters:", error);
+  //       }
+  //   }
+  
+  //   fetchProductParams()
+  // }, [productId]);
 
-      setCategories(categories);
+  const addCustomParam = () => {
+    append({ name: "", value: "" });
+  };
+  
+  const customParams = useWatch({
+    control: form.control,
+    name: "customParams",
+    defaultValue: []
+  }) ?? [];
+  
+  // Use `useMemo` to check if all custom parameters are filled
+  const areAllParamsFilled = useMemo(() => {
+    return customParams.every(
+      (param: { name: string; value: string }) => param.name.trim() && param.value.trim()
+    );
+  }, [customParams]);
+  
+  const mapFieldName = (name: string) => {
+    switch(name) {
+      case "Ширина, см":
+        return "Width";
+      case "Висота, см":
+        return "Height";
+      case "Глибина, см":
+          return "Depth";
+          case "Вид":
+          return "Type";
+      case "Колір":
+        return "Color";
+      case "Товар":
+        return "Model";
+      default:
+        return name;
     }
-
-    fetchAllCategories();
-  }, [productId])
+  }
 
   useEffect(() => {
-    const parsedPrice = parseFloat(price);
-    const parsedDiscountPrice = parseFloat(discountPrice);
-
-    if (!isNaN(parsedPrice) && !isNaN(parsedDiscountPrice) && parsedPrice !== 0) {
-      const percentage = ((parsedPrice - parsedDiscountPrice) / parsedPrice) * 100;
-      setDiscountPercentage(percentage);
-    }
+            const parsedPrice = parseFloat(price);
+            const parsedDiscountPrice = parseFloat(discountPrice);
+        
+            if (!isNaN(parsedPrice) && !isNaN(parsedDiscountPrice) && parsedPrice !== 0) {
+              const percentage = ((parsedPrice - parsedDiscountPrice) / parsedPrice) * 100;
+              setDiscountPercentage(percentage);
+            }
   }, [price, discountPrice]);
 
   useEffect(() => {
-    if(discountPercentage) {
-      console.log(discountPercentage);
-      console.log(discountPrice);
-  
-      const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
-  
-      console.log("Result " + discountValue);
-    } else {
-      setDiscountPercentage(0);
-
-      console.log(discountPercentage);
-      console.log(discountPrice);
-  
-      const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
-  
-      setDiscountPrice(`${discountValue}`);
-
-      console.log("Result " + discountPrice);
-    }
+            if(discountPercentage) {
+              console.log(discountPercentage);
+              console.log(discountPrice);
+          
+              const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
+          
+              setDiscountPrice(`${discountValue}`);
+        
+              console.log("Result " + discountValue);
+            } else {
+              setDiscountPercentage(0);
+        
+              console.log(discountPercentage);
+              console.log(discountPrice);
+          
+              const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
+          
+              setDiscountPrice(`${discountValue}`);
+        
+              console.log("Result " + discountPrice);
+            }
   }, [discountPercentage])
 
   const handleNoDiscount = (value: boolean) => {
-    if(value) {
-      setDiscountPrice(price);
-      setDiscountPercentage(0);
-      setDiscountType("percentage");
-    }
+            if(value) {
+              setDiscountPrice(price);
+              setDiscountPercentage(0);
+              setDiscountType("percentage");
+            }
   }
-
-  
-
-
-  useEffect(() => {
-    const fetchProductParams = async () => {
-        try {
-            const productParams = await getProductParams(productId);
-            const fetchedParams = JSON.parse(productParams);
-
-            console.log("Fetched params", fetchedParams);
-
-            setParams((prevParams) => {
-              const updatedParams = [...prevParams];
-    
-              fetchedParams.forEach(({ name, value }: { name: string, value: string }) => {
-                const valueName = mapFieldName(name);
-    
-                const paramIndex = updatedParams.findIndex(param => param.name === valueName);
-    
-                if (paramIndex !== -1) {
-                  updatedParams[paramIndex] = { ...updatedParams[paramIndex], value };
-                }
-              });
-    
-              return updatedParams;
-            });
-        } catch (error) {
-            console.error("Error fetching product parameters:", error);
-        }
-    }
-
-    fetchProductParams()
-  }, [productId]);
-
-  const mapFieldName = (name: string) => {
-      switch(name) {
-          case "Ширина, см":
-              return "Width";
-          case "Висота, см":
-              return "Height";
-          case "Глибина, см":
-              return "Depth";
-          case "Вид":
-              return "Type";
-          case "Колір":
-              return "Color";
-          case "Товар":
-              return "Model";
-          default:
-              return name;
-      }
-  }
-
-  return (
-    <Form {...form}>
+          
+          
+          return (
+            <Form {...form}>
       <form
         className='w-full flex gap-5 custom-scrollbar max-[900px]:flex-col'
         onSubmit={form.handleSubmit(onSubmit)}
@@ -746,234 +780,81 @@ const EditProduct = ({ productId }: { productId: string }) => {
 
           <div className="w-full h-fit pl-4 pr-5 py-4 border rounded-2xl">
             <h4 className="w-full text-base-semibold text-[15px] mb-4">Параметри</h4>
-            <div className="w-full grid grid-cols-2 gap-3">
-              {params.map((param, index) => (
+            <div className="w-full grid grid-cols-2 gap-3 max-[425px]:grid-cols-1">
+              {params.map((param,index) => (
                 <FormField
-                  key={index}
+                  key={param.name}
                   control={form.control}
                   name={param.name as keyof ProductFormValues}
                   render={({ field }) => (
-                    <FormItem className='w-full'>
-                      <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                        {paramsNamesUa[index]}{['Ширина', 'Висота', 'Глибина'].includes(paramsNamesUa[index]) && (<span className="text-subtle-medium"> (см)</span>)}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type='text'
-                          className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]"
-                          onChange={() => console.log(field)}
-                          value={param.value}
-                          onBlur={field.onBlur}
-                          ref={field.ref}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                      <FormItem className='w-full'>
+                          <FormLabel className='text-small-medium text-[14px] text-dark-1'>
+                              {paramsNamesUa[index]} {['Ширина', 'Висота', 'Глибина'].includes(paramsNamesUa[index]) && (<span className="text-subtle-medium">(см)</span>)}
+                          </FormLabel>
+                          <FormControl>
+                              <Input
+                                  type='text'
+                                  className='text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]'
+                                  value={
+                                    paramsNamesUa[index] === "Назва" && typeof field.value === "string"
+                                      ? field.value.replace(/_/g, " ")
+                                      : field.value as string
+                                  }
+                                  onChange={field.onChange}
+                                  onBlur={field.onBlur}
+                                  ref={field.ref}
+                              />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
                   )}
                 />
               ))}
+              {fields.map((field, index) => (
+                        <FormItem key={field.id} className='w-full'>
+                          <div className="relative w-full flex justify-end">
+                            <FormLabel className='w-full text-base-semibold text-dark-1 max-lg:w-full'>
+                                <Input
+                                    placeholder="Назва параметра"
+                                    {...form.register(`customParams.${index}.name` as const)}
+                                    className='w-full appearance-none text-small-medium text-[14px] text-dark-1 bg-transparent rounded-none border-0 border-b ml-1 px-0 focus-visible:ring-0 focus-visible:border-black'
+                                    // onChange={(e) => {field.name = e.target.value; console.log(field)}}
+                                />
+                            </FormLabel>
+                              <Button type="button" onClick={() => remove(index)} variant="outline" className="absolute h-fit bg-white border-0 px-0 pr-3 pt-3 -mr-2 transition-all hover:pt-2">
+                                <Image
+                                  src="/assets/delete.svg"
+                                  width={16}
+                                  height={16}
+                                  alt="Delete"
+                                />
+                              </Button>
+                          </div>
+                            <FormControl>
+                                <Input
+                                    type='text'
+                                    placeholder="Значення"
+                                    {...form.register(`customParams.${index}.value` as const)}
+                                    className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]"
+                                    // onChange={(e) => {field.value = e.target.value; console.log(field)}}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                ))}
             </div>
+            {areAllParamsFilled && (
+              <div className="w-full flex justify-end">
+                <Button onClick={addCustomParam} className="size-7 text-[28px] text-black font-light bg-transparent rounded-xl border border-transparent ml-1 mt-4 p-0 pb-1 transition-all hover:bg-transparent hover:pb-3" size="sm">
+                  +
+                </Button>
+              </div>
+            )}
           </div>
+          <Button type='submit' className='bg-green-500 hover:bg-green-400'>
+            Зберегти зміни
+          </Button>
         </div>
-        {/* <FormField
-          control={form.control}
-          name='id'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                ID
-                <p className="mt-3 text-small-medium text-gray-500">Унікальний ID для товару</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  className=''
-                  {...field}
-                  disabled
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Ім&apos;я
-                <p className="mt-3 text-small-medium text-gray-500">Додайте назву товару </p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  className=''
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='description'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Опис
-                <p className="mt-3 text-small-medium text-gray-500">Опишіть ваш товар</p>
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  rows={5}
-                  className=''
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="w-full h-[2px] bg-gray-400 my-5 rounded-lg"></div>
-
-        <FormField
-          control={form.control}
-          name='price'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Ціна без знижки
-                <p className="mt-3 text-small-medium text-gray-500">Скільки буде коштувати товар без знижки ?</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                    type='text'
-                    className=''
-                    {...field}
-                    />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='priceToShow'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Ціна
-                <p className="mt-3 text-small-medium text-gray-500">Справжня ціна товару?</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                    type='text'
-                    className=''
-                    {...field}
-                    />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='quantity'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Кількість
-                <p className="mt-3 text-small-medium text-gray-500">Скільки товару є на складі?</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  className=''
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="w-full h-[2px] bg-gray-400 my-5 rounded-lg"></div>
-        
-        <FormField
-          control={form.control}
-          name='url'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                URl
-                <p className="mt-3 text-small-medium text-gray-500">Provide the URL if you have one</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  className=''
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='category'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Категорія
-                <p className="mt-3 text-small-medium text-gray-500">Додайте товар до категорії</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  className=''
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='vendor'
-          render={({ field }) => (
-            <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-              <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-                Постачальник
-                <p className="mt-3 text-small-medium text-gray-500">Марка товару</p>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  className=''
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="w-full h-[2px] bg-gray-400 my-5 rounded-lg"></div>
-
-        <Button type='submit' className='bg-green-500 hover:bg-green-400'>
-          Зберегти зміни
-        </Button> */}
       </form>
     </Form>
 )}

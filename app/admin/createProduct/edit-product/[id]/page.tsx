@@ -2,7 +2,7 @@ import EditProduct from "@/components/forms/EditProduct";
 
 const Page = ({ params }: { params: { id: string } }) => {
     if(!params.id) return null;
-
+    
     return (
       <section className="px-10 py-20">
         <h1 className="w-full text-heading1-bold drop-shadow-text-blue max-[440px]:text-center">Редагувати товар</h1>
