@@ -32,7 +32,7 @@ type ProductFormValues = z.infer<typeof ProductValidation>;
 type DiscountType = "percentage" | "digits";
 type UploadingState = "initial" | "uploading" | "success" | "error";
 
-const EditProduct = ({ productId }: { productId: string }) => {
+const EditProduct = ({ productProperities }: { productProperities: string}) => {
   const [ price, setPrice ] = useState<string>("");
   const [ discountPrice, setDiscountPrice ] = useState<string>("");
   const [ discountPercentage, setDiscountPercentage ] = useState<number>(0);
@@ -169,17 +169,58 @@ const EditProduct = ({ productId }: { productId: string }) => {
 
     router.back()
   }
-
+  
   
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "customParams",
   });
+  
+  useEffect(() => {
+            const parsedPrice = parseFloat(price);
+            const parsedDiscountPrice = parseFloat(discountPrice);
+        
+            if (!isNaN(parsedPrice) && !isNaN(parsedDiscountPrice) && parsedPrice !== 0) {
+              const percentage = ((parsedPrice - parsedDiscountPrice) / parsedPrice) * 100;
+              setDiscountPercentage(percentage);
+            }
+  }, [price, discountPrice]);
 
   useEffect(() => {
-    const fetchProductProperities = async () => {
+            if(discountPercentage) {
+              console.log(discountPercentage);
+              console.log(discountPrice);
+          
+              const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
+          
+              setDiscountPrice(`${discountValue}`);
+        
+              console.log("Result " + discountValue);
+            } else {
+              setDiscountPercentage(0);
+        
+              console.log(discountPercentage);
+              console.log(discountPrice);
+          
+              const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
+          
+              setDiscountPrice(`${discountValue}`);
+        
+              console.log("Result " + discountPrice);
+            }
+  }, [discountPercentage])
+
+  const handleNoDiscount = (value: boolean) => {
+            if(value) {
+              setDiscountPrice(price);
+              setDiscountPercentage(0);
+              setDiscountType("percentage");
+            }
+  }
+
+  useEffect(() => {
+    const fetchProductProperities = () => {
         try {
-            const productProperities = await getProductsProperities(productId, "json");
             const { properities: parsedProductProperities, params: fetchedParams, categories } = JSON.parse(productProperities as string)
 
             parsedProductProperities.forEach(({ name, value }: { name: string, value: string | string[]}) => {
@@ -191,7 +232,6 @@ const EditProduct = ({ productId }: { productId: string }) => {
               if(name === "priceToShow") {
                 setDiscountPrice(value as string);
               }
-
               if(name === "images") {
                 setImages(value as string[])
               }
@@ -211,15 +251,15 @@ const EditProduct = ({ productId }: { productId: string }) => {
                 }
             });
 
+            console.log("Category", form.getValues("category"));
           } catch (error: any) {
             throw new Error(`Error appending existing product properities: ${error.message}`)
           }
         }
         
         fetchProductProperities();
-  }, [productId])
+  }, [productProperities])
 
-  
   // useEffect(() => {
   //   const fetchProductParams = async () => {
   //       try {
@@ -280,52 +320,10 @@ const EditProduct = ({ productId }: { productId: string }) => {
         return name;
     }
   }
-
-  useEffect(() => {
-            const parsedPrice = parseFloat(price);
-            const parsedDiscountPrice = parseFloat(discountPrice);
         
-            if (!isNaN(parsedPrice) && !isNaN(parsedDiscountPrice) && parsedPrice !== 0) {
-              const percentage = ((parsedPrice - parsedDiscountPrice) / parsedPrice) * 100;
-              setDiscountPercentage(percentage);
-            }
-  }, [price, discountPrice]);
-
-  useEffect(() => {
-            if(discountPercentage) {
-              console.log(discountPercentage);
-              console.log(discountPrice);
-          
-              const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
-          
-              setDiscountPrice(`${discountValue}`);
-        
-              console.log("Result " + discountValue);
-            } else {
-              setDiscountPercentage(0);
-        
-              console.log(discountPercentage);
-              console.log(discountPrice);
-          
-              const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
-          
-              setDiscountPrice(`${discountValue}`);
-        
-              console.log("Result " + discountPrice);
-            }
-  }, [discountPercentage])
-
-  const handleNoDiscount = (value: boolean) => {
-            if(value) {
-              setDiscountPrice(price);
-              setDiscountPercentage(0);
-              setDiscountType("percentage");
-            }
-  }
-          
-          
-          return (
-            <Form {...form}>
+  
+  return (
+    <Form {...form}>
       <form
         className='w-full flex gap-5 custom-scrollbar max-[900px]:flex-col'
         onSubmit={form.handleSubmit(onSubmit)}
@@ -755,7 +753,15 @@ const EditProduct = ({ productId }: { productId: string }) => {
                       <FormLabel className='text-small-medium text-[14px] text-dark-1'>
                         Категорія товару
                       </FormLabel>
-                      <Select onValueChange={field.onChange} {...field}>
+                      <Select        
+                        onValueChange={(value) => {
+                          // Check if the value is defined before setting it because Initial Rendering and Component Mounting: When the component containing the Select is rendered for the first time, React initializes all the states and props. During this process, the Select component is mounted, and onValueChange is triggered because the component tries to reconcile the initial state of the Select with its current value. Since no value has been selected yet, it is initially undefined.
+                          if (value) {
+                            field.onChange(value);
+                          }
+                        }} 
+                        {...field}
+                      >
                         <FormControl>
                           <SelectTrigger className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]">
                             <SelectValue className="text-small-regular text-gray-700 text-[13px]"></SelectValue>
