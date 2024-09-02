@@ -591,8 +591,8 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 control={form.control}
                 name="isAvailable"
                 render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel className='text-small-medium text-[14px] text-dark-1'>
+                  <FormItem className="w-full flex">
+                    <FormLabel className='text-small-medium text-[14px] text-dark-1 mt-[6px]'>
                       Доступний
                     </FormLabel>
                     <FormControl>
@@ -600,7 +600,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                         checked={field.value}
                         onCheckedChange={field.onChange}
                         aria-readonly
-                        className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:bg-black focus-visible:ring-[1px]"
+                        className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-2 focus-visible:ring-black focus-visible:bg-black focus-visible:ring-[1px] data-[state=checked]:bg-black"
                       />
                     </FormControl>
                     <FormMessage />
