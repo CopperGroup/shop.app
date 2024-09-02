@@ -370,6 +370,7 @@ export async function getProductsProperities(productId: string, type?: "json") {
                 { name: "category", value: product.category }, 
                 { name: "vendor", value: product.vendor },
                 { name: "images", value: product.images },
+                { name: "isAvailable", value: product.isAvailable }
             ], 
             params: product.params,
             categories: categories
@@ -387,6 +388,7 @@ export async function getProductsProperities(productId: string, type?: "json") {
                     { name: "category", value: product.category }, 
                     { name: "vendor", value: product.vendor },
                     { name: "images", value: product.images },
+                    { name: "isAvailable", value: product.isAvailable }
                 ], 
                 params: product.params,
                 categories: categories

@@ -12,6 +12,7 @@ export const ProductValidation = z.object({
     quantity: z.string(),
     category: z.string(),
     vendor: z.string(),
+    isAvailable: z.boolean(),
     Model: z.string().min(1, { message: "Model requires a name." }),
     Width: z.string().min(1, { message: "Width is required." }),
     Height: z.string().min(1, { message: "Height is required." }),

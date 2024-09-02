@@ -27,6 +27,7 @@ import { useDropzone } from "@uploadthing/react";
 import { generateClientDropzoneAccept } from "uploadthing/client";
 import { Progress } from "../ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Switch } from "../ui/switch";
 
 type ProductFormValues = z.infer<typeof ProductValidation>;
 type DiscountType = "percentage" | "digits";
@@ -34,6 +35,8 @@ type UploadingState = "initial" | "uploading" | "success" | "error";
 
 const EditProduct = ({ productProperities }: { productProperities: string}) => {
   const [ price, setPrice ] = useState<string>("");
+  const [ rawPrice, setRawPrice ] = useState<string>("");
+  const [ priceFocused, setPriceFocused ] = useState(false);
   const [ discountPrice, setDiscountPrice ] = useState<string>("");
   const [ discountPercentage, setDiscountPercentage ] = useState<number>(0);
   const [ focused, setFocused ] = useState(false);
@@ -177,6 +180,13 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
   });
   
   useEffect(() => {
+    // Set the initial value of rawPrice from the form field
+    if (price) {
+      setRawPrice(price); 
+    }
+  }, [price]);
+  
+  useEffect(() => {
             const parsedPrice = parseFloat(price);
             const parsedDiscountPrice = parseFloat(discountPrice);
         
@@ -211,11 +221,11 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
   }, [discountPercentage])
 
   const handleNoDiscount = (value: boolean) => {
-            if(value) {
-              setDiscountPrice(price);
-              setDiscountPercentage(0);
-              setDiscountType("percentage");
-            }
+    if(value) {
+      setDiscountPrice(price);
+      setDiscountPercentage(0);
+      setDiscountType("percentage");
+    }
   }
 
   useEffect(() => {
@@ -575,6 +585,29 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 )}
               />
           </div>
+          <div className="w-full h-fit pl-4 pr-5 py-4 border rounded-2xl">
+            <h4 className="w-full text-base-semibold text-[15px] mb-4">Стан</h4>
+              <FormField
+                control={form.control}
+                name="isAvailable"
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel className='text-small-medium text-[14px] text-dark-1'>
+                      Доступний
+                    </FormLabel>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-readonly
+                        className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:bg-black focus-visible:ring-[1px]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+          </div>
         </div>
         
         <div className="w-1/2 h-fit flex flex-col gap-5 max-[900px]:w-full">
@@ -593,12 +626,25 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                       <Input
                           type='text'
                           className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]"
-                          value={`₴ ${parseFloat(price).toFixed(2)}`}
+                          value={priceFocused ? rawPrice : `₴ ${rawPrice}`} // Use the raw input value for the input field
                           onChange={(e) => {
-                            const rawValue = e.target.value.replace(/[^\d]/g, "");
 
-                            setPrice(rawValue);
+                            const rawValue = e.target.value.replace(/[^\d.]/g, "");
+
+                            setPriceFocused(true);
+                            setRawPrice(rawValue);
                           }}
+                          onBlur={() => {
+                            if (!isNaN(parseFloat(rawPrice)) && rawPrice !== "") {
+                              const formattedPrice = `${parseFloat(rawPrice).toFixed(2)}`;
+                              setPrice(formattedPrice);
+                              setRawPrice(formattedPrice);
+                            } else {
+                              setRawPrice(""); 
+                            }
+                            setPriceFocused(false);
+                          }}
+                          onFocus={() => {setPriceFocused(true)}}
                         />
                     </FormControl>
                     <FormMessage />
