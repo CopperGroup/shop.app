@@ -51,11 +51,11 @@ const Header = ({ email, user }: { email: string, user: string }) => {
             const isActive = (pathname.includes(href) && href.length > 1) || pathname === href;
 
             return (
-              <div className={`w-fit h-8 text-neutral-400  flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
+              <div  key={label} className={`w-fit h-8 text-neutral-400  flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
                 {["Уподобані", "Мої замовлення"].includes(label) ? email && (
-                  <TransitionLink key={label} href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</TransitionLink>
+                  <TransitionLink href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</TransitionLink>
                 ): (
-                  <TransitionLink key={label} href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</TransitionLink>
+                  <TransitionLink href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</TransitionLink>
                 )
                 }
               </div>
