@@ -45,3 +45,14 @@ export const sidebarLinks = [
         label: "Категорії"
     }
 ]
+
+export const headerLinks = [
+    {
+        label: "Головна",
+        href: "/"
+      }, 
+      {
+        label: "Каталог",
+        href: "/catalog"
+      }
+]

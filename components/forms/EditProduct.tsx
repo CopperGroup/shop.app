@@ -3,9 +3,10 @@
 import * as z from "zod";
 import Image from "next/image";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { editProduct, } from "@/lib/actions/product.actions";
 import {
   Form,
   FormControl,
@@ -18,16 +19,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ProductValidation } from "@/lib/validations/product";
-import { editProduct, findAllProductsCategories, getProduct, getProductParams, getProductsProperities } from "@/lib/actions/product.actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Checkbox } from "../ui/checkbox";
 import { CheckboxSmall } from "../ui/checkbox-small";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useDropzone } from "@uploadthing/react";
 import { generateClientDropzoneAccept } from "uploadthing/client";
-import { Progress } from "../ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { Switch } from "../ui/switch";
+import DeleteProductButton from "../interface/DeleteProductButton";
 
 type ProductFormValues = z.infer<typeof ProductValidation>;
 type DiscountType = "percentage" | "digits";
@@ -148,17 +146,19 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
   });
 
   const onSubmit = async (values: z.infer<typeof ProductValidation>) => {
+
     await editProduct({
       id: values.id,
       name: values.name,
       quantity: parseFloat(values.quantity),
       images: images,
-      url: values.url,
+      url: values.url ? values.url : "",
       price: parseFloat(price),
       priceToShow: parseFloat(discountPrice),
       vendor: values.vendor,
       category: values.category,
       description: values.description,
+      isAvailable: values.isAvailable as boolean,
       params: {
         Model: values.Model,
         Width: values.Width,
@@ -370,7 +370,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                      Ім&apos;я товару
+                      Ім&apos;я товару<span className="text-subtle-medium"> *</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -389,7 +389,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                      Опис
+                      Опис<span className="text-subtle-medium"> *</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea
@@ -571,7 +571,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                      Кількість
+                      Кількість<span className="text-subtle-medium"> *</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -585,13 +585,13 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 )}
               />
           </div>
-          <div className="w-full h-fit pl-4 pr-5 py-4 border rounded-2xl">
+          {/* <div className="w-full h-fit pl-4 pr-5 py-4 border rounded-2xl">
             <h4 className="w-full text-base-semibold text-[15px] mb-4">Стан</h4>
               <FormField
                 control={form.control}
                 name="isAvailable"
                 render={({ field }) => (
-                  <FormItem className="w-full flex">
+                  <FormItem className="w-full flex flex-col">
                     <FormLabel className='text-small-medium text-[14px] text-dark-1 mt-[6px]'>
                       Доступний
                     </FormLabel>
@@ -607,7 +607,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                   </FormItem>
                 )}
               />
-          </div>
+          </div> */}
         </div>
         
         <div className="w-1/2 h-fit flex flex-col gap-5 max-[900px]:w-full">
@@ -620,7 +620,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                      Звичайна ціна
+                      Звичайна ціна<span className="text-subtle-medium"> *</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -654,7 +654,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
               {noDiscount === false && (
                 <div className="w-full h-fit">
                   <p className='w-full text-small-medium text-[14px] text-dark-1'>
-                    {discountType === "percentage" ? "Знижка у відсотках (%)" : "Ціна зі знижкою"}
+                    {discountType === "percentage" ? "Знижка у відсотках (%)" : "Ціна зі знижкою"}<span className="text-subtle-medium"> *</span>
                   </p>
                   <div className="w-full h-fit flex gap-2 items-end max-[370px]:flex-col max-[370px]:px-1">
                     {discountType === "percentage" ? (
@@ -732,7 +732,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                   render={({ field }) => (
                     <FormItem className='w-full'>
                       <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                        Постачальник
+                        Постачальник<span className="text-subtle-medium"> *</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -777,7 +777,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                      Назва категоріЇ
+                      Назва категоріЇ<span className="text-subtle-medium"> *</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -797,7 +797,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                   render={({ field }) => (
                     <FormItem className='w-full'>
                       <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                        Категорія товару
+                        Категорія товару<span className="text-subtle-medium"> *</span>
                       </FormLabel>
                       <Select        
                         onValueChange={(value) => {
@@ -841,7 +841,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                   render={({ field }) => (
                       <FormItem className='w-full'>
                           <FormLabel className='text-small-medium text-[14px] text-dark-1'>
-                              {paramsNamesUa[index]} {['Ширина', 'Висота', 'Глибина'].includes(paramsNamesUa[index]) && (<span className="text-subtle-medium">(см)</span>)}
+                              {paramsNamesUa[index]} {['Ширина', 'Висота', 'Глибина'].includes(paramsNamesUa[index]) && (<span className="text-subtle-medium">(см)</span>)}<span className="text-subtle-medium"> *</span>
                           </FormLabel>
                           <FormControl>
                               <Input
@@ -903,9 +903,33 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
               </div>
             )}
           </div>
-          <Button type='submit' className='bg-green-500 hover:bg-green-400'>
-            Зберегти зміни
-          </Button>
+          <div className="w-full flex gap-1">
+            <Button type='submit' className='w-full bg-green-500 hover:bg-green-400' size="sm">
+              Зберегти зміни
+            </Button>
+            <DeleteProductButton id={form.getValues("id")}/>
+          </div>
+          <div className="w-full flex justify-end">
+            <FormField
+              control={form.control}
+              name="isAvailable"
+              render={({ field }) => (
+                <FormItem className="w-fit h-full flex items-center gap-1">
+                  <FormLabel className='text-subtle-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mt-2'>
+                    Доступний
+                  </FormLabel>
+                  <FormControl>
+                    <CheckboxSmall 
+                      className="size-3 rounded-[4px] border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white" 
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
       </form>
     </Form>

@@ -8,6 +8,9 @@ import Provider from "../Provider";
 import { AppWrapper } from "./context";
 import CartPage from "@/components/shared/CartPage";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import BannerHero from "@/components/banner/BannerHero";
+import { getSession } from "@/lib/getServerSession";
+import { fetchUserByEmail } from "@/lib/actions/user.actions";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,25 +20,26 @@ export const metadata: Metadata = {
   description: "Your's best bathroom advisor",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
 
- 
+  const email = await getSession();
 
+  const user = await fetchUserByEmail(email);
   return (
       <html lang="en">
         <body className={inter.className}>
           <Provider>
-              <Header/>
+              <Header email={email} user={JSON.stringify(user)}/>
               <AppWrapper>
-                <section className = "main-container">
-                  <div className = "w-full max-w-screen-2xl px-3">
-                      {children}
-                  </div>
-                </section>
+                <main className = "main-container">
+                  <div className = "w-full max-w-[1680px] px-5">
+                    {children}
+                 </div>
+                </main>
                 <StickyCart/>
             </AppWrapper>
           <Footer/>

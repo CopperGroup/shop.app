@@ -57,6 +57,7 @@ interface CreateParams {
     vendor: string,
     category?: string,
     description: string,
+    isAvailable: boolean,
     params: {
         Model: string,
         Width: string,
@@ -103,13 +104,16 @@ export async function createUrlProduct({ id, name, isAvailable, quantity, url, p
     }
 }
 
-export async function createProduct({ id, name, quantity, url, price, priceToShow, vendor, category, description }: CreateParams){
+export async function createProduct({ id, name, quantity, images, url, priceToShow, price, vendor, category, description, isAvailable, params, customParams }: CreateParams){
     try {
         connectToDB();
 
-        const createdProduct = await Product.create({
+        console.log("Custom params", customParams);
+        
+        await Product.create({
             id: id,
             name: name,
+            images: images,
             quantity: quantity,
             url: url,
             price: price,
@@ -117,9 +121,26 @@ export async function createProduct({ id, name, quantity, url, price, priceToSho
             category: category ? category : "",
             vendor: vendor,
             description: description,
+            isAvailable: isAvailable,
+            params: [
+               { name: "Товар", value: params.Model.replace(/ /g, '_') },
+               { name: "Ширина, см", value: parseFloat(params.Width).toFixed(2).toString() },
+               { name: "Висота, см", value: parseFloat(params.Height).toFixed(2).toString() },
+               { name: "Глибина, см", value: parseFloat(params.Depth).toFixed(2).toString() },
+               { name: "Вид", value: params.Type },
+               { name: "Колір", value: params.Color },
+            ],
         })
+        
+        const createdProduct = await Product.findOne({ id: id });
 
-  
+        if(customParams){
+            for(const customParam of customParams){
+                createdProduct.params.push({ name: customParam.name, value: customParam.value });
+            }
+        }
+
+        await createdProduct.save();
     } catch (error: any) {
         throw new Error(`Error creating new product, ${error.message}`)
     }
@@ -399,7 +420,7 @@ export async function getProductsProperities(productId: string, type?: "json") {
     }
 }
 
-export async function editProduct({ id, name, quantity, images, url, priceToShow, price, vendor, category, description, params, customParams }: CreateParams){
+export async function editProduct({ id, name, quantity, images, url, priceToShow, price, vendor, category, description, isAvailable, params, customParams }: CreateParams){
     try {
         connectToDB();
         
@@ -414,6 +435,7 @@ export async function editProduct({ id, name, quantity, images, url, priceToShow
         createdProduct.vendor = vendor;
         createdProduct.category = category ? category : "";
         createdProduct.description = description;
+        createdProduct.isAvailable = isAvailable;
 
         createdProduct.params = [];
         
@@ -500,6 +522,35 @@ export async function findAllProductsCategories(type?: "json") {
   }
 }
 
+export async function deleteProduct(productId: string, path: string) {
+  try {
+    connectToDB();
+
+    const product = await Product.findOne({ id: productId });
+
+    const usersWhoLikedProduct = await User.find({ _id: { $in: product.likedBy }});
+
+    if(!product) {
+        throw new Error("Product not found");
+    }
+
+    console.log("Liked by", usersWhoLikedProduct);
+
+    if(usersWhoLikedProduct){
+        for(const user of usersWhoLikedProduct) {
+            user.likes.pull(product._id);
+    
+            await user.save();
+        }
+    }
+
+    await Product.deleteOne({ id: productId });
+
+    revalidatePath(path)
+  } catch (error: any) {
+    throw new Error(`Error deleting product: ${productId} ${error.message}`)
+  }
+}
 
 
 

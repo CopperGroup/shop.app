@@ -202,7 +202,7 @@ const catalog = async ({searchParams,data}:any) => {
  
 
   return (
-    <section className="-mt-12">
+    <section>
       <BannerSmall/>
       <div className="flex mt-12">
         <Filter categories={category} category={searchParams.category} minPrice={minPrice} maxPrice={maxPrice} maxMin={maxMinRes} vendors={vendors} series={series} color={color} Type={Type} counts={{ vendorCount: vendorCount, categoryCount: categoryCount, typeCount: typeCount, seriesCount: seriesCount, colorCount: colorCount}}/>

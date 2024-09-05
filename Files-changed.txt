@@ -43,3 +43,14 @@
 41. lib/actions/product.actions.ts
 42. lib/types/types.ts
 43. lib/validations/product.ts
+44. app/admin/createProduct/edit-product/[id]/page.tsx
+45. app/admin/createProduct/page.tsx
+46. components/forms/CreateProduct.tsx
+47. components/interface/DeleteProductButton.tsx
+48. app/(root)/page.tsx
+49. app/(root)/layout.tsx
+50. components/shared/Banner.tsx
+50. components/baners/BannerHero.tsx
+51. components/shared/Header.tsx
+52. components/svg/Logo.tsx
+53. components/shared/AdminLink.tsx

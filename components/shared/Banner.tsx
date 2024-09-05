@@ -16,12 +16,12 @@ const Banner = () => {
   const images = [1,2,3,4]
 
   return (
-    <section className="w-full rounded-sm mt-[-100px]">
+    <section className="w-full rounded-sm max-h-96">
       <div className="w-full flex justify-center items-center  ">
           {/* <Image src="/bannergh.png" width={768} height={504} alt="Hero" priority/> */}
           <section className=''>
       <div className='container'>
-      <Carousel className="w-4/5 mx-auto max-md:w-full">
+      <Carousel className="w-4/5 mx-auto max-md:w-full max-h-96">
       <CarouselContent>
         
           <CarouselItem >
