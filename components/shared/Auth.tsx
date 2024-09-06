@@ -5,9 +5,10 @@ import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 import { useState } from "react"
 import AdminLink from "./AdminLink"
+import Image from "next/image"
 
 
-const Auth = ({email,user}:any) => {
+const Auth = ({ email, user }: { email: string, user: string}) => {
   const { data:session, status} = useSession();
   const [burger, setBurger] = useState('burger-lines');
   const [bgBurger, setBgBurger] = useState('bg-burger');
@@ -33,24 +34,12 @@ const Auth = ({email,user}:any) => {
   return (
     <>
       
-      {//@ts-ignore
-      status === "authenticated"?<Button onClick={signOut} variant="outline" className="hover:border-black transition-colors duration-300 ">Вийти</Button>:<Link href='/login'><Button variant="default" className="z-40 relative ">Увійти</Button></Link>}
-      <div onClick={burgerClass} className="py-3">
-        <div className={burger}></div>
-      </div>
-     
-      <div className={bgBurger}>
-        <p className="py-5 px-2  "><AdminLink></AdminLink></p>
-        <p className="py-5 px-2  "><Link href='/' className="Underline " onClick={handleRouteChange}>Головна</Link></p>
-        <p className="py-5 px-2  "><Link href='/presentations' className="Underline" onClick={handleRouteChange}>Презентації</Link></p>
-        <p className="py-5 px-2  "><Link href='/catalog' className="Underline" onClick={handleRouteChange}>Каталог</Link></p>
-        <p className="py-5 px-2  "><Link href='/contacts' className="Underline" onClick={handleRouteChange}>Контакти</Link></p>
-        <p className="py-5 px-2  ">{email &&<Link href='/myOrders' className="Underline" onClick={handleRouteChange}>Мої замовлення</Link>}</p>
-        <p className="py-5 px-2 "><Link href='/delivery-payment' className="Underline" onClick={handleRouteChange}>Доставка та оплата</Link></p>
-        <p className="py-5 px-2 "><Link href='/warranty-services' className="Underline" onClick={handleRouteChange}>Гарантія та сервіси</Link></p>
-        <p className="py-5 px-2 ">{email && <Link  href={`/liked/${user._id}`} className="Underline" onClick={handleRouteChange}>Уподобані</Link>}</p>
-        {/* {email && <Link href={`/liked/${user._id}`} className="Underline">Уподобані</Link>} */}
-    </div>
+      {//@ts-ignore 
+        status === "authenticated" ? (<Button onClick={signOut} className="h-8 space-x-1 bg-white text-[14px] font-semibold text-black border border-black rounded-full mt-[6px] px-5 transition-colors duration-300 hover:bg-white hover:text-black" size="sm"><Image src="/assets/logout.svg" height={20} width={20} alt="Log-out"/><p>Вийти</p></Button>)
+        : (<Link href='/login'>
+            <Button className="h-8 space-x-1 bg-white text-[14px] font-semibold text-black border border-black rounded-full mt-[6px] px-5 transition-colors duration-300 hover:bg-white hover:text-black" size="sm"><Image src="/assets/user.svg" height={22} width={22} alt="Log-in"/><p>Увійти</p></Button>
+          </Link>
+          )}
     </>
   )
 }

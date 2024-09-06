@@ -54,3 +54,7 @@
 51. components/shared/Header.tsx
 52. components/svg/Logo.tsx
 53. components/shared/AdminLink.tsx
+54. components/shared/Auth.tsx
+55. npm i @headlessui/react
+56. npx shadcn@latest add menubar
+57. components/shared/BurgerMenu.tsx
