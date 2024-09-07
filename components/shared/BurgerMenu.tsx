@@ -25,7 +25,10 @@ export default function BurgerMenu({ email, user }: { email: string; user: strin
     { label: "Каталог", href: "/catalog" },
     { label: "Уподобані", href: `/liked/${userInfo?._id}` },
     { label: "Мої замовлення", href: "/myOrders" },
-    { label: "Інформація", href: "/info" }
+    { label: "Контакти", href: "/info/contacts"},
+    { label: "Доставка та оплата", href: "/info/delivery-payment"},
+    { label: "Гарантія та сервіси", href: "/info/warranty-services"},
+    { label: "Презентації", href: "/info/presentations"}
   ]
 
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function BurgerMenu({ email, user }: { email: string; user: strin
         <div className="fixed inset-x-0 top-20 bottom-0 bg-black z-40">
           <div className="h-full overflow-y-auto py-6 px-4 flex flex-col items-center">
             <nav className="flex flex-col items-center space-y-4 w-full">
-              <AdminLink />
+              <AdminLink className="pt-2 hover:bg-transparent hover:text-red-500" linkDecoration="text-base-regular"/>
               {Links.map(({ label, href }) => {
                 const isActive = (pathname.includes(href) && href.length > 1) || pathname === href
 

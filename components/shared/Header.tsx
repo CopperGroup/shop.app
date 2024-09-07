@@ -52,12 +52,12 @@ const Header = ({ email, user }: { email: string, user: string }) => {
   
   return (
     <header className="w-full h-20 flex justify-center items-center">
-      <div className="w-full max-w-[1680px] h-full flex justify-between items-center bg-black rounded-b-full px-12 max-lg:rounded-none">
+      <div className="w-full max-w-[1680px] h-full flex justify-between items-center bg-black rounded-b-full px-12 max-lg:rounded-none max-[600px]:px-9 max-[500px]:px-7">
         <div className="size-5 hidden max-lg:flex"></div>
-        <div className="w-fit flex gap-2 justify-center items-center">
+        <Link href="/" className="w-fit flex gap-2 justify-center items-center">
           <Logo/>
           <p className="text-base-semibold text-white">SANTEHVAN</p>
-        </div>
+        </Link>
         <nav className="w-fit h-11 flex gap-1 justify-center items-center rounded-full bg-[#1f1f1f] px-2 max-lg:hidden">
           <AdminLink></AdminLink>
           {Links.map(({ label, href }) => { 
@@ -71,7 +71,7 @@ const Header = ({ email, user }: { email: string, user: string }) => {
                   </div>
                 ): label === "Інформація" ? (
                   <Menubar className="h-8 border-0 p-0 space-x-0">
-                    <MenubarMenu >
+                    <MenubarMenu>
                       <MenubarTrigger className={`w-fit h-8 text-neutral-400  flex justify-center items-center border-neutral-400 rounded-full cursor-pointer px-[0.885rem] ${isActive && "bg-glass text-white border"}`}><p className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</p></MenubarTrigger>
                       <MenubarContent className="min-w-[9rem] bg-[#1f1f1f] text-neutral-400 border-0 rounded-2xl">
                         <MenubarItem className="text-small-medium font-normal cursor-pointer hover:text-white transition-all">

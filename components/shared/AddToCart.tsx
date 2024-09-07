@@ -77,7 +77,7 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount}: { id: string
 
 
   return (
-    <Button className="border-[1px] border-black  mr-1 px-9 z-40" onClick={AddDataToCart}>У кошик</Button>
+    <Button className="border-[1px] border-black  mr-1 px-9 z-20" onClick={AddDataToCart}>У кошик</Button>
   )
 }
 
