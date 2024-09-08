@@ -58,3 +58,6 @@
 55. npm i @headlessui/react
 56. npx shadcn@latest add menubar
 57. components/shared/BurgerMenu.tsx
+59. npm install embla-carousel-react
+
+
