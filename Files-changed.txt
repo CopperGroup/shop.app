@@ -59,5 +59,6 @@
 56. npx shadcn@latest add menubar
 57. components/shared/BurgerMenu.tsx
 59. npm install embla-carousel-react
+60. components/shared/categories.tsx
 
 
