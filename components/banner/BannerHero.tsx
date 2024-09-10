@@ -33,7 +33,7 @@ const BannerHero = ({ children }: { children?: ReactNode }) => {
           <LinkButton href="/catalog" type="white">Переглянути каталог</LinkButton>
         </div>
         <div className="lg:w-1/2 mt-10 lg:mt-0">
-          <div className="relative w-full h-[450px] max-[1260px]:pt-5 max-[1130px]:pt-12 max-[1024px]:pt-0 max-[768px]:h-fit max-[768px]:max-h-[400px]">
+          <div className="relative w-full h-[450px] max-[1260px]:pt-5 max-[1130px]:pt-12 max-[1023px]:pt-0 max-[768px]:h-fit max-[768px]:max-h-[400px]">
             <div className="w-full h-full rounded-3xl overflow-hidden">
 
               <Carousel 

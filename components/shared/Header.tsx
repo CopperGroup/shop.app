@@ -47,8 +47,8 @@ const Header = ({ email, user }: { email: string, user: string }) => {
       href: "/info"
     }
   ]
-
-  console.log(email);
+  
+  console.log(userInfo);
   
   return (
     <header className="w-full h-20 flex justify-center items-center">
@@ -70,7 +70,7 @@ const Header = ({ email, user }: { email: string, user: string }) => {
                     <TransitionLink href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</TransitionLink>
                   </div>
                 ): label === "Інформація" ? (
-                  <Menubar className="h-8 border-0 p-0 space-x-0">
+                  <Menubar key={label} className="h-8 border-0 p-0 space-x-0">
                     <MenubarMenu>
                       <MenubarTrigger className={`w-fit h-8 text-neutral-400  flex justify-center items-center border-neutral-400 rounded-full cursor-pointer px-[0.885rem] ${isActive && "bg-glass text-white border"}`}><p className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</p></MenubarTrigger>
                       <MenubarContent className="min-w-[9rem] bg-[#1f1f1f] text-neutral-400 border-0 rounded-2xl">

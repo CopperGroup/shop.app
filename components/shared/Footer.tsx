@@ -10,9 +10,9 @@ const Footer = () => {
                 <div className="flex gap-2 lg:gap-20 justify-between w-full lg:w-fit">
                     <ul>
                         <li className="mb-3">Фіз. особам</li>
-                        <li className="text-md font-thin my-1 underline"><Link href='/contacts'>Контакти</Link></li>
-                        <li className="text-md font-thin my-1 underline"><Link href='/delivery-payment'>Доставка та оплата</Link></li>
-                        <li className="text-md font-thin my-1 underline"><Link href='/warranty-services'>Гарантія та сервіс</Link></li>
+                        <li className="text-md font-thin my-1 underline"><Link href='info/contacts'>Контакти</Link></li>
+                        <li className="text-md font-thin my-1 underline"><Link href='info/delivery-payment'>Доставка та оплата</Link></li>
+                        <li className="text-md font-thin my-1 underline"><Link href='info/warranty-services'>Гарантія та сервіс</Link></li>
                     </ul>
                     <ul>
                         <li>Дизайн</li>

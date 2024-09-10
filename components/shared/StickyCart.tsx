@@ -42,7 +42,7 @@ const StickyCart = () => {
         </Button>
     </div>
 
-    <div ref={cartRef} className="fixed duration-700 transition-all h-full right-[-100%] bg-white max-w-[400px] w-full  mx-auto z-50 rounded-sm  top-0 border-l-2 border-l-gray-700">
+    <div ref={cartRef} className="fixed duration-700 transition-all h-full right-[-100%] bg-gradient-to-r from-gray-50 to-white max-w-[400px] w-full  mx-auto z-50 rounded-sm  top-0 shadow-2xl">
       <CartPage cartRef={cartRef} setIsOpened={setIsOpened}/>
     </div>
     

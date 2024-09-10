@@ -64,5 +64,8 @@
 62. components/svg/Beaker.tsx
 63. components/shared/AboutUs.tsx
 64. components/interface/LinkButton.tsx
+65. components/shared/Footer.tsx
+66. components/shared/Map.tsx
+67. components/shared/Stickycart.tsx
 
 

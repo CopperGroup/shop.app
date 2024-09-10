@@ -141,8 +141,8 @@ function delProduct(index: number, value: any){
 
             
             
-            <div className='w-full flex bg-white my-3 px-10 right-0 flex-col absolute bottom-0 border-t-2 border-dashed pt-2 border-black'>
-              <div className='text-[20px] text-center border-black pb-5 text-nowrap'>Разом: <span className='font-bold'>{toPay.toFixed(2)}</span> грн.</div>
+            <div className='w-full flex bg-neutral-100 rounded-2xl right-0 flex-col absolute bottom-0 pt-4 my-3 px-10'>
+              <div className='text-body-semibold text-center border-black pb-5 text-nowrap'>Разом: <span className="font-medium">{toPay.toFixed(2)}грн.</span></div>
               <Button onClick={hideCart} variant='outline' className='mb-5'>Повернутись до кокупок</Button>
               <Link href='/order' className='w-full'><Button onClick={hideCart} className='w-full'>Замовити</Button></Link>
             </div>
