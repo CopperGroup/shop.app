@@ -9,10 +9,10 @@ const categories = [
 
 const Categories = () => {
 return (
-  <section className="w-full pt-10 pb-32">
+  <section className="w-full pt-10 pb-7">
     <div className="w-full flex justify-center items-center">
       <div className="w-full max-w-[1680px] px-12 max-lg:px-9 max-[500px]:px-7">
-        <h2 className="text-heading1-bold text-black mb-4 text-center">Категорії продуктів</h2>
+        <h2 className="text-heading1-bold text-black mb-4 text-center">Категорії товару</h2>
         <p className="text-body-medium text-light-4 mb-16 text-center max-w-2xl mx-auto">
           Знайдіть ідеальні рішення для вашого дому серед наших категорій
         </p>

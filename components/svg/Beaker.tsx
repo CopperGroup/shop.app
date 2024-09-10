@@ -23,14 +23,33 @@ const Beaker = ({ cursor, cardRef }: Props) => {
   }, [cursor, cardRef])
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 371.409 371.409" className="w-80 h-80 duration-200 transition-all">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" className="absolute w-[200%] h-[200%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-30">
       <defs>
-        <radialGradient id="blueGradient" gradientUnits="userSpaceOnUse" cx={gradientCenter.cx} cy={gradientCenter.cy}>
-          <stop stopColor="#2563EB70"/>
-          <stop offset={1} stopColor="#404040"/>
+        <radialGradient id="confidenceGradient" gradientUnits="userSpaceOnUse" cx={gradientCenter.cx} cy={gradientCenter.cy} r="50%">
+          <stop stopColor="#0095f6"/>
+          <stop offset={1} stopColor="#40404005"/>
         </radialGradient>
       </defs>
-      <path strokeLinecap="round" strokeLinejoin="round" className="fill-transparent" stroke="url(#blueGradient)" d="M270.265,149.448c-36.107-47.124-70.38-78.948-73.439-141.372c0-1.836-0.612-3.06-1.836-4.284 c-0.612-3.06-3.672-4.896-6.732-3.06c-3.672,0-6.731,2.448-6.731,6.732c-77.112,83.232-207.468,294.372-43.452,354.959 c74.052,27.541,157.896-9.791,172.584-90.576C318.614,228.396,295.969,182.497,270.265,149.448z M138.686,323.256 c-17.748-10.404-28.764-31.211-34.272-49.572c-2.448-9.18-3.672-18.359-3.06-27.539c3.672-15.912,8.568-31.213,14.076-46.512 c3.06,13.463,9.18,26.928,17.748,36.719c19.584,21.422,59.364,34.273,70.38,61.201c6.732,16.523-19.584,30.6-30.6,34.271 C161.33,335.496,148.477,329.377,138.686,323.256z"></path>
+      <g fill="none" stroke="url(#confidenceGradient)" strokeWidth="3">
+        {/* Grid pattern for stability */}
+        <path d="M0,200 h2000 M0,600 h2000 M0,1000 h2000 M0,1400 h2000 M0,1800 h2000" />
+        <path d="M200,0 v2000 M600,0 v2000 M1000,0 v2000 M1400,0 v2000 M1800,0 v2000" />
+        
+        {/* Interlocking circles for unity and strength */}
+        <circle cx="500" cy="500" r="300" />
+        <circle cx="1500" cy="500" r="300" />
+        <circle cx="500" cy="1500" r="300" />
+        <circle cx="1500" cy="1500" r="300" />
+        
+        {/* Shield shape for trust and security */}
+        <path d="M1000,200 L1400,600 L1000,1800 L600,600 Z" />
+        
+        {/* Star burst for quality and excellence */}
+        <path d="M1000,1000 L1100,600 L1000,200 L900,600 Z" />
+        <path d="M1000,1000 L1400,900 L1800,1000 L1400,1100 Z" />
+        <path d="M1000,1000 L1100,1400 L1000,1800 L900,1400 Z" />
+        <path d="M1000,1000 L600,900 L200,1000 L600,1100 Z" />
+      </g>
     </svg>
   )
 }

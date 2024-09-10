@@ -60,5 +60,9 @@
 57. components/shared/BurgerMenu.tsx
 59. npm install embla-carousel-react
 60. components/shared/categories.tsx
+61. npm i framer-motion
+62. components/svg/Beaker.tsx
+63. components/shared/AboutUs.tsx
+64. components/interface/LinkButton.tsx
 
 

@@ -12,6 +12,7 @@ import Image from "next/image"
 import { ReactNode } from "react"
 import { Button } from "../ui/button"
 import Link from "next/link"
+import LinkButton from "../interface/LinkButton"
 
 
 
@@ -29,9 +30,7 @@ const BannerHero = ({ children }: { children?: ReactNode }) => {
           <p className="text-xl text-neutral-400">
             Широкий вибір сучасних та надійних сантехнічних рішень для вашої оселі
           </p>
-          <Link href="/catalog" className="bg-white text-black font-medium border border-black rounded-xl py-3 px-4 hover:border-white hover:text-white hover:bg-black">
-            Переглянути каталог
-          </Link>
+          <LinkButton href="/catalog" type="white">Переглянути каталог</LinkButton>
         </div>
         <div className="lg:w-1/2 mt-10 lg:mt-0">
           <div className="relative w-full h-[450px] max-[1260px]:pt-5 max-[1130px]:pt-12 max-[1024px]:pt-0 max-[768px]:h-fit max-[768px]:max-h-[400px]">
