@@ -67,5 +67,14 @@
 65. components/shared/Footer.tsx
 66. components/shared/Map.tsx
 67. components/shared/Stickycart.tsx
-
-
+68. app/(root)/info/contacts/page.tsx
+69. app/(root)/info/delivery-payment/page.tsx
+70. app/(root)/info/presentations/page.tsx
+71. app/(root)/info/warranty-services
+72. npx shadcn@latest add badge
+73. npx shadcn@latest add separator
+74. components/shared/ProdactPage.tsx
+75. app/(root)/catalog/[id]/page.tsx
+76. app/(root)/catalog/[id]/loading.tsx
+77. components/shared/ProductPage.tsx
+78. components/shared/AddToCart.tsx

@@ -4,6 +4,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { useAppContext } from '@/app/(root)/context'
 import { productAddedToCart } from '@/lib/actions/product.actions'
+import { ShoppingCart } from 'lucide-react'
 
 // interface CartData {
 //   id: string;
@@ -13,7 +14,7 @@ import { productAddedToCart } from '@/lib/actions/product.actions'
 //   amount: number;
 // }
 
-const AddToCart = ({ id, name, image, price, priceWithoutDiscount}: { id: string, name:string, image:string, price:number, priceWithoutDiscount: number}) => {
+const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { id: string, name:string, image:string, price:number, priceWithoutDiscount: number, variant?: "full"}) => {
     //@ts-ignore
     const {cartData, setCartData} = useAppContext();
 
@@ -75,10 +76,18 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount}: { id: string
     //     console.log('f', cartData);
     // }
 
-
-  return (
-    <Button className="border-[1px] border-black  mr-1 px-9 z-20" onClick={AddDataToCart}>У кошик</Button>
-  )
+    if(variant === "full") {
+      return (
+        <Button className="w-48" onClick={AddDataToCart}>
+          <ShoppingCart className="mr-2" size={20} />
+          Додати в кошик
+        </Button>
+      )
+    } else {
+      return (
+        <Button className="border-[1px] border-black  mr-1 px-9 z-20" onClick={AddDataToCart}>У кошик</Button>
+      )
+    }
 }
 
 export default AddToCart

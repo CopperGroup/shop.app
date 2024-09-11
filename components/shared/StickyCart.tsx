@@ -1,53 +1,91 @@
 'use client'
 
-import Image from "next/image"
-import { Button } from "../ui/button"
-import { useAppContext } from '@/app/(root)/context'
 import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
+import { motion, AnimatePresence } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { useAppContext } from '@/app/(root)/context'
 import CartPage from "./CartPage"
 
-const StickyCart = () => {
-  const [ isOpened, setIsOpened ] = useState(false);
-  const { cartData} = useAppContext();
-  const cartRef = useRef<HTMLDivElement>(null);
-  const cartButtonRef = useRef<HTMLDivElement>(null);
+export default function StickyCart() {
+  const [isOpened, setIsOpened] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const { cartData } = useAppContext()
+  const cartButtonRef = useRef<HTMLDivElement>(null)
+  const prevCartLength = useRef(cartData.length)
 
-  function showCart(){
-    setIsOpened(!isOpened);
-
-    if(cartRef.current) {
-      cartRef.current.style.right = "0";
-      document.body.style.overflow = "hidden";
-    }
+  const toggleCart = () => {
+    setIsOpened((prev) => !prev)
   }
 
   useEffect(() => {
-    if(cartButtonRef.current) {
-      if(isOpened) {
-        cartButtonRef.current.style.display = "none";
-      }
+    document.body.style.overflow = isOpened ? "hidden" : "auto"
+    
+    if (cartButtonRef.current) {
+      cartButtonRef.current.style.display = isOpened ? "none" : "block"
+    }
 
-      if(!isOpened) {
-        cartButtonRef.current.style.display = "block";
-      }
+    return () => {
+      document.body.style.overflow = "auto"
     }
   }, [isOpened])
 
+  useEffect(() => {
+    if (cartData.length > prevCartLength.current) {
+      setIsAnimating(true)
+      setTimeout(() => setIsAnimating(false), 300)
+    }
+    prevCartLength.current = cartData.length
+  }, [cartData])
+
   return (
     <>
-    <div ref={cartButtonRef} className="fixed bottom-8 right-8 z-[100] max-sm:bottom-4 max-sm:right-4 transition-all">
-        <Button onClick={showCart} className="size-16 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-white hover:bg-white hover:border-black hover:size-[4.2rem] transition-all max-sm:size-14">
-            <div className="bg-black rounded-full absolute top-[-5px] right-2 w-6">{cartData.length>0?cartData.length:''}</div>
-            <Image src="/assets/cart.svg" width={32} height={32} alt="cart-icon" className="drop-shadow-text-blue"/>
-        </Button>
-    </div>
+      <motion.div
+        ref={cartButtonRef}
+        className="fixed bottom-8 right-8 z-[100] max-sm:bottom-4 max-sm:right-4"
+        animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        >
+          <Button 
+            onClick={toggleCart} 
+            className="size-16 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200 transition-all duration-300 ease-in-out hover:bg-white max-sm:size-14"
+          >
+            <AnimatePresence>
+              {cartData.length > 0 && (
+                <motion.div
+                  key="cart-count"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  className="absolute top-0 right-0 bg-black text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+                >
+                  {cartData.length}
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <Image src="/assets/cart.svg" width={28} height={28} alt="cart-icon" className="drop-shadow-sm"/>
+          </Button>
+        </motion.div>
+      </motion.div>
 
-    <div ref={cartRef} className="fixed duration-700 transition-all h-full right-[-100%] bg-gradient-to-r from-gray-50 to-white max-w-[400px] w-full  mx-auto z-50 rounded-sm  top-0 shadow-2xl">
-      <CartPage cartRef={cartRef} setIsOpened={setIsOpened}/>
-    </div>
-    
+      <AnimatePresence>
+        {isOpened && (
+          <motion.div
+            className="fixed h-full bg-white max-w-[400px] w-full z-50 top-0 right-0 shadow-2xl"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <CartPage setIsOpened={setIsOpened} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
-
-export default StickyCart;

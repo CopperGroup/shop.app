@@ -29,7 +29,7 @@ export default function AboutUs() {
   }
 
   return (
-    <section className="w-full py-24 bg-white pb-56">
+    <section className="w-full py-24 bg-white pb-56 max-sm:pb-36">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div 
           ref={cardRef}

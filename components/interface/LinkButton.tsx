@@ -2,6 +2,7 @@ import Link, { LinkProps } from 'next/link';
 import React, { ReactNode, useState } from 'react'
 import { motion } from "framer-motion";
 import { cn } from '@/lib/utils';
+import { TransitionLink } from './TransitionLink';
 
 interface Props extends LinkProps {
     children: ReactNode;
@@ -14,7 +15,7 @@ const LinkButton = ({ children, href, className, type, ...props }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Link href={href} {...props}>
+    <TransitionLink href={href} {...props} type={"left"}>
       <motion.div
         className={cn(`relative w-fit h-fit flex justify-center items-center font-medium gap-2 border border-black rounded-full px-4 py-2 overflow-hidden ${type === "white" ? "border-white bg-white" : "border-black"}`, className)}
         onHoverStart={() => setIsHovered(true)}
@@ -63,7 +64,7 @@ const LinkButton = ({ children, href, className, type, ...props }: Props) => {
           </svg>
         </motion.div>
       </motion.div>
-    </Link>
+    </TransitionLink>
   )
 }
 
