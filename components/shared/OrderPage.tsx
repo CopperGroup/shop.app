@@ -93,7 +93,7 @@ export default function OrderPage({ orderJson }: { orderJson: string}) {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Інформація про клієнта</h2>
             <p className="flex items-center gap-2">
-              <span className="font-semibold">Ім'я:</span> {order.name} {order.surname}
+              <span className="font-semibold">Ім&apos;я:</span> {order.name} {order.surname}
             </p>
             <Link href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.adress}, ${order.city}, ${order.postalCode}`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sky-600 hover:text-sky-800">
               <MapPin size={16} />
