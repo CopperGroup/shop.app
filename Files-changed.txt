@@ -78,3 +78,8 @@
 76. app/(root)/catalog/[id]/loading.tsx
 77. components/shared/ProductPage.tsx
 78. components/shared/AddToCart.tsx
+79. components/shared/Footer.tsx
+80. components/cards/OrderCard.tsx
+81. components/shared/OrderPage.tsx
+82. app/(root)/myOrders/[id]/page.tsx
+83. app/admin/Orders/[id]/page.tsx

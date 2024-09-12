@@ -30,7 +30,7 @@ const ProductCard = ({ id, productId, email, priceToShow, price, name, imageUrl,
   return (
     <article className="w-[100%] h-96 bg-neutral-100 rounded-2xl flex items-center justify-center  mx-auto" >     
         <div className="w-11/12 h-[90%]">
-            <TransitionLink href={`/catalog/${url}`}>
+            <a href={`/catalog/${url}`}>
                 <div className="w-full h-56 flex justify-center">
                     <Image src={imageUrl} width={200} height={200} alt="Product image" className="absolute rounded-2xl max-w-[200px] max-h-[200px]"/>
                     <div className="w-full h-full flex justify-between items-start">
@@ -43,7 +43,7 @@ const ProductCard = ({ id, productId, email, priceToShow, price, name, imageUrl,
                     <h3 className="text-body-bold ml-1">{name}</h3>
                     <p className="ml-1">{description}</p>
                 </div>
-            </TransitionLink>
+            </a>
             <div className="flex flex-1 justify-between items-center mt-2">
                 <div>
                     <p className="text-base-medium text-gray-700 line-through">{price != priceToShow?'₴' + price:<></>}</p>

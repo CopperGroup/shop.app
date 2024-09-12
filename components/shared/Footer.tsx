@@ -35,7 +35,7 @@ const Footer = () => {
   return (
     <footer ref={ref} className="bg-gradient-to-b from-gray-900 to-black text-white relative z-40 pt-16 pb-8 w-full min-w-[340px]">
       <motion.div
-        className="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-8 w-full"
+        className="max-w-screen-2xl mx-auto px-4 lg:px-8 w-full "
         variants={containerVariants}
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}

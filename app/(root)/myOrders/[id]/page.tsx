@@ -1,5 +1,6 @@
 
 import OrderedProductCard from "@/components/cards/OrderedProductCard";
+import OrderPage from "@/components/shared/OrderPage";
 import { fetchOrder } from "@/lib/actions/order.actions";
 import { fetchUserById } from "@/lib/actions/user.actions";
 import Image from "next/image";
@@ -23,117 +24,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
 
     const order = await fetchOrder(params.id);
 
-    const user = await fetchUserById(params.id);
-
-    console.log(user);
-
     return (
-        <section className="px-2 py-20 w-full">
-            <div className="w-full flex gap-2 items-center">
-                <h1 className="text-heading2-bold">Замовлення №{order.id}</h1>
-                <Image
-                    src="/assets/arrow-right-circle-black.svg"
-                    height={32}
-                    width={32}
-                    alt="Arror-right-circle"
-                />
-                {order.paymentStatus === "Pending" ? (
-                    <>
-                        <div className="size-5 rounded-full bg-gray-500"></div>
-                    </>
-                ): order.paymentStatus === "Declined" ? (
-                    <>
-                        <div className="size-5 rounded-full bg-red-500"></div>
-                    </>
-                ): order.paymentStatus === "Success" && (
-                    <>
-                        <div className="size-5 rounded-full bg-green-500"></div>
-                    </>
-                )}
-                {order.deliveryStatus === "Proceeding"? (
-                    <>
-                        <div className="size-5 rounded-full bg-gray-500"></div>
-                    </>
-                ): order.deliveryStatus === "Canceled"? (
-                    <>
-                        <div className="size-5 rounded-full bg-red-500"></div>
-                    </>
-                ): order.deliveryStatus === "Fulfilled" && (
-                    <>
-                        <div className="size-5 rounded-full bg-green-500"></div>
-                    </>
-                )}
-            </div>
-            <h3 className="text-heading3-bold font-medium mt-10">Ім&apos;я: {order.name} {order.surname}</h3>
-            <Link href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.adress}, ${order.city}, ${order.postalCode}`)}`} target="_blank" rel="noopener noreferrer">
-                <p className="text-body-medium mt-5">Адреса доставки: <span className="text-primary-experimental hover:underline">{order.city}, {order.adress}, {order.postalCode}</span>; {order.deliveryMethod}, <span className="lowercase">оплата: {order.paymentType}</span></p>
-            </Link>
-            <Link href={`tel:${order.phoneNumber}`}>
-                <p className="text-body-medium mt-5">Номер телеіону клієнта: <span className="text-primary-experimental hover:underline">{order.phoneNumber}</span></p>
-            </Link>
-            <Link href={`mailto:${order.email}`}>
-                <p className="text-body-medium mt-5">Email клієнта: <span className="text-primary-experimental hover:underline">{order.email}</span></p>
-            </Link>
-            {order.comment !== "" && (
-                <p className="text-body-medium mt-5">Коментар клієнта: {order.comment}</p>
-            )}
-            <p className="text-body-medium mt-20">Замовлена продукція</p>
-            <div className="w-full flex flex-col gap-7 mt-4 max-h-[700px] overflow-y-auto px-2">
-                {order.products.map((product: Product) => (
-                    <OrderedProductCard
-                        key={product.product?.id}
-                        id={product.product?.id}
-                        name={product.product?.name}
-                        image={product.product?.images[0]}
-                        priceToShow={product.product?.priceToShow}
-                        model={product.product?.params[0].value}
-                        amount={product?.amount}
-                    />
-                ))}
-            </div>
-            <div className="w-full flex justify-end items-center mt-7 pr-5">
-                <p className="text-body-medium">Загальна вартість: <span className="text-body-semibold text-green-500">{order.value}₴</span></p>
-            </div>
-            <div className="w-full flex gap-7 pl-3">
-                <div className="flex gap-1 items-center mt-3 text-small-medium">
-                    <p>Payment</p>
-                        {order.paymentStatus === "Pending" ? (
-                            <>
-                                <p className="lowercase">{order.paymentStatus}</p>
-                                <div className="size-3 rounded-full bg-gray-500 mt-1"></div>
-                            </>
-                        ): order.paymentStatus === "Declined" ? (
-                            <>
-                                <p className="lowercase">{order.paymentStatus}</p>
-                                <div className="size-3 rounded-full bg-red-500 mt-1"></div>
-                            </>
-                        ): order.paymentStatus === "Success" && (
-                            <>
-                                <p className="lowercase">{order.paymentStatus}</p>
-                                <div className="size-3 rounded-full bg-green-500 mt-1"></div>
-                            </>
-                        )}
-                </div>
-                <div className="flex gap-1 items-center mt-3 text-small-medium">
-                    <p>Delivery</p>
-                        {order.deliveryStatus === "Proceeding"? (
-                            <>
-                                <p className="lowercase">{order.deliveryStatus}</p>
-                                <div className="size-3 rounded-full bg-gray-500 mt-1"></div>
-                            </>
-                        ): order.deliveryStatus === "Canceled"? (
-                            <>
-                                <p className="lowercase">{order.deliveryStatus}</p>
-                                <div className="size-3 rounded-full bg-red-500 mt-1"></div>
-                            </>
-                        ): order.deliveryStatus === "Fulfilled" && (
-                            <>
-                                <p className="lowercase">{order.deliveryStatus}</p>
-                                <div className="size-3 rounded-full bg-green-500 mt-1"></div>
-                            </>
-                        )}
-                </div>
-            </div>
+        <section className="-mt-32 px-10 py-20 w-full max-[1100px]:pb-5">
+            <OrderPage orderJson={JSON.stringify(order)}/>
         </section>
     )
 }

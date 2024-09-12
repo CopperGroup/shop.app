@@ -45,7 +45,7 @@ export default function Header({ email, user }: { email: string; user: string })
   return (
     <motion.header
       ref={headerRef}
-      className="w-full h-20 flex justify-center items-center"
+      className="w-full min-w-[340px] h-20 flex justify-center items-center"
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={headerVariants}

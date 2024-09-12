@@ -45,8 +45,8 @@ interface Order{
   adress:string,
   postalCode:string,
   comment:string,
-  paymentStatus:string,
-  deliveryStatus:string,
+  paymentStatus: "Pending" | "Success" | "Declined";
+  deliveryStatus: "Proceeding" | "Fulfilled" | "Canceled";
   data:string
 
  
