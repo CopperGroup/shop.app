@@ -43,10 +43,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   return (
     <div className="embla rounded-md">
       <div className="embla__viewport rounded-md" ref={emblaMainRef}>
-        <div className="embla__container rounded-md">
+        <div className="embla__container rounded-md ">
           {slides.map((index) => (
             <div className="embla__slide rounded-md" key={index}>
-              <div className="embla__slide__number   rounded-md "><Image src={images[index]} width={1000} height={573} alt='k'   className='w-auto h-full max-h-full rounded-md  border-gray-700' ></Image></div>
+              <div className="embla__slide__number rounded-md "><Image src={images[index]} width={1000} height={573} alt='k'   className='w-auto h-full max-h-full rounded-md  border-gray-700' ></Image></div>
             </div>
           ))}
         </div>

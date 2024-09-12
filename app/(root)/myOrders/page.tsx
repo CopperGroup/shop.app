@@ -18,6 +18,8 @@ const myOrders = async() => {
     redirect('/login')
   }
   
+  console.log(email);
+  
   const orders = await fetchUsersOrders(email);
   console.log('fsdfsd',orders);
 

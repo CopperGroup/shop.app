@@ -19,49 +19,55 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
     const router = useRouter();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="px-2 sm:px-4 py-4 sm:py-8 max-w-full overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
-            <Button className="inline-flex items-center font-normal text-sky-600 hover:text-sky-800 mb-6" variant="destructive" onClick={() => router.back()}>
-                <ArrowLeft className="mr-2" size={20} />
+            <Button className="inline-flex items-center font-normal text-sky-600 hover:text-sky-800 max-lg:-ml-3 mb-2 sm:mb-4 text-sm sm:text-base" variant="destructive" onClick={() => router.back()}>
+                <ArrowLeft className="mr-1 sm:mr-2" size={16} />
                 Назад до каталогу
             </Button>
         </motion.div>
       
-      <div className="grid md:grid-cols-2 gap-12">
-        <ProdactPage images={product.images} />
+      <div className="grid lg:grid-cols-2 gap-6 sm:gap-12">
+        <div className="max-lg:hidden">
+          <ProdactPage images={product.images} />
+        </div>
         
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="space-y-4 sm:space-y-6 sm:mt-12"
         >
-          <h1 className="text-4xl font-bold">{product.name}</h1>
+          <h1 className="text-heading1-bold sm:text-[42px] leading-tight sm:leading-[58px] font-bold">{product.name}</h1>
           
-          <div className="flex items-center space-x-4">
-            <span className="text-3xl font-bold text-blue-600">₴{product.priceToShow}</span>
-            <span className="text-xl text-gray-500 line-through">₴{product.price}</span>
+          <div className="lg:hidden">
+            <ProdactPage images={product.images} />
+          </div>
+
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-wrap">
+            <span className="text-xl sm:text-3xl font-bold text-blue-600">₴{product.priceToShow}</span>
+            <span className="text-lg sm:text-xl text-gray-500 line-through">₴{product.price}</span>
             <Badge variant="destructive">Sale</Badge>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-2 text-sm sm:text-base">
             <div className="flex items-center">
-              <CreditCard className="mr-2" size={20} />
+              <CreditCard className="mr-2 flex-shrink-0" size={16} />
               <span>Оплата: готівка / безготівковий розрахунок</span>
             </div>
             <div className="flex items-center">
-              <Shield className="mr-2" size={20} />
+              <Shield className="mr-2 flex-shrink-0" size={16} />
               <span>Гарантія: {product.params.find((param: { name: string, value: string }) => param.name === "Гарантія")?.value}</span>
             </div>
           </div>
           
           <div>
-            <h2 className="text-2xl font-semibold mb-3">Колір</h2>
-            <div className="flex space-x-4">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">Колір</h2>
+            <div className="flex flex-wrap gap-2 sm:gap-4">
               {colors.map((color: { images: string[], params: {name: string, value: string}[] }, index: number) => (
                 <motion.div
                   key={color.params[0].value}
@@ -74,7 +80,7 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
                             width={60}
                             height={60}
                             alt={`Color ${color.params[0].value}`}
-                            className="rounded-full border-2 border-gray-300 hover:border-blue-500 cursor-pointer"
+                            className="rounded-full border-2 border-gray-300 hover:border-blue-500 cursor-pointer max-[425px]:size-12 max-[380px]:size-10"
                         />
                     </TransitionLink>
                 </motion.div>
@@ -82,37 +88,37 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
             <AddToCart id={product._id} name={product.name} image={product.images[0]} price={product.price} priceWithoutDiscount={product.priceToShow} variant="full"/>
-            <Button className="py-5" variant="outline">Купити зараз</Button>
+            <Button className="py-3 sm:py-5 text-sm sm:text-base max-[425px]:w-full" variant="outline">Купити зараз</Button>
           </div>
         </motion.div>
       </div>
       
-      <Separator className="my-12" />
+      <Separator className="my-6 sm:my-12" />
       
-      <div className="grid md:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-6 sm:gap-12">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h2 className="text-2xl font-semibold mb-4">Опис</h2>
-          <p className="text-gray-700 leading-relaxed">{product.description.replace(/[^а-щьюяґєіїА-ЩЬЮЯҐЄІЇ0-9. ]/g, '')}</p>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">Опис</h2>
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{product.description.replace(/[^а-щьюяґєіїА-ЩЬЮЯҐЄІЇ0-9. ]/g, '')}</p>
         </motion.div>
         
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <h2 className="text-2xl font-semibold mb-4">Параметри</h2>
-          <table className="w-full">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">Параметри</h2>
+          <table className="w-full text-sm sm:text-base">
             <tbody>
               {product.params.map((param: { name: string, value: string }) => (
                 <tr key={param.name} className="border-b">
-                  <td className="py-2 font-medium">{param.name}</td>
-                  <td className="py-2 text-gray-700">{param.value.replaceAll("_", " ")}</td>
+                  <td className="py-1 sm:py-2 font-medium">{param.name}</td>
+                  <td className="py-1 sm:py-2 text-gray-700">{param.value.replaceAll("_", " ")}</td>
                 </tr>
               ))}
             </tbody>

@@ -36,7 +36,9 @@ const Page = async (context: any) => {
   }
 
   return (
-    <ProductPage productJson={JSON.stringify(product)} colorsJson={JSON.stringify(colors)} />
+    <section className="max-lg:-mt-24">
+      <ProductPage productJson={JSON.stringify(product)} colorsJson={JSON.stringify(colors)} />
+    </section>
   );
 };
 

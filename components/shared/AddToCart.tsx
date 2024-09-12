@@ -78,7 +78,7 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { 
 
     if(variant === "full") {
       return (
-        <Button className="w-48" onClick={AddDataToCart}>
+        <Button className="w-48 max-[425px]:w-full" onClick={AddDataToCart}>
           <ShoppingCart className="mr-2" size={20} />
           Додати в кошик
         </Button>

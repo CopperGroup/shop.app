@@ -76,7 +76,7 @@ export default function Header({ email, user }: { email: string; user: string })
                 animate={isInView ? "visible" : "hidden"}
                 transition={{ duration: 0.3, delay: 0.1 * (index + 1) }}
               >
-                {["Уподобані", "Мої замовлення"].includes(label) ? (
+                {["Уподобані"].includes(label) ? (
                   email && (
                     <div className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
                       <TransitionLink href={`${href}/${userInfo?._id}`} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>

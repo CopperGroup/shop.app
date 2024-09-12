@@ -1,6 +1,7 @@
 
 import OrderedProductCard from "@/components/cards/OrderedProductCard";
 import { fetchOrder } from "@/lib/actions/order.actions";
+import { fetchUserById } from "@/lib/actions/user.actions";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -22,7 +23,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
 
     const order = await fetchOrder(params.id);
 
-    console.log(order.products);
+    const user = await fetchUserById(params.id);
+
+    console.log(user);
 
     return (
         <section className="px-2 py-20 w-full">

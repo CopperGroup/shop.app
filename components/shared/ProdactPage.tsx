@@ -31,7 +31,7 @@ const Prodact =  (images:any) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <EmblaCarousel images={images.images} slides={SLIDES} options={OPTIONS} />
+      <EmblaCarousel images={images.images} slides={SLIDES} options={OPTIONS}/>
     </motion.div>
   )
 }
