@@ -33,9 +33,9 @@ const Footer = () => {
   }
 
   return (
-    <footer ref={ref} className="bg-gradient-to-b from-gray-900 to-black text-white relative z-40 pt-16 pb-8 w-full min-w-[340px]">
+    <footer ref={ref} className="bg-gradient-to-b from-dark-4 to-black text-white z-40 pt-16 pb-8 w-full min-w-[320px]">
       <motion.div
-        className="max-w-screen-2xl mx-auto px-4 lg:px-8 w-full "
+        className="max-w-screen-2xl mx-auto px-4 lg:px-8 w-full"
         variants={containerVariants}
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
@@ -89,13 +89,13 @@ const Footer = () => {
           variants={itemVariants}
           className="border-t border-gray-700 pt-8 mt-8 w-full"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-400 mb-4 md:mb-0 text-center md:text-left">
+          <div className="flex flex-col lg:flex-row justify-between items-center">
+            <p className="text-sm text-gray-400 mb-4 lg:mb-0 text-center lg:text-left">
               © {currentYear} Меблі для ванної інтернет магазин <span className="font-semibold">SANTEHVAN</span>. Всі права захищені.
             </p>
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <span className="text-sm text-gray-400 text-center">Представник українських виробників меблів для ванної:</span>
-              <div className="flex space-x-2">
+            <div className="flex flex-col items-center lg:items-end space-y-2 lg:space-y-0">
+              <span className="text-sm text-gray-400 text-center lg:text-right">Представник українських виробників меблів для ванної:</span>
+              <div className="flex space-x-2 mt-2 lg:mt-1">
                 <Image className="h-6 w-auto" width={88} height={18} src='/assets/botticelli.png' alt='Botticelli logo' />
                 <Image className="h-6 w-auto" width={55} height={18} src='/assets/juventa.png' alt='Juventa logo' />
               </div>

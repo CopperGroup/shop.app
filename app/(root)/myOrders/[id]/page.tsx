@@ -25,7 +25,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
     const order = await fetchOrder(params.id);
 
     return (
-        <section className="-mt-32 px-10 py-20 w-full max-[1100px]:pb-5">
+        <section className="-mt-32 px-10 py-20 w-full max-[1100px]:pb-5 max-[425px]:px-0">
             <OrderPage orderJson={JSON.stringify(order)}/>
         </section>
     )

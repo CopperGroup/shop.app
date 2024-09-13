@@ -33,8 +33,7 @@ export default async function Home() {
       {/* <Divider iconUrl="/assets/wave1-up.svg" width={1536} height={320} mt={32} mb={32} type="icon-only" />
       <Latest />
       <Divider iconUrl="/assets/wave1-down.svg" width={1536} height={320} mt={10} mb={32} type="icon-only" /> */}
-      <Map/>
-      <StickyCart/>   
+      <Map/>  
     </>
   );
 }

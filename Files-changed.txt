@@ -83,3 +83,6 @@
 81. components/shared/OrderPage.tsx
 82. app/(root)/myOrders/[id]/page.tsx
 83. app/admin/Orders/[id]/page.tsx
+84. components/cards/OrderedProductCard.tsx
+85. components/admin-components/OrderPage.tsx
+86. components/interface/ChangeOrdersStatuses.tsx
