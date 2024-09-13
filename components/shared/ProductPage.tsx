@@ -23,7 +23,7 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5 }}
         >
             <Button className="inline-flex items-center font-normal text-sky-600 hover:text-sky-800 max-lg:-ml-3 mb-2 sm:mb-4 text-sm sm:text-base" variant="destructive" onClick={() => router.back()}>
                 <ArrowLeft className="mr-1 sm:mr-2" size={16} />
@@ -39,7 +39,7 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5 }}
           className="space-y-4 sm:space-y-6 sm:mt-12"
         >
           <h1 className="text-heading1-bold sm:text-[42px] leading-tight sm:leading-[58px] font-bold">{product.name}</h1>
@@ -101,7 +101,7 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5 }}
         >
           <h2 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">Опис</h2>
           <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{product.description.replace(/[^а-щьюяґєіїА-ЩЬЮЯҐЄІЇ0-9. ]/g, '')}</p>
