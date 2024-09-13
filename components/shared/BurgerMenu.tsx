@@ -64,7 +64,7 @@ export default function BurgerMenu({ email, user }: { email: string; user: strin
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 -translate-y-full"
       >
-        <div className="fixed inset-x-0 top-20 bottom-0 bg-black z-40">
+        <div className="fixed inset-x-0 top-20 bottom-0 bg-black z-[9999]">
           <div className="h-full overflow-y-auto py-6 px-4 flex flex-col items-center">
             <nav className="flex flex-col items-center space-y-4 w-full">
               <AdminLink className="pt-2 hover:bg-transparent hover:text-red-500" linkDecoration="text-base-regular"/>
