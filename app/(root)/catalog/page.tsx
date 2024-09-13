@@ -14,15 +14,20 @@ import { fetchAllProducts } from '@/lib/actions/product.actions'
 import Link from 'next/link'
 import { getSession } from '@/lib/getServerSession'
 import BannerSmall from '@/components/banner/BannerSmall'
+import { redis } from '@/lib/redis'
+import { ProductType } from '@/lib/types/types'
+import { createCatalogChunks, fetchCatalog } from '@/lib/actions/redis/catalog.actions'
 
-
-  
 
 const catalog = async ({searchParams,data}:any) => {
 
 
-  let filtredProducts = await fetchAllProducts();
+  let filtredProducts: any[] = await fetchCatalog();
   console.log('gh')
+
+  // await createCatalogChunks(filtredProducts);
+
+  // await fetchCatalog();
 
   const email = await getSession()
 

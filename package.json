@@ -33,6 +33,7 @@
     "@studio-freight/react-lenis": "^0.0.47",
     "@tanstack/react-table": "^8.17.3",
     "@uploadthing/react": "^6.7.2",
+    "@upstash/redis": "^1.34.0",
     "@vercel/speed-insights": "^1.0.12",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
