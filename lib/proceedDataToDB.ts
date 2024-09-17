@@ -1,4 +1,5 @@
 import { createUrlProduct, deleteUrlProducts } from "./actions/product.actions";
+import { clearCatalogCache } from "./actions/redis/catalog.actions";
 
 interface Product {
     id: string | null,
@@ -49,6 +50,8 @@ export async function proceedDataToDB(data: Product[], selectedRowsIds: (string 
                 await new Promise(resolve => setTimeout(resolve, 30000));
             }
         }
+
+        await clearCatalogCache();
     } catch (error: any) {
         throw new Error(`Error proceeding products to DB: ${error.message}`);
     }

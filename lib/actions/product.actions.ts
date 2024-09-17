@@ -6,6 +6,7 @@ import User from "../models/user.model";
 import { revalidatePath } from "next/cache";
 import Value from "../models/value.model";
 import { ProductType } from "../types/types";
+import { clearCatalogCache } from "./redis/catalog.actions";
 
 interface CreateUrlParams {
     id: string | null,
@@ -141,6 +142,8 @@ export async function createProduct({ id, name, quantity, images, url, priceToSh
         }
 
         await createdProduct.save();
+
+        await clearCatalogCache();
     } catch (error: any) {
         throw new Error(`Error creating new product, ${error.message}`)
     }
@@ -454,6 +457,7 @@ export async function editProduct({ id, name, quantity, images, url, priceToShow
 
         await createdProduct.save();
 
+        await clearCatalogCache();
         revalidatePath(`/admin/createProduct/list/${id}`)
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
@@ -546,7 +550,8 @@ export async function deleteProduct(productId: string, path: string) {
 
     await Product.deleteOne({ id: productId });
 
-    revalidatePath(path)
+    await clearCatalogCache();
+    revalidatePath(path);
   } catch (error: any) {
     throw new Error(`Error deleting product: ${productId} ${error.message}`)
   }

@@ -92,7 +92,7 @@ function generateRandomDateWithinYear() {
     return oneYearAgo.add(randomDays, 'days').toDate();
 }
 
-export async function createOrder({ products, userId, value, name, surname, phoneNumber, email, paymentType, deliveryMethod, city, adress, postalCode, comment }: CreateOrderParams) {
+export async function createOrder({ products, userId, value, name, surname, phoneNumber, email, paymentType, deliveryMethod, city, adress, postalCode, comment }: CreateOrderParams, type?: "json") {
     try {
         connectToDB();
 
@@ -142,6 +142,12 @@ export async function createOrder({ products, userId, value, name, surname, phon
             await orderedProduct.save();
         }
 
+        console.log(type)
+        if(type === "json") {
+          return JSON.stringify(createdOrder)
+        } else {
+          return createdOrder
+        }
     } catch (error: any) {
         throw new Error(`Error creating order: ${error.message}`)
     }

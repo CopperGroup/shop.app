@@ -50,7 +50,13 @@ export async function fetchCatalog () {
     
             chunkIndex++;
         }
+
+        if(chunks.length !== chunkCount) {
+            return await fetchAndCreateCatalogChunks();
+        }
     
+        console.log("Fetching from redis");
+
         const combinedChunks = chunks.join('');
     
         const data = JSON.parse(combinedChunks);
@@ -66,10 +72,30 @@ export async function fetchAndCreateCatalogChunks() {
     try {
         const filtredProducts = await fetchAllProducts();
 
+        await clearCatalogCache();
         await createCatalogChunks(filtredProducts);
 
         return filtredProducts;
     } catch (error: any) {
         throw new Error(`Error fetching catalog data: ${error.message}`);
+    }
+}
+
+export async function clearCatalogCache() {
+    let cursor = '0';
+    const matchPattern = '*catalog*';
+
+    try {
+        do {
+            const scanResult = await redis.scan(cursor, { match: matchPattern, count: 100 });
+            cursor = scanResult[0];
+            const keys = scanResult[1];
+
+            if (keys.length > 0) {
+                await redis.del(...keys);
+            }
+        } while (cursor !== '0')
+    } catch (error: any) {
+        throw new Error(`Error clearing catalog cache: ${error.message}`);
     }
 }

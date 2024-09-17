@@ -3,3 +3,11 @@
 3. lib/redis.ts
 4. app/(root)/catalog/page.tsx
 5. lib/actions/redis/catalog.actions.ts
+6. lib/actions/product.actions.ts
+7. lib/proceedDataToDB.ts
+8. components/forms/CreateOrder.tsx
+9. lib/actions/order.actions.ts
+10. npm i react-confetti
+11. app/(root)/order/page.tsx
+12. components/shared/MobileAdminSidebar.tsx
+13. app/admin/layout.tsx

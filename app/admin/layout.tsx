@@ -2,6 +2,7 @@ import AdminSidebar from "@/components/shared/AdminSidebar"
 import Provider from "../Provider";
 import { Inter } from "next/font/google";
 import "../globals.css";
+import MobileAdminSidebar from "@/components/shared/MobileAdminSidebar";
 
 export const metadata = {
   title: 'Next.js',
@@ -27,6 +28,7 @@ export default function RootLayout({
             {children}
           </div>
         </section>
+        <MobileAdminSidebar/>
       </main>
 
  

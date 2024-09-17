@@ -1,34 +1,25 @@
 'use server'
 
-import React, { Suspense } from 'react'
+import React from 'react'
 import Filter from '@/components/shared/Filter'
 import ProductCard from '@/components/cards/ProductCard'
 import Search from '@/components/shared/Search'
 import PaginationForCatalog from '@/components/shared/PaginationForCatalog'
-import FilterButton from '@/components/shared/FilterButton' 
-import { useEffect } from 'react'
-import Loading from '@/components/loadings/Loading'
 
-
-import { fetchAllProducts } from '@/lib/actions/product.actions'
-import Link from 'next/link'
 import { getSession } from '@/lib/getServerSession'
 import BannerSmall from '@/components/banner/BannerSmall'
-import { redis } from '@/lib/redis'
-import { ProductType } from '@/lib/types/types'
-import { createCatalogChunks, fetchCatalog } from '@/lib/actions/redis/catalog.actions'
+import { fetchCatalog } from '@/lib/actions/redis/catalog.actions'
+import { fetchAllProducts } from '@/lib/actions/product.actions'
 
 
 const catalog = async ({searchParams,data}:any) => {
 
 
-  let filtredProducts: any[] = await fetchCatalog();
+  let filtredProducts = await fetchAllProducts();
   console.log('gh')
 
-  // await createCatalogChunks(filtredProducts);
-
-  // await fetchCatalog();
-
+  // let filtredProducts: any[] = await fetchCatalog();
+  
   const email = await getSession()
 
   const category = Array.from(new Set (filtredProducts.map(item => item.category))).filter(function(item) {return item !== '';});
