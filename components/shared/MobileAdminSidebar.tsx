@@ -5,12 +5,13 @@ import { sidebarLinks } from "@/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { motion, PanInfo, useAnimation } from "framer-motion";
+import { motion, PanInfo, useAnimation, useDragControls } from "framer-motion";
 
 const MobileAdminSidebar = () => {
   const pathname = usePathname();
   const session = useSession();
   const controls = useAnimation();
+  const dragControls = useDragControls();
   const constraintsRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -24,6 +25,10 @@ const MobileAdminSidebar = () => {
     } else {
       controls.start(isOpen ? "open" : "closed");
     }
+  };
+
+  const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragControls.start(event, { snapToCursor: false });
   };
 
   useEffect(() => {
@@ -44,11 +49,18 @@ const MobileAdminSidebar = () => {
       variants={variants}
       transition={{ type: "spring", damping: 30, stiffness: 300 }}
       drag="y"
+      dragControls={dragControls}
+      dragListener={false}
       dragConstraints={constraintsRef}
       dragElastic={0.2}
       onDragEnd={handleDragEnd}
     >
-      <div className="h-1.5 w-12 bg-gray-300 rounded-full mx-auto my-3" />
+      <div 
+        className="h-7 w-full bg-transparent cursor-grab active:cursor-grabbing"
+        onPointerDown={startDrag}
+      >
+        <div className="h-1.5 w-12 bg-gray-300 rounded-full mx-auto my-3" />
+      </div>
       <div className="px-5 py-4">
         <Link href="/" className="text-heading3-bold">SANTEHVAN</Link>
         <p className="text-small-x-semibold text-dark-4 mt-4 mb-2">Admin</p>
