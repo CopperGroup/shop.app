@@ -12,3 +12,4 @@
 12. components/shared/MobileAdminSidebar.tsx
 13. app/admin/layout.tsx
 14. components/admin-components/Dashboard.tsx
+15. app/admin/dashboard/page.tsx
