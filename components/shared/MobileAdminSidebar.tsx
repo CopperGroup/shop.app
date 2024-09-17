@@ -37,7 +37,7 @@ const MobileAdminSidebar = () => {
 
   return (
     <motion.section
-      className="fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-3xl overflow-hidden z-50"
+      className="fixed bottom-0 left-0 right-0 bg-gradient-to-b from-gray-100 to-white shadow-lg rounded-t-3xl overflow-hidden z-50 md:hidden"
       ref={constraintsRef}
       initial="closed"
       animate={controls}
