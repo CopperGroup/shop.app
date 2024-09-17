@@ -163,7 +163,7 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 2.7 }}
             >
-              Дякуємо за ваше замовлення. Наш менеджер зв'яжеться з вами найближчим часом.
+              Дякуємо за ваше замовлення. Наш менеджер зв&apos;яжеться з вами найближчим часом.
             </motion.p>
             <motion.div 
               className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4"
@@ -247,7 +247,7 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
                             name="name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-base-medium">Ім'я</FormLabel>
+                                <FormLabel className="text-base-medium">Ім&apos;я</FormLabel>
                                 <FormControl>
                                   <Input {...field} className="rounded-lg" />
                                 </FormControl>
