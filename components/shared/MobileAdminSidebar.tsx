@@ -5,30 +5,25 @@ import { sidebarLinks } from "@/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { motion, PanInfo, useAnimation, useDragControls } from "framer-motion";
+import { motion, AnimatePresence, useAnimation, PanInfo } from "framer-motion";
 
 const MobileAdminSidebar = () => {
   const pathname = usePathname();
   const session = useSession();
   const controls = useAnimation();
-  const dragControls = useDragControls();
   const constraintsRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.y < -50 && !isOpen) {
-      controls.start("open");
-      setIsOpen(true);
-    } else if (info.offset.y > 50 && isOpen) {
-      controls.start("closed");
+    if (info.offset.y > 50 && isOpen) {
       setIsOpen(false);
     } else {
       controls.start(isOpen ? "open" : "closed");
     }
-  };
-
-  const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    dragControls.start(event, { snapToCursor: false });
   };
 
   useEffect(() => {
@@ -48,58 +43,65 @@ const MobileAdminSidebar = () => {
       animate={controls}
       variants={variants}
       transition={{ type: "spring", damping: 30, stiffness: 300 }}
-      drag="y"
-      dragControls={dragControls}
-      dragListener={false}
+      drag={isOpen ? "y" : false}
       dragConstraints={constraintsRef}
       dragElastic={0.2}
       onDragEnd={handleDragEnd}
     >
       <div 
-        className="h-7 w-full bg-transparent cursor-grab active:cursor-grabbing"
-        onPointerDown={startDrag}
+        className="h-7 w-full bg-transparent cursor-pointer"
+        onClick={toggleSidebar}
       >
         <div className="h-1.5 w-12 bg-gray-300 rounded-full mx-auto my-3" />
       </div>
-      <div className="px-5 py-4">
-        <Link href="/" className="text-heading3-bold">SANTEHVAN</Link>
-        <p className="text-small-x-semibold text-dark-4 mt-4 mb-2">Admin</p>
-        <div className="flex flex-col gap-2">
-          {sidebarLinks.map((link) => {
-            const isActive = (pathname.includes(link.route) && link.route.length > 1) || pathname === link.route;
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="px-5 py-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Link href="/" className="text-heading3-bold">SANTEHVAN</Link>
+            <p className="text-small-x-semibold text-dark-4 mt-4 mb-2">Admin</p>
+            <div className="flex flex-col gap-2">
+              {sidebarLinks.map((link) => {
+                const isActive = (pathname.includes(link.route) && link.route.length > 1) || pathname === link.route;
 
-            return (
-              <Link
-                href={link.route}
-                key={link.label}
-                className={`flex items-center p-2 rounded-lg ${
-                  isActive ? "bg-muted-normal" : ""
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  width={24}
-                  height={24}
-                  className={`mr-3 rounded-full p-[1px] ${isActive ? "stroke-white bg-black" : "stroke-black"}`}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d={link.svgPath}
-                  />
-                </svg>
-                <p className={`text-black text-small-x-semibold ${isActive ? "font-bold" : ""}`}>
-                  {link.label}
-                </p>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+                return (
+                  <Link
+                    href={link.route}
+                    key={link.label}
+                    className={`flex items-center p-2 rounded-lg ${
+                      isActive ? "bg-muted-normal" : ""
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      width={22}
+                      height={22}
+                      className={`mr-3 rounded-full p-[1px] ${isActive ? "stroke-white bg-black" : "stroke-black"}`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d={link.svgPath}
+                      />
+                    </svg>
+                    <p className={`text-black text-small-x-semibold ${isActive ? "font-bold" : ""}`}>
+                      {link.label}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.section>
   );
 };

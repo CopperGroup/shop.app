@@ -1,6 +1,6 @@
 "use client"
 
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis } from "recharts"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useEffect, useState } from "react"
@@ -163,31 +163,33 @@ const Dashboard = ({ stringifiedData }: { stringifiedData: string }) => {
           <div className="w-full h-4/5 rounded-xl mt-3 pb-5 pt-12 px-2">
             <div className="w-full flex justify-end">
             </div>
-            <ChartContainer config={chartConfig} className="w-full h-full text-small-medium">
+            <ResponsiveContainer>
+              <ChartContainer config={chartConfig} className="w-full h-full text-small-medium">
                 <BarChart
-                accessibilityLayer
-                data={timePeriod.data}
-                margin={{
-                  left: 5,
-                  right: 5,
-                }}
-                >
-                <CartesianGrid vertical={false} horizontal={false} syncWithTicks/>
-                <XAxis
-                  dataKey="dateName"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={10}
-                  minTickGap={30}
-                />
-                <ChartTooltip
-                  content={
-                    <CustomTooltip timePeriod={timePeriod} />
-                  }
-                />
-                <Bar dataKey="totalOrders" fill="var(--color-desktop)" radius={[36, 36, 0, 0]}/>
-              </BarChart>
-            </ChartContainer>
+                  accessibilityLayer
+                  data={timePeriod.data}
+                  margin={{
+                    left: 5,
+                    right: 5,
+                  }}
+                  >
+                  <CartesianGrid vertical={false} horizontal={false} syncWithTicks/>
+                  <XAxis
+                    dataKey="dateName"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                    minTickGap={30}
+                  />
+                  <ChartTooltip
+                    content={
+                      <CustomTooltip timePeriod={timePeriod} />
+                    }
+                  />
+                  <Bar dataKey="totalOrders" fill="var(--color-desktop)" radius={[36, 36, 0, 0]}/>
+                </BarChart>
+              </ChartContainer>
+            </ResponsiveContainer>
           </div>
         </div>
         <div className="w-full h-1/3 border-red-500 mt-5">
