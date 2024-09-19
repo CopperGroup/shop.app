@@ -22,11 +22,11 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
   const router = useRouter();
   const { cartData, priceToPay, setCartData } = useAppContext();
   const [currentStep, setCurrentStep] = useState(1);
-  const [isOrderCreated, setIsOrderCreated] = useState(false);
+  const [isOrderCreated, setIsOrderCreated] = useState(true);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
-  const [showThankYou, setShowThankYou] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(true);
   const [ position, setPosition ] = useState<"fixed" | "relative">("fixed")
 
   useEffect(() => {
@@ -125,9 +125,9 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
             }}
             style={{
               position: position,
-              left: '50%',
-              translateX: '-50%',
-              translateY: '-50%',
+              left: position === "fixed" ? '50%' : '0%',
+              translateX: position === "fixed" ? '-50%' : '0%',
+              translateY: position === "fixed" ? '-50%' : '0%',
             }}
             onAnimationComplete={() => setPosition("relative")}
             className="bg-sky-100 rounded-full p-8 mb-8 overflow-hidden"
@@ -147,7 +147,7 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.2, duration: 0.5 }}
-            className="mt-24 text-center"
+            className="text-center mt-7"
           >
             <motion.h1 
               className="text-heading1-bold mb-6"

@@ -86,31 +86,29 @@ const ProductsTable =  ({stringifiedProducts}:{stringifiedProducts:string}) => {
 
       
         
-        <div className="flex items-center mt-5 gap-5">
+        <div className="flex gap-5 items-center mt-12 max-[425px]:flex-col">
+          <Input
+            className=" w-full"
+            placeholder="Назва товару..."
+            onChange={(e)=>setInputValue(e.target.value)}
+            value={inputValue}
+          />
 
-        <Input
-          className=" w-full"
-          placeholder="Назва товару..."
-          onChange={(e)=>setInputValue(e.target.value)}
-          value={inputValue}
-        />
-
-
-        <Select onValueChange={(element)=>setSelect(element)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Всі категорії" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="Всі">Всі категорії</SelectItem>
-              <SelectItem value="Меблі для ванної кімнати">Меблі для ванної кімнати</SelectItem>
-              <SelectItem value="Житлові меблі">Житлові меблі</SelectItem>
-              <SelectItem value="Дитячі меблі">Дитячі меблі</SelectItem>
-              <SelectItem value="Сад та город">Сад та город</SelectItem>
-              <SelectItem value="Сантехніка">Сантехніка</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+          <Select onValueChange={(element)=>setSelect(element)}>
+            <SelectTrigger className="w-[10.2rem] max-[425px]:w-full">
+              <SelectValue placeholder="Всі категорії" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="Всі">Всі категорії</SelectItem>
+                <SelectItem value="Меблі для ванної кімнати">Меблі для ванної кімнати</SelectItem>
+                <SelectItem value="Житлові меблі">Житлові меблі</SelectItem>
+                <SelectItem value="Дитячі меблі">Дитячі меблі</SelectItem>
+                <SelectItem value="Сад та город">Сад та город</SelectItem>
+                <SelectItem value="Сантехніка">Сантехніка</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
 

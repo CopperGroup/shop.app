@@ -89,7 +89,7 @@
   }
 
   .leftsidebar_link {
-    @apply relative flex justify-start gap-4 rounded-l-lg py-2 pr-24 max-w-[250px];
+    @apply relative flex justify-start gap-4 rounded-l-lg py-2 pr-24 max-w-[250px] max-lg:pr-3 max-lg:rounded-lg;
   }
 
   .active_svg {

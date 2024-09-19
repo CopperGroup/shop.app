@@ -3,6 +3,7 @@ import Provider from "../Provider";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import MobileAdminSidebar from "@/components/shared/MobileAdminSidebar";
+import AdminHeader from "@/components/shared/AdminHeader";
 
 export const metadata = {
   title: 'Next.js',
