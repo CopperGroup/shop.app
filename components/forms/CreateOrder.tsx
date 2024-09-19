@@ -22,11 +22,11 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
   const router = useRouter();
   const { cartData, priceToPay, setCartData } = useAppContext();
   const [currentStep, setCurrentStep] = useState(1);
-  const [isOrderCreated, setIsOrderCreated] = useState(true);
+  const [isOrderCreated, setIsOrderCreated] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
-  const [showThankYou, setShowThankYou] = useState(true);
-  const [showConfetti, setShowConfetti] = useState(true);
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [ position, setPosition ] = useState<"fixed" | "relative">("fixed")
 
   useEffect(() => {
