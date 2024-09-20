@@ -43,7 +43,7 @@ export default function OrderPage({ orderJson }: { orderJson: string}) {
     const order = JSON.parse(orderJson);
 
   return (
-    <div className="max-w-full justify-center overflow-x-hidden">
+    <div className="max-w-full justify-center overflow-x-hidden pb-12">
       <div
         className="space-y-4 sm:space-y-6"
       >

@@ -135,8 +135,8 @@ export function DataTable<TData extends Product, TValue>({
 
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
+    <div className="w-full max-md:pb-12">
+      <div className="flex gap-2 items-center py-4">
         <Input
           placeholder="Назва товару..."
           value={(table.getColumn("name")?.getFilterValue() as string | undefined) ?? ""}
@@ -222,17 +222,18 @@ export function DataTable<TData extends Product, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end space-x-2 py-4 max-[560px]:flex-col max-[560px]:items-start max-[560px]:gap-2 max-[560px]:space-x-0">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} з{" "}
           {table.getFilteredRowModel().rows.length} товарів вибрано
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 max-[440px]:w-full max-[440px]:flex max-[440px]:justify-end">
           <Button
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="max-[440px]:w-full"
           >
             Попередня
           </Button>
@@ -241,6 +242,7 @@ export function DataTable<TData extends Product, TValue>({
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="max-[440px]:w-full"
           >
             Наступна
           </Button>
@@ -249,10 +251,23 @@ export function DataTable<TData extends Product, TValue>({
             size="sm"
             onClick={() => handleProceed(data)}
             disabled={isProceedDisabled}
-            className="bg-green-500 hover:bg-green-400"
+            className="bg-green-500 hover:bg-green-400 max-[440px]:hidden"
+
           >
             {proceedingState}
             {proceedingState === "Збереження" ? <Image height={24} width={24} src="/assets/spinner.svg" alt="Loading"/> : proceedingState === "Збережено" ? <Image height={24} width={24} src="/assets/success.svg" alt="Loading" className="ml-1"/> : <Image height={24} width={24} src="/assets/arrow-right-circle.svg" alt="Loading" className="ml-1"/>}
+          </Button>
+        </div>
+        <div className="w-full flex justify-end min-[441px]:hidden">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => handleProceed(data)}
+            disabled={isProceedDisabled}
+            className="w-full bg-green-500 hover:bg-green-400"
+          >
+              {proceedingState}
+              {proceedingState === "Збереження" ? <Image height={24} width={24} src="/assets/spinner.svg" alt="Loading"/> : proceedingState === "Збережено" ? <Image height={24} width={24} src="/assets/success.svg" alt="Loading" className="ml-1"/> : <Image height={24} width={24} src="/assets/arrow-right-circle.svg" alt="Loading" className="ml-1"/>}
           </Button>
         </div>
       </div>

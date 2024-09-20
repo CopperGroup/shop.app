@@ -39,13 +39,19 @@ export async function fetchUserById(userId: string) {
     }
 }
 
-export async function fetchUsers() {
+export async function fetchUsers(type?: "json") {
     try {
         connectToDB();
 
-        const users = await User.find();
+        const users = await User.find().select("_id email username orders");
 
-        return users;
+        const fetchedUsers = [];
+
+        for(const user of users) {
+            fetchedUsers.push({ _id: user._id, email: user.email, username: user.username, orders: user.orders.length })
+        }
+        
+        return fetchedUsers;
     } catch (error: any) {
         throw new Error(`Error fetching users: ${error.message}`)
     }

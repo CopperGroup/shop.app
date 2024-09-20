@@ -25,11 +25,19 @@ const Links = [
   { label: "Інформація", href: "/info" },
 ];
 
+const infoNames = [
+  "Контакти",
+  "Доставка та оплата",
+  "Гаратнія та сервіси",
+  "Презентації"
+]
+
 export default function Header({ email, user }: { email: string; user: string }) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const isInView = useInView(headerRef, { once: true });
   
+  console.log("Email", email)
   const userInfo = JSON.parse(user);
 
   const headerVariants = {
@@ -68,49 +76,68 @@ export default function Header({ email, user }: { email: string; user: string })
           {Links.map(({ label, href }, index) => {
             const isActive = (pathname.includes(href) && href.length > 1) || pathname === href;
 
-            return (
-              <motion.div
-                key={label}
-                variants={linkVariants}
-                initial="hidden"
-                animate={isInView ? "visible" : "hidden"}
-                transition={{ duration: 0.3, delay: 0.1 * (index + 1) }}
-              >
-                {["Уподобані", "Мої замовлення"].includes(label) ? (
-                  email && (
+                if(["Уподобані", "Мої замовлення"].includes(label)) {
+                  if (!email) return null;
+                  
+                  return (
+                    <motion.div
+                      key={label}
+                      variants={linkVariants}
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      transition={{ duration: 0.3, delay: 0.1 * (index + 1) }}
+                    >
                     <div className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
                       <TransitionLink href={`${href}${label === "Уподобані" ? "/" + userInfo?._id : ""}`} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>
                         {label}
                       </TransitionLink>
                     </div>
+                  </motion.div>
+                )} else if(label === "Інформація") {
+                  return (
+                    <motion.div
+                      key={label}
+                      variants={linkVariants}
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      transition={{ duration: 0.3, delay: 0.1 * (index + 1) }}
+                    >
+                      <Menubar className="h-8 border-0 p-0 space-x-0">
+                        <MenubarMenu>
+                          <MenubarTrigger className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full cursor-pointer px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
+                            <p className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</p>
+                          </MenubarTrigger>
+                          <MenubarContent className="min-w-[9rem] bg-[#1f1f1f] text-neutral-400 border-0 rounded-2xl">
+                            {["contacts", "delivery-payment", "warranty-services", "presentations"].map((subItem, index) => (
+                              <MenubarItem key={subItem} className="text-small-medium font-normal cursor-pointer hover:text-white transition-all">
+                                <TransitionLink href={`/info/${subItem}`}>
+                                  {infoNames[index].split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                </TransitionLink>
+                              </MenubarItem>
+                            ))}
+                          </MenubarContent>
+                        </MenubarMenu>
+                      </Menubar>
+                    </motion.div>
+                 )} else {
+                   return (
+                    <motion.div
+                      key={label}
+                      variants={linkVariants}
+                      initial="hidden"
+                      animate={isInView ? "visible" : "hidden"}
+                      transition={{ duration: 0.3, delay: 0.1 * (index + 1) }}
+                    >
+                      <div className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
+                        <TransitionLink href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>
+                          {label}
+                        </TransitionLink>
+                      </div>
+                    </motion.div>
                   )
-                ) : label === "Інформація" ? (
-                  <Menubar className="h-8 border-0 p-0 space-x-0">
-                    <MenubarMenu>
-                      <MenubarTrigger className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full cursor-pointer px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
-                        <p className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>{label}</p>
-                      </MenubarTrigger>
-                      <MenubarContent className="min-w-[9rem] bg-[#1f1f1f] text-neutral-400 border-0 rounded-2xl">
-                        {["contacts", "delivery-payment", "warranty-services", "presentations"].map((subItem) => (
-                          <MenubarItem key={subItem} className="text-small-medium font-normal cursor-pointer hover:text-white transition-all">
-                            <TransitionLink href={`/info/${subItem}`}>
-                              {subItem.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                            </TransitionLink>
-                          </MenubarItem>
-                        ))}
-                      </MenubarContent>
-                    </MenubarMenu>
-                  </Menubar>
-                ) : (
-                  <div className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
-                    <TransitionLink href={href} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>
-                      {label}
-                    </TransitionLink>
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
+                 }
+
+            })}
         </nav>
         <motion.div
           className="w-fit flex justify-center items-center max-lg:hidden"

@@ -35,7 +35,7 @@ export type User = {
   _id: string;
   username: string;
   email: string;
-  orders: string[];
+  orders: number;
 }
 
 export const columns: ColumnDef<User>[] = [
@@ -64,6 +64,6 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="pl-16">{row.getValue("orders").length}</div>,
+    cell: ({ row }) => <div className="pl-16">{row.getValue("orders")}</div>,
   },
 ]

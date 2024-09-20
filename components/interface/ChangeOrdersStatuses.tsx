@@ -37,7 +37,7 @@ const ChangeOrdersStatuses = ({ id, paymentStatus, deliveryStatus }: { id: strin
       <div className="flex items-center gap-2 max-[900px]:flex-col">
               <span className="text-start font-semibold max-[900px]:w-full">Статус оплати:</span>
               <Select defaultValue={paymentStatus} onValueChange={(value) => handlePaymentStatusChange(id, value)}>
-                <SelectTrigger className="w-72 h-9 text-start max-[1100px]:w-full border-0">
+                <SelectTrigger className="w-72 h-9 appearance-none text-start border-black rounded-none mt-2 pb-4 focus:ring-0 focus:border-b max-[1100px]:w-full border-0 ">
                   <SelectValue className="cursor-poiner flex gap-2"/>
                 </SelectTrigger>
                 <SelectContent className="cursor-poiner">
@@ -50,7 +50,7 @@ const ChangeOrdersStatuses = ({ id, paymentStatus, deliveryStatus }: { id: strin
             <div className="flex items-center gap-2 max-[900px]:flex-col">
               <span className="text-start font-semibold max-[900px]:w-full">Статус доставки:</span>
               <Select defaultValue={deliveryStatus} onValueChange={(value) => handleDeliveryStatusChange(id, value)}>
-                <SelectTrigger className="w-80 h-9 text-start max-[1100px]:w-full border-0">
+                <SelectTrigger className="w-80 h-9 appearance-none text-start border-black rounded-none mt-2 pb-4 focus:ring-0 focus:border-b max-[1100px]:w-full border-0">
                   <SelectValue className="cursor-poiner flex gap-2"/>
                 </SelectTrigger>
                 <SelectContent className="cursor-poiner">

@@ -51,6 +51,7 @@ const CreateProduct = () => {
   const [ categories, setCategories ] = useState<{name: string, amount: number}[]>([]);
   const [ isNewCategory, setIsNewCategory ] = useState<boolean>(false);
 
+  
   const [ params ] = useState([
     { name: "Model"},
     { name: "Width"},
@@ -60,7 +61,7 @@ const CreateProduct = () => {
     { name: "Color"},
   ])
   const paramsNamesUa = ['Назва', 'Ширина', 'Висота', 'Глибина', 'Вид', 'Колір'];
-
+  
   const handleMouseEnter = (index: number) => {
     setHoveredIndex(index);
   };
@@ -70,12 +71,12 @@ const CreateProduct = () => {
   };
 
   const router = useRouter();
-
+  
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
     console.log(files)
   }, [])
-
+  
   useEffect(() => {
     if(files.length > 0) {
       startUpload(files);
@@ -98,7 +99,7 @@ const CreateProduct = () => {
       },
       onUploadError: () => {
         setUploadingState("error");
-
+        
         setTimeout(() => {
           setUploadingState("initial")
           setUploadProgress(0)
@@ -125,25 +126,27 @@ const CreateProduct = () => {
   const handleImageAdding = () => {
       setImages([...images, inputValue]);
       setInputValue("");
-  }
+    }
 
-  const handleDeleteImage = (index: number| null) => {
+    const handleDeleteImage = (index: number| null) => {
     setImages(images.filter((_, i) => i !== index));
   }
 
   const fileTypes = permittedFileInfo?.config
     ? Object.keys(permittedFileInfo?.config)
     : [];
-
+    
     const {getRootProps, getInputProps} = useDropzone({
       onDrop,
       accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined
-  })
+    })
+    
+    
+    const form = useForm<z.infer<typeof ProductValidation>>({
+      resolver: zodResolver(ProductValidation),
+    });
 
-
-  const form = useForm<z.infer<typeof ProductValidation>>({
-    resolver: zodResolver(ProductValidation),
-  });
+  const [isChecked, setIsChecked] = useState(form.getValues("isAvailable") ?? true); 
 
   function generateUniqueId() {
     const randomPart = Math.floor(1000 + Math.random() * 9000).toString();
@@ -153,7 +156,7 @@ const CreateProduct = () => {
 
   const onSubmit = async (values: z.infer<typeof ProductValidation>) => {
     console.log("Submitting");
-
+    
     await createProduct({
       id: values.id,
       name: values.name,
@@ -165,7 +168,7 @@ const CreateProduct = () => {
       vendor: values.vendor,
       category: values.category,
       description: values.description,
-      isAvailable: values.isAvailable as boolean,
+      isAvailable: isChecked,
       params: {
         Model: values.Model,
         Width: values.Width,
@@ -177,7 +180,11 @@ const CreateProduct = () => {
       customParams: values.customParams ? values.customParams : []
     })
 
-    router.push(`/admin/createProduct/add-images/${values.id}`)
+    if(isChecked) {
+      router.push(`/catalog/${values.Model}`);
+    } else {
+      router.push(`/admin/products`);
+    }
   }
 
   useEffect(() => {
@@ -852,7 +859,7 @@ const CreateProduct = () => {
             )}
           </div>
           <Button type='submit' className='bg-green-500 hover:bg-green-400' onClick={() => console.log(form.getValues())}>
-            Зберегти зміни
+            Додати товар
           </Button>
           <div className="w-full flex justify-end">
             <FormField
@@ -864,12 +871,15 @@ const CreateProduct = () => {
                     Доступний
                   </FormLabel>
                   <FormControl>
-                    <CheckboxSmall 
-                      className="size-3 rounded-[4px] border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white" 
-                      defaultChecked={true}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                  <CheckboxSmall
+                        className="size-3 rounded-[4px] border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"
+                        checked={isChecked}
+                        onCheckedChange={(checked) => {
+                          console.log(checked)
+                          setIsChecked(checked as boolean); // Update the state when checked state changes
+                          field.onChange(checked); // Call field onChange to update form state
+                        }}
+                      />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -879,212 +889,6 @@ const CreateProduct = () => {
         </div>
       </form>
     </Form>
-    // <Form {...form}>
-    //   <form
-    //     className='flex flex-col justify-start gap-10 custom-scrollbar'
-    //     onSubmit={form.handleSubmit(onSubmit)}
-    //   >
-
-    //     <FormField
-    //       control={form.control}
-    //       name='id'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             ID
-    //             <p className="mt-3 text-small-medium text-gray-500">Унікальний ID для товару</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //               type='text'
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <FormField
-    //       control={form.control}
-    //       name='name'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Ім&apos;я
-    //             <p className="mt-3 text-small-medium text-gray-500">Добавте назву товару </p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //               type='text'
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <FormField
-    //       control={form.control}
-    //       name='description'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Опис
-    //             <p className="mt-3 text-small-medium text-gray-500">Опишіть ваш товар</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Textarea
-    //               rows={5}
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <div className="w-full h-[2px] bg-gray-400 my-5 rounded-lg"></div>
-
-    //     <FormField
-    //       control={form.control}
-    //       name='price'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Ціна без знижки
-    //             <p className="mt-3 text-small-medium text-gray-500">Скільки буде коштувати товар без знижки ?</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //                 type='text'
-    //                 className=''
-    //                 {...field}
-    //               />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <FormField
-    //       control={form.control}
-    //       name='priceToShow'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Ціна
-    //             <p className="mt-3 text-small-medium text-gray-500">Справжня ціна товару?</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //                 type='text'
-    //                 className=''
-    //                 {...field}
-    //               />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <FormField
-    //       control={form.control}
-    //       name='quantity'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Кількість
-    //             <p className="mt-3 text-small-medium text-gray-500">Скільки товару є на складі?</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //               type='text'
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <div className="w-full h-[2px] bg-gray-400 my-5 rounded-lg"></div>
-
-    //     <FormField
-    //       control={form.control}
-    //       name='url'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             URl
-    //             <p className="mt-3 text-small-medium text-gray-500">Provide the URL if you have one</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //               type='text'
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <FormField
-    //       control={form.control}
-    //       name='category'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Категорія
-    //             <p className="mt-3 text-small-medium text-gray-500">Додайте товар до категорії</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //               type='text'
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <FormField
-    //       control={form.control}
-    //       name='vendor'
-    //       render={({ field }) => (
-    //         <FormItem className='flex w-full gap-3 max-[1440px]:flex-col pr-[400px] max-xl:pr-0'>
-    //           <FormLabel className='text-base-semibold w-2/5 text-dark-1 max-lg:w-full'>
-    //             Постачальник
-    //             <p className="mt-3 text-small-medium text-gray-500">Марка товару</p>
-    //           </FormLabel>
-    //           <FormControl>
-    //             <Input
-    //               type='text'
-    //               className=''
-    //               {...field}
-    //             />
-    //           </FormControl>
-    //           <FormMessage />
-    //         </FormItem>
-    //       )}
-    //     />
-
-    //     <div className="w-full h-[2px] bg-gray-400 my-5 rounded-lg"></div>
-
-    //     <Button type='submit' className='bg-green-500 hover:bg-green-400'>
-    //       Додати товар
-    //     </Button>
-    //   </form>
-    // </Form>
 )}
 
 export default CreateProduct;

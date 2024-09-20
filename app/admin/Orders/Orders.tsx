@@ -93,14 +93,14 @@ const Orders = ({orders}:{orders:string}) => {
   return (
     <div>
 
-        <div className='flex justify-end gap-5 mt-10'>
+        <div className='flex justify-end gap-5 mt-10 max-md:justify-start max-[425px]:flex-col'>
 
 
         
 
 
         <Select onValueChange={(element)=>setP(element)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px] max-[425px]:w-full">
                 <SelectValue placeholder="Стан оплати" />
             </SelectTrigger>
             <SelectContent className='w-[180px]'>
@@ -137,7 +137,7 @@ const Orders = ({orders}:{orders:string}) => {
 
 
         <Select onValueChange={(element)=>setD(element)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px] max-[425px]:w-full">
                 <SelectValue placeholder="Стан доставки " />
             </SelectTrigger>
             <SelectContent>

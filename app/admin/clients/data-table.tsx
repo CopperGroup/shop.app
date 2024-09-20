@@ -91,7 +91,7 @@ export function DataTable<TData extends Product, TValue>({
   })
 
   return (
-    <div className="w-full mt-7">
+    <div className="w-full mt-7 max-md:pb-12">
       <div className="flex items-center py-4">
         <Input
           placeholder="Username..."
