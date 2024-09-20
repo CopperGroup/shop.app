@@ -15,11 +15,11 @@ import { fetchAllProducts } from '@/lib/actions/product.actions'
 const catalog = async ({searchParams,data}:any) => {
 
 
-  let filtredProducts = await fetchAllProducts();
+  // let filtredProducts = await fetchAllProducts();
   
   console.log('gh')
 
-  // let filtredProducts: any[] = await fetchCatalog();
+  let filtredProducts: any[] = await fetchCatalog();
   
   const email = await getSession()
 
