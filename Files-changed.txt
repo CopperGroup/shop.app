@@ -31,3 +31,4 @@
 31. components/interface/ChangeOrdersStatuses.tsx
 32. app/admin/clients/[id]/page.tsx
 33. components/shared/Header.tsx
+34. app/admin/payments/page.tsx
