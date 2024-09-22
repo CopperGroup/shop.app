@@ -32,3 +32,16 @@
 32. app/admin/clients/[id]/page.tsx
 33. components/shared/Header.tsx
 34. app/admin/payments/page.tsx
+35. app/admin/statistics/page.tsx
+36. components/admin-components/statistics/TotalRevenue.tsx
+37. compoennts/admin-components/statistics/TotalOrders.tsx
+38. components/admin-components/statistics/TopSellingProduct.tsx
+39. components/admin-components/statistics/SuccessfulOrders.tsx
+40. components/admin-components/statistics/SalesByCategory.tsx
+41. components/admin-components/statistics/NewCustomers.tsx
+42. components/admin-components/statistics/MostPopularRegion.tsx
+43. components/admin-components/statistics/FulfilledOrders.tsx
+44. components/admin-components/statistics/DeclinedOrders.tsx
+45. components/admin-components/statistics/CanceledOrders.tsx
+46. components/admin-components/statistics/AverageOrderValue.tsx
+47. components/admin-components/statistics/AddedToCart.tsx
