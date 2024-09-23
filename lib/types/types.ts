@@ -19,3 +19,12 @@ export type ProductType = {
     likedBy: string[],
     addedToCart: Date[]
 }
+
+export type Category = {
+    category: string,
+    values: {
+      totalProducts: number,
+      totalValue: number,
+      averageProductPrice: number
+    }
+}

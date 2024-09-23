@@ -557,7 +557,42 @@ export async function deleteProduct(productId: string, path: string) {
   }
 }
 
+export async function fetchCategoriesProperities() {
+    try {
+      connectToDB();
+  
+      const categories: { [key: string]: { totalProducts: number, totalValue: number }} = {};
+  
+      const categoriesAverageProductValue: { [key: string]: number } = {};
+  
+      const products = await Product.find();
+  
+      for(const product of products) {
+          if(!categories[product.category]) {
+              categories[product.category] = { totalProducts: 0, totalValue: 0 };
+          }
+  
+          categories[product.category] = { totalProducts: categories[product.category].totalProducts + 1, totalValue: categories[product.category].totalValue + product.priceToShow }
+      }
+  
+      const categoriesList = Object.entries(categories).map(([ category, value ]) => ({
+          category,
+          values: { totalProducts: value.totalProducts, totalValue: value.totalValue, averageProductPrice: parseFloat((value.totalValue / value.totalProducts).toFixed(2))}
+      }))
+  
+      console.log(categoriesList);
 
+      for(const product of products) {
+        if(product.priceToShow < 0) {
+            console.log("Negative price:", product.priceToShow);
+            console.log("Product with negtive price:", product);
+        }
+      }
+      return categoriesList;
+    } catch (error: any) {
+      throw new Error(`Error fetching categories properities ${error.message}`)
+    }
+  }
 
 
 

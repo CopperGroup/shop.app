@@ -71,71 +71,23 @@ export function MostPopularRegion() {
   }, [date])
   
 
-  React.useEffect(() => {
-    const screenWidth = window.screen.width;
-
-    setScreenWidth(screenWidth);
-  }, [screenWidth])
-
-  const svgRef = React.useRef(null);
-
-  // React.useEffect(() => {
-  //   const svg = d3.select(svgRef.current);
-  //   const width = 800;
-  //   const height = 600;
-
-  //   const projection = d3
-  //     .geoMercator()
-  //     .scale(2000)
-  //     .center([31, 48])
-  //     .translate([width / 2, height / 2]);
-
-  //   const path = d3.geoPath().projection(projection);
-
-  //   const colorScale = d3
-  //     .scaleSequential(d3.interpolateBlues)
-  //     .domain([0, d3.max(Object.values(regionOrders))]);
-
-  //   svg
-  //     .selectAll("path")
-  //     .data(ukraineGeoJson.features)
-  //     .enter()
-  //     .append("path")
-  //     .attr("d", path)
-  //     .attr("fill", d => colorScale(regionOrders[d.properties.name] || 0))
-  //     .attr("stroke", "#ffffff")
-  //     .attr("stroke-width", 0.5);
-
-  //   svg
-  //     .selectAll("text")
-  //     .data(ukraineGeoJson.features)
-  //     .enter()
-  //     .append("text")
-  //     .attr("x", d => path.centroid(d)[0])
-  //     .attr("y", d => path.centroid(d)[1])
-  //     .attr("text-anchor", "middle")
-  //     .attr("font-size", "10px")
-  //     .attr("fill", "#000")
-  //     .text(d => d.properties.name);
-  // }, [regionOrders]);
-
   return (
-    <section className="w-full h-[25rem] mt-10  max-[1300px]:mt-24">
+    <section className="w-full h-[25rem] mt-10">
       <div className="w-full h-full">
         <div className="w-full h-fit flex gap-2 justify-end max-[1300px]:flex-col">
           <div className="w-full h-full">
             <h3 className="text-heading3-bold font-semibold">Продажі за регіоном</h3>
             <p>За весь час: {topRegion}</p>
           </div>
-          <div className="flex gap-1 max-[1300px]:mt-2">
-            <div className={cn("grid gap-2 justify-items-end")}>
+          <div className="flex gap-1 max-[1300px]:mt-2 max-[460px]:flex-col">
+            <div className={cn("grid gap-2 justify-items-end max-[460px]:justify-items-start")}>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     id="date"
                     variant={"outline"}
                     className={cn(
-                      "w-[300px] justify-start text-left font-normal",
+                      "w-[300px] justify-start text-left font-normal max-[460px]:w-full",
                       !date && "text-muted-foreground"
                     )}
                   >
@@ -168,7 +120,7 @@ export function MostPopularRegion() {
               </Popover>
             </div>
             <Select defaultValue={"BarChart"} onValueChange={(value) => setChartType(value)}>
-              <SelectTrigger className="w-72 h-full">
+              <SelectTrigger className="w-72 border-0 border-b border-black appearance-none rounded-none mb-1 max-[460px]:w-full">
                 <SelectValue className="cursor-poiner flex gap-2"/>
               </SelectTrigger>
               <SelectContent className="cursor-poiner">

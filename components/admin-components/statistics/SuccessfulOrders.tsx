@@ -58,21 +58,21 @@ export function SuccessfulOrders() {
   }, [screenWidth])
   
   return (
-    <section className="w-full h-[25rem] mt-10 max-[1300px]:mt-24">
+    <section className="w-full h-[25rem] mt-10">
       <div className="w-full h-full">
         <div className="w-full h-fit flex gap-2 justify-end max-[1300px]:flex-col">
           <div className="w-full h-full">
             <h3 className="text-heading3-bold font-semibold">Оплачені замовлення <span className="text-green-500 text-heading4-medium">+{totalSuccessfulOrders}</span></h3>
           </div>
-          <div className="flex gap-1 max-[1300px]:mt-2">
-            <div className={cn("grid gap-2 justify-items-end")}>
+          <div className="flex gap-1 max-[1300px]:mt-2 max-[460px]:flex-col">
+            <div className={cn("grid gap-2 justify-items-end max-[460px]:justify-items-start")}>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     id="date"
                     variant={"outline"}
                     className={cn(
-                      "w-[300px] justify-start text-left font-normal",
+                      "w-[300px] justify-start text-left font-normal max-[460px]:w-full",
                       !date && "text-muted-foreground"
                     )}
                   >
@@ -105,7 +105,7 @@ export function SuccessfulOrders() {
               </Popover>
             </div>
             <Select defaultValue={"BarChart"} onValueChange={(value) => setChartType(value)}>
-              <SelectTrigger className="w-72 h-full">
+              <SelectTrigger className="w-72 border-0 border-b border-black appearance-none rounded-none mb-1 max-[460px]:w-full">
                 <SelectValue className="cursor-poiner flex gap-2"/>
               </SelectTrigger>
               <SelectContent className="cursor-poiner">
