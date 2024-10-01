@@ -322,7 +322,10 @@ export async function deleteOrder(id: string, path: string) {
     try {
         connectToDB();
 
-        const order = await Order.deleteOne({ id: id });
+        const order = await Order.findOne({ id: id });
+
+        const user = await User.findOne({ _id: order.user });
+        const deletedOrder = await Order.deleteOne({ id: id });
 
         revalidatePath(path);
         revalidatePath("/myOrders");

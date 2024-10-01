@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import Value from "../models/value.model";
 import { ProductType } from "../types/types";
 import { clearCatalogCache } from "./redis/catalog.actions";
+import Order from "../models/order.model";
 
 interface CreateUrlParams {
     id: string | null,
@@ -79,6 +80,8 @@ interface InterfaceProps {
     email: string,
     path: string,
 }
+
+const DELETEDPRODUCT_ID = "66f6c46231cc6f8147dc73db";
 
 export async function createUrlProduct({ id, name, isAvailable, quantity, url, priceToShow, price, images, vendor, description, params, isFetched, category }: CreateUrlParams){
     try {
@@ -163,7 +166,7 @@ export async function fetchAllProducts() {
     try {
         connectToDB();
         
-        const fetchedProducts = await Product.find({ isAvailable: true, quantity: { $gt: 0 } })
+        const fetchedProducts = await Product.find({ _id: { $ne: DELETEDPRODUCT_ID }, isAvailable: true, quantity: { $gt: 0 } })
         .populate({
             path: 'likedBy',
             model: User,
@@ -180,7 +183,7 @@ export async function fetchProducts(){
     try {
         connectToDB();
 
-        const products = await Product.find();
+        const products = await Product.find({ _id: { $ne: DELETEDPRODUCT_ID } });
         
         return products
     } catch (error:any) {
@@ -197,7 +200,7 @@ export async function fetchLastProducts() {
         connectToDB();
         
 
-        const last12Products = await Product.find({ isAvailable: true })
+        const last12Products = await Product.find({ _id: { $ne: DELETEDPRODUCT_ID }, isAvailable: true })
         .populate({
             path: 'likedBy',
             model: User,
@@ -548,6 +551,18 @@ export async function deleteProduct(productId: string, path: string) {
         }
     }
 
+    const orders = await Order.find({  'products.product': product._id })
+
+    for(const order of orders) {
+        for(let product of order.products) {
+            if(product._id = product) {
+                product = DELETEDPRODUCT_ID
+            } 
+        }
+
+        await order.save();
+    }
+
     await Product.deleteOne({ id: productId });
 
     await clearCatalogCache();
@@ -566,7 +581,8 @@ export async function fetchCategoriesProperities() {
       const categoriesAverageProductValue: { [key: string]: number } = {};
   
       const products = await Product.find();
-  
+
+      const productsIds = [];
       for(const product of products) {
           if(!categories[product.category]) {
               categories[product.category] = { totalProducts: 0, totalValue: 0 };
@@ -582,19 +598,81 @@ export async function fetchCategoriesProperities() {
   
       console.log(categoriesList);
 
-      for(const product of products) {
-        if(product.priceToShow < 0) {
-            console.log("Negative price:", product.priceToShow);
-            console.log("Product with negtive price:", product);
-        }
-      }
       return categoriesList;
     } catch (error: any) {
       throw new Error(`Error fetching categories properities ${error.message}`)
     }
   }
 
+  export async function setCategoryDiscount(categoryName: string, percentage: number) {
+    try {
+        connectToDB()
 
+        const products = await Product.find({ category: categoryName });
+
+        for(const product of products) {
+            product.priceToShow = product.price - (product.price * (percentage / 100))
+
+            await product.save()
+        }
+    } catch (error: any) {
+        throw new Error(`Error changing discount for all the products in the category: ${error.message}`)
+    }
+}
+
+export async function changeProductsCategory({productsIds, categoryName}: {productsIds: string[], categoryName: string}) {
+    try {
+        connectToDB(); 
+
+        const products = await Product.find({ _id: { $in: productsIds } });
+
+        for(const product of products) {
+            product.category = categoryName;
+
+            await product.save()
+        }
+    } catch (error: any) {
+        throw new Error(`Error changing products' category: ${error.message}`)        
+    }
+}
+
+export async function deleteCategory(categoryName: string, removeProducts: boolean) {
+    try {
+        connectToDB();
+
+        const products = await Product.find({ category: categoryName });
+
+        const productIds: string[] = []
+
+        for(const product of products) {
+            if(removeProducts) {
+                productIds.push(product._id)
+            } else {
+                product.category = "No-category"
+
+                await product.save()
+            }
+        }
+
+        if(removeProducts) {
+            const deletedProducts = await Product.deleteMany({ _id: { $in: productIds } });
+
+            const orders = await Order.find({  'products.product': { $in: productIds } })
+
+            for(const order of orders) {
+                for(let product of order.products) {
+                    if(productIds.includes(product)) {
+                        product = DELETEDPRODUCT_ID
+                    }
+                }
+
+                await order.save();
+            }
+        } 
+    } catch (error: any) {
+        throw new Error(`Error deleting category: ${error.message}`)
+    }
+}
 
 
 
