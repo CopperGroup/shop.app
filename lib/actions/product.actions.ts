@@ -10,6 +10,7 @@ import { clearCatalogCache } from "./redis/catalog.actions";
 import Order from "../models/order.model";
 
 interface CreateUrlParams {
+    _id?: string,
     id: string | null,
     name: string | null,
     isAvailable: boolean,
@@ -27,26 +28,6 @@ interface CreateUrlParams {
     isFetched: boolean
     category:string
 }
-
-
-
-
-interface GetParams {
-    productId: string,
-    params: {
-        Color: string,
-        Depth: string,
-        Height: string,
-        Model: string,
-        Type: string,
-        Width: string,
-        customParams: {
-            name: string,
-            value: string,
-        } []
-    }
-}
-
 
 interface CreateParams {
     id: string,
@@ -81,7 +62,7 @@ interface InterfaceProps {
     path: string,
 }
 
-const DELETEDPRODUCT_ID = "66f6c46231cc6f8147dc73db";
+const DELETEDPRODUCT_ID = "6707f05df81d3417841fa610";
 
 export async function createUrlProduct({ id, name, isAvailable, quantity, url, priceToShow, price, images, vendor, description, params, isFetched, category }: CreateUrlParams){
     try {
@@ -152,6 +133,33 @@ export async function createProduct({ id, name, quantity, images, url, priceToSh
     }
 }
 
+export async function updateUrlProduct({_id, id, name, isAvailable, quantity, url, priceToShow, price, images, vendor, description, params, isFetched, category }: CreateUrlParams){
+    try {
+        connectToDB();
+        
+        const product = await Product.findByIdAndUpdate(_id, {
+            id: id,
+            name: name,
+            isAvailable: isAvailable,
+            quantity: quantity,
+            url: url,
+            priceToShow: priceToShow,
+            price: price,
+            images: images,
+            vendor: vendor,
+            description: description,
+            params: params,
+            isFetched: isFetched,
+            category:category,
+        })
+        
+
+        console.log(product);
+    } catch (error: any) {
+        throw new Error(`Error creating url-product, ${error.message}`)
+    }
+}
+
 export async function deleteUrlProducts(){
     try {
         connectToDB();
@@ -159,6 +167,22 @@ export async function deleteUrlProducts(){
         await Product.deleteMany({ isFetched: true});
     } catch (error: any) {
         throw new Error(`Error deleting fetched products, ${error.message}`)
+    }
+}
+
+export async function fetchUrlProducts(type?: "json"){
+    try {
+        connectToDB();
+        
+        const urlProducts = await Product.find({_id: {$ne: DELETEDPRODUCT_ID}, isFetched: true });
+
+        if(type === "json"){
+            return JSON.stringify(urlProducts)
+        } else{
+            return urlProducts;
+        }
+    } catch (error: any) {
+        throw new Error(`Error finding url-added products: ${error.message}`)
     }
 }
 
@@ -304,30 +328,30 @@ export async function getProductImages(productId: string) {
     }
 }
 
-export async function addParamsToProduct({ productId, params }: GetParams) {
-    try {
-        connectToDB();
+// export async function addParamsToProduct({ productId, params }: GetParams) {
+//     try {
+//         connectToDB();
 
-        const product = await Product.findOne({ id: productId });
+//         const product = await Product.findOne({ id: productId });
 
-        product.params = [];
+//         product.params = [];
         
-        await product.params.push({ name: "Товар", value: params.Model.replace(/ /g, '_') });
-        await product.params.push({ name: "Ширина, см", value: params.Width });
-        await product.params.push({ name: "Висота, см", value: params.Height });
-        await product.params.push({ name: "Глибина, см", value: params.Depth });
-        await product.params.push({ name: "Вид", value: params.Type });
-        await product.params.push({ name: "Колір", value: params.Color });
+//         await product.params.push({ name: "Товар", value: params.Model.replace(/ /g, '_') });
+//         await product.params.push({ name: "Ширина, см", value: params.Width });
+//         await product.params.push({ name: "Висота, см", value: params.Height });
+//         await product.params.push({ name: "Глибина, см", value: params.Depth });
+//         await product.params.push({ name: "Вид", value: params.Type });
+//         await product.params.push({ name: "Колір", value: params.Color });
 
-        for(const customParam of params.customParams){
-            await product.params.push({ name: customParam.name, value: customParam.value });
-        }
+//         for(const customParam of params.customParams){
+//             await product.params.push({ name: customParam.name, value: customParam.value });
+//         }
 
-        await product.save();
-    } catch (error: any) {
-        throw new Error(`Error adding params to product: ${error.message}`)
-    }
-}
+//         await product.save();
+//     } catch (error: any) {
+//         throw new Error(`Error adding params to product: ${error.message}`)
+//     }
+// }
 
 export async function getProductParams(productId: string) {
     try {
@@ -529,44 +553,56 @@ export async function findAllProductsCategories(type?: "json") {
   }
 }
 
-export async function deleteProduct(productId: string, path: string) {
+export async function deleteProduct(productId: string, path: string, cache?: "keep-catalog-cache") {
   try {
     connectToDB();
-
-    const product = await Product.findOne({ id: productId });
-
-    const usersWhoLikedProduct = await User.find({ _id: { $in: product.likedBy }});
-
-    if(!product) {
-        throw new Error("Product not found");
-    }
-
-    console.log("Liked by", usersWhoLikedProduct);
-
-    if(usersWhoLikedProduct){
-        for(const user of usersWhoLikedProduct) {
-            user.likes.pull(product._id);
     
-            await user.save();
+    if(productId){
+        const product = await Product.findOne({ id: productId });
+    
+        if(product){
+            
+            const usersWhoLikedProduct = await User.find({ _id: { $in: product.likedBy }});
+        
+            if(!product) {
+                throw new Error("Product not found");
+            }
+        
+            console.log("Liked by", usersWhoLikedProduct);
+        
+            if(usersWhoLikedProduct){
+                for(const user of usersWhoLikedProduct) {
+                    user.likes.pull(product._id);
+            
+                    await user.save();
+                }
+            }
+        
+            const orders = await Order.find({ 'products.product': product._id })
+        
+            console.log(orders);
+
+            for(const order of orders) {
+                for(let product of order.products) {
+                    if(product._id = product) {
+                        product = DELETEDPRODUCT_ID
+                    } 
+                }
+        
+                await order.save();
+            }
+        
+            // await Product.deleteOne({ id: productId });
+        
+            if(!cache){
+                await clearCatalogCache();
+            } else {
+                console.log("Catalog cache cleared.");
+            }
+            revalidatePath(path);
         }
+
     }
-
-    const orders = await Order.find({  'products.product': product._id })
-
-    for(const order of orders) {
-        for(let product of order.products) {
-            if(product._id = product) {
-                product = DELETEDPRODUCT_ID
-            } 
-        }
-
-        await order.save();
-    }
-
-    await Product.deleteOne({ id: productId });
-
-    await clearCatalogCache();
-    revalidatePath(path);
   } catch (error: any) {
     throw new Error(`Error deleting product: ${productId} ${error.message}`)
   }

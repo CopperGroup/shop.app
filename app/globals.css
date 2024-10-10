@@ -251,6 +251,7 @@
 
 
 body{
+  overflow: overlay;
   scrollbar-gutter: stable both-edges; /* Стабільність скролу та видимі краї з обох сторін */
   scroll-behavior: smooth; /* Плавна прокрутка */
 }
@@ -405,20 +406,21 @@ h1{
 }
 
 ::-webkit-scrollbar {
-  width: 12px; /* Ширина скрола */
+  width: 7px; /* Ширина скрола */
   height: 12px; /* Висота скрола для горизонтального скролу */
-  
 }
 
 ::-webkit-scrollbar-track {
-  background: #fff; /* Колір треку (фону) */
+  display: none;
+  background: #ffffff10; /* Колір треку (фону) */
   border-radius: 6px;
   margin: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: black; /* Колір повзунка */
-  border: 3px solid #f0f0f0;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -427,13 +429,29 @@ h1{
 }
 
 
-
 /* Стилізація для Firefox */
-* {
-  scrollbar-width: thin; /* Тонкий скрол */
-  scrollbar-color: black #fff; /* Колір повзунка та треку відповідно */
-  
- 
+
+/* * {
+  scrollbar-width: thin; Тонкий скрол
+  scrollbar-color: black #fff; Колір повзунка та треку відповідно  
+} */
+
+.admin-panel-scrollbar::-webkit-scrollbar {
+  width: 7px;
+}
+
+.admin-panel-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ffffff00;
+  border: 0px;
+  border-left: 3px solid #ffffff;
+  transition-duration: 1s;
+}
+
+.admin-panel-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #000000;
+}
+.admin-panel-scrollbar::-webkit-scrollbar-track {
+  background: #ffffff50;
 }
 
 /* Додаткові стилі для країв та плавності прокрутки */

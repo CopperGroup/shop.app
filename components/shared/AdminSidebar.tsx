@@ -16,7 +16,7 @@ const AdminSidebar = () => {
    
 
     return (
-        <section className="custom-scrollbar leftsidebar">
+        <section className="admin-panel-scrollbar leftsidebar">
             <div className="flex w-full flex-1 flex-col gap-3 pl-5 max-lg:pl-0">
                 <div className="flex gap-2 items-center">
                     <Link href="/" className="text-heading3-bold pl-3 max-lg:hidden">SANTEHVAN</Link>

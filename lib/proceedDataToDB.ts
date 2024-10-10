@@ -1,7 +1,8 @@
-import { createUrlProduct, deleteUrlProducts } from "./actions/product.actions";
+import { createUrlProduct, deleteProduct, deleteUrlProducts, fetchUrlProducts, updateUrlProduct } from "./actions/product.actions";
 import { clearCatalogCache } from "./actions/redis/catalog.actions";
 
 interface Product {
+    _id: string,
     id: string | null,
     name: string | null,
     isAvailable: boolean,
@@ -22,33 +23,66 @@ interface Product {
 
 export async function proceedDataToDB(data: Product[], selectedRowsIds: (string | null)[]) {
     try {
-        await deleteUrlProducts();
-        
-        for (let i = 0; i < data.length; i++) {
-            const product = data[i];
-            if (product.id && selectedRowsIds.includes(product.id)) {
-                await createUrlProduct({
-                    id: product.id,
-                    name: product.name,
-                    isAvailable: product.isAvailable,
-                    quantity: product.quantity,
-                    url: product.url,
-                    priceToShow: product.priceToShow,
-                    price: product.price,
-                    images: product.images,
-                    vendor: product.vendor,
-                    description: product.description,
-                    params: product.params,
-                    isFetched: product.isFetched,
-                    category: product.category
-                });
-            }
+        const stringifiedUrlProducts = await fetchUrlProducts("json");
+        let urlProducts: Product[] = JSON.parse(stringifiedUrlProducts as string);
 
-            // Перевірка для додавання затримки після кожних 100 товарів
-            if ((i + 1) % 100 === 0) {
-                console.log(`Processed ${i + 1} products, waiting for 30 seconds...`);
-                await new Promise(resolve => setTimeout(resolve, 30000));
+        const leftOverProducts = urlProducts.filter(urlProduct => 
+            !data.some(product => product.id === urlProduct.id)
+        );
+
+        const processedIds = new Set<string>();
+
+        for (const product of data) {
+            if (product.id && selectedRowsIds.includes(product.id) && !processedIds.has(product.id)) {
+                const existingProductIndex = urlProducts.findIndex(urlProduct => urlProduct.id === product.id);
+
+                if (existingProductIndex !== -1) {
+                    const urlProduct = urlProducts[existingProductIndex];
+                    console.log("Update: ", product.id);
+                    
+                    await updateUrlProduct({
+                        _id: urlProduct._id,
+                        id: product.id,
+                        name: product.name,
+                        isAvailable: product.isAvailable,
+                        quantity: product.quantity,
+                        url: product.url,
+                        priceToShow: product.priceToShow,
+                        price: product.price,
+                        images: product.images,
+                        vendor: product.vendor,
+                        description: product.description,
+                        params: product.params,
+                        isFetched: product.isFetched,
+                        category: product.category
+                    });
+                } else {
+                    console.log("Create: ", product.id);
+
+                    await createUrlProduct({
+                        id: product.id,
+                        name: product.name,
+                        isAvailable: product.isAvailable,
+                        quantity: product.quantity,
+                        url: product.url,
+                        priceToShow: product.priceToShow,
+                        price: product.price,
+                        images: product.images,
+                        vendor: product.vendor,
+                        description: product.description,
+                        params: product.params,
+                        isFetched: product.isFetched,
+                        category: product.category
+                    });
+                }
+
+                processedIds.add(product.id);
             }
+        }
+
+        console.log("Left products:", leftOverProducts);
+        for (const leftOverProduct of leftOverProducts) {
+            await deleteProduct(leftOverProduct.id as string, "/catalog", "keep-catalog-cache");
         }
 
         await clearCatalogCache();

@@ -6,7 +6,8 @@ import { connectToDB } from "@/lib/mongoose"
 export async function fetchUserByEmail(email: string){
     try {
         connectToDB()
-        const currentUser = User.findOne({ email: email})
+        const currentUser = User.findOne({ email: email}).select("_id username email orders favourite cart discounts role isVerified name phoneNumber surname likes totalOrders")
+
         return currentUser
     } catch (error:any) {
         throw new Error(`Error getting current user ${error.message}`)

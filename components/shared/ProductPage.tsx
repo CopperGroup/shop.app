@@ -104,7 +104,7 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">Опис</h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{product.description.replace(/[^а-щьюяґєіїА-ЩЬЮЯҐЄІЇ0-9. ]/g, '')}</p>
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{product.description}</p>
         </motion.div>
         
         <motion.div

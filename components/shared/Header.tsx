@@ -37,7 +37,6 @@ export default function Header({ email, user }: { email: string; user: string })
   const headerRef = useRef<HTMLElement>(null);
   const isInView = useInView(headerRef, { once: true });
   
-  console.log("Email", email)
   const userInfo = JSON.parse(user);
 
   const headerVariants = {

@@ -45,3 +45,28 @@ export function totalProducts(products : {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+export function replaceDescription(str: string) {
+  return str
+    .replace(/&amp;lt;/g, '<')
+    .replace(/&amp;gt;/g, '>')
+    .replace(/&amp;quot;/g, '"')
+    .replace(/&amp;amp;/g, '&')
+    .replace(/&amp;#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&copy;/g, '©')
+    .replace(/&reg;/g, '®')
+    .replace(/&euro;/g, '€')
+    .replace(/&pound;/g, '£')
+    .replace(/&yen;/g, '¥')
+    .replace(/&cent;/g, '¢')
+    .replace(/&bull;/g, '•')
+    .replace(/&hellip;/g, '…')
+    .replace(/&mdash;/g, '—')   
+    .replace(/&ndash;/g, '–');  
+}

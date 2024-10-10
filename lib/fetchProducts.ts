@@ -1,5 +1,6 @@
 import { DOMParser } from "xmldom";
 import { createUrlProduct, deleteUrlProducts } from "./actions/product.actions";
+import { replaceDescription } from "./utils";
 
 
 export default async function xmlParse(xmlString: string){
@@ -33,8 +34,8 @@ export default async function xmlParse(xmlString: string){
             const categoryIdElement = product.getElementsByTagName("categoryId")[0];
             const imagesElements = product.getElementsByTagName("picture");
             const vendorElement = product.getElementsByTagName("vendor")[0];
-            const nameElement = product.getElementsByTagName("name_ua")[0];
-            const descriptionElement = product.getElementsByTagName("description_ua")[0];
+            const nameElement = product.getElementsByTagName("name_ua")[0] ? product.getElementsByTagName("name_ua")[0] : product.getElementsByTagName("name")[0];
+            const descriptionElement = product.getElementsByTagName("description_ua")[0] ? product.getElementsByTagName("description_ua")[0] : product.getElementsByTagName("description")[0];
             const paramElements = product.getElementsByTagName("param");
             const images = [];
             const params = [];
@@ -58,7 +59,7 @@ export default async function xmlParse(xmlString: string){
             const categoryId = categoryIdElement ? categoryIdElement.textContent : "";
             const vendor = vendorElement ? vendorElement.textContent : "";
             const name = nameElement ? nameElement.textContent : "";
-            const description = descriptionElement ? descriptionElement.textContent : "";
+            const description = descriptionElement ? replaceDescription(descriptionElement.textContent as string) : "";
             
             let category = ''
 
@@ -99,20 +100,20 @@ export default async function xmlParse(xmlString: string){
                 const paramValue = paramElements[i].textContent;
     
                 // Check if the parameter is "Ширина"
-                if (paramName === "Ширина, см") {
+                if (["Ширина, см", "Width, cm"].includes(paramName ? paramName : "")) {
                     widthParam = { name: paramName, value: paramValue };
-                } else if(paramName === "Висота, см"){
+                } else if(["Висота, см", "Height, cm"].includes(paramName ? paramName : "")){
                     heightParam = { name: paramName, value: paramValue };
-                }else if(paramName === "Артикул"){
+                }else if(["Артикул", "SKU"].includes(paramName ? paramName : "")){
                     let first = paramValue?.replace(/ /g, '_');
 
                     modelParam = { name: "Товар", value: first };
                   
-                }else if(paramName === "Глибина, см"){
+                }else if(["Глибина, см", "Depth, cm"].includes(paramName ? paramName : "")){
                     deepParam = { name: paramName, value: paramValue };
-                }else if(paramName === "Вид"){
+                }else if(["Вид", "Kind"].includes(paramName ? paramName : "")){
                     typeParam = { name: paramName, value: paramValue };
-                }else if(paramName === "Колір"){
+                }else if(["Колір", "Color"].includes(paramName ? paramName : "")){
                     colorParam = { name: paramName, value: paramValue };
                 }else {
                     params.push({ name: paramName, value: paramValue });
