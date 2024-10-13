@@ -17,7 +17,7 @@ const DeleteProductButton = ({ id }: { id: string }) => {
 
     const handleDelete = async (id: string) => {
         if(productId === id) {
-            await deleteProduct(id, pathname);
+            await deleteProduct({productId: id,}, pathname);
             router.back();
         } else {
             setError("Неправильний ID замовлення")

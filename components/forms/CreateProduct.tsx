@@ -192,7 +192,7 @@ const CreateProduct = () => {
       try {
         const categories = await findAllProductsCategories();
 
-        setCategories(categories);
+        setCategories(categories as { name: string, amount: number}[]);
       } catch (error: any) {
         throw new Error(`Error appending existing product properities: ${error.message}`)
       }
@@ -781,7 +781,13 @@ const CreateProduct = () => {
               )}
 
               <div className="w-full flex justify-end mt-2">
-                <Button type="button" className="text-subtle-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 py-0 px-0 -mb-3" variant="destructive" onClick={() => setIsNewCategory(prev => !prev)}>{isNewCategory ? "Вибрати існуючу?" : "Створити нову?"}</Button>
+                <Button 
+                 type="button" 
+                 className="text-subtle-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 py-0 px-0 -mb-3" 
+                 variant="destructive" 
+                 onClick={() => setIsNewCategory(prev => !prev)}>
+                  {isNewCategory ? "Вибрати існуючу?" : "Створити нову?"}
+                </Button>
               </div>
           </div>
 

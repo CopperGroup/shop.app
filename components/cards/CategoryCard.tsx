@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreVertical, Edit, Trash2, BarChart2 } from "lucide-react"
 import { Category } from "@/lib/types/types"
+import DeleteCategoryButton from "../interface/categories/DeleteCategoryButton"
 
 function formatNumber(num: number): string {
   if (num >= 1000000) {
@@ -30,9 +31,8 @@ const CategoryCard = ({ categoryInfo }: {categoryInfo: Category}) => {
                     <Edit className="mr-2 h-4 w-4" />
                     <span>Редагувати</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    <span>Видалити</span>
+                  <DropdownMenuItem className="flex items-center text-red-500 cursor-pointer hover:text-red-700 transition-colors duration-200">
+                    <DeleteCategoryButton categoryName={categoryInfo.category}/>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <BarChart2 className="mr-2 h-4 w-4" />

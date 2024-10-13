@@ -82,7 +82,7 @@ export async function proceedDataToDB(data: Product[], selectedRowsIds: (string 
 
         console.log("Left products:", leftOverProducts);
         for (const leftOverProduct of leftOverProducts) {
-            await deleteProduct(leftOverProduct.id as string, "/catalog", "keep-catalog-cache");
+            await deleteProduct({productId: leftOverProduct.id as string}, "/catalog", "keep-catalog-cache");
         }
 
         await clearCatalogCache();

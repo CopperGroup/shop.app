@@ -62,7 +62,7 @@ interface InterfaceProps {
     path: string,
 }
 
-const DELETEDPRODUCT_ID = "6707f05df81d3417841fa610";
+const DELETEDPRODUCT_ID = "67081c925bb87b6f68d83c50";
 
 export async function createUrlProduct({ id, name, isAvailable, quantity, url, priceToShow, price, images, vendor, description, params, isFetched, category }: CreateUrlParams){
     try {
@@ -547,18 +547,33 @@ export async function findAllProductsCategories(type?: "json") {
 
     console.log("Categories", allCategories);
 
-    return categories
+    if(type === "json") {
+        return JSON.stringify(categories);
+    } else {
+        return categories
+    }
   } catch (error: any) {
     throw new Error(`${error.message}`)
   }
 }
 
-export async function deleteProduct(productId: string, path: string, cache?: "keep-catalog-cache") {
+export async function deleteProduct(id: { productId: string} | {product_id: string}, path: string, cache?: "keep-catalog-cache") {
   try {
     connectToDB();
-    
-    if(productId){
-        const product = await Product.findOne({ id: productId });
+
+    if(id){
+        const productId = "productId" in id ? id.productId : id.product_id;
+        const searchParam = "productId" in id ? "id" : "_id";
+
+        let product;
+
+        if(searchParam === "id") {
+            product = await Product.findOne({ id: productId });
+        } else if (searchParam === "_id") {
+            product = await Product.findOne({ _id: productId });
+        }
+
+        console.log("Product", product);
     
         if(product){
             
@@ -579,20 +594,23 @@ export async function deleteProduct(productId: string, path: string, cache?: "ke
             }
         
             const orders = await Order.find({ 'products.product': product._id })
-        
-            console.log(orders);
 
             for(const order of orders) {
-                for(let product of order.products) {
-                    if(product._id = product) {
-                        product = DELETEDPRODUCT_ID
-                    } 
+                for(const orderedProduct of order.products) {
+                    orderedProduct.product = DELETEDPRODUCT_ID;
+
+                    console.log("Product", orderedProduct)
                 }
-        
+
+                
                 await order.save();
             }
-        
-            // await Product.deleteOne({ id: productId });
+
+            if(searchParam === "id") {
+                await Product.deleteOne({ id: productId });
+            } else if(searchParam === "_id") {
+                await Product.deleteOne({ _id: productId })
+            }
         
             if(!cache){
                 await clearCatalogCache();
@@ -604,7 +622,7 @@ export async function deleteProduct(productId: string, path: string, cache?: "ke
 
     }
   } catch (error: any) {
-    throw new Error(`Error deleting product: ${productId} ${error.message}`)
+    throw new Error(`Error deleting product: ${id} ${error.message}`)
   }
 }
 
@@ -638,9 +656,9 @@ export async function fetchCategoriesProperities() {
     } catch (error: any) {
       throw new Error(`Error fetching categories properities ${error.message}`)
     }
-  }
+}
 
-  export async function setCategoryDiscount(categoryName: string, percentage: number) {
+export async function setCategoryDiscount(categoryName: string, percentage: number) {
     try {
         connectToDB()
 
@@ -672,26 +690,34 @@ export async function changeProductsCategory({productsIds, categoryName}: {produ
     }
 }
 
-export async function deleteCategory(categoryName: string, removeProducts: boolean) {
+type DeleteCategoryProps = {
+    categoryName: string;
+} & ( { removeProducts: true } | { removeProducts: false, categoryToMoveProducts: string})
+
+export async function deleteCategory(props: DeleteCategoryProps) {
     try {
         connectToDB();
 
-        const products = await Product.find({ category: categoryName });
+        const products = await Product.find({ category: props.categoryName});
 
         const productIds: string[] = []
 
         for(const product of products) {
-            if(removeProducts) {
+            if(props.removeProducts) {
                 productIds.push(product._id)
             } else {
-                product.category = "No-category"
+                product.category = props.categoryToMoveProducts;
 
-                await product.save()
+                await product.save();
             }
         }
 
-        if(removeProducts) {
-            const deletedProducts = await Product.deleteMany({ _id: { $in: productIds } });
+        if(props.removeProducts) {
+            for(const _id of productIds) {
+                console.log(productIds);
+                console.log("Id", _id)
+                await deleteProduct({product_id: _id}, "/admin")
+            }
 
             const orders = await Order.find({  'products.product': { $in: productIds } })
 

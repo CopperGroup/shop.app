@@ -441,15 +441,12 @@ h1{
 }
 
 .admin-panel-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #ffffff00;
+  background-color: #000000;
   border: 0px;
   border-left: 3px solid #ffffff;
   transition-duration: 1s;
 }
 
-.admin-panel-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #000000;
-}
 .admin-panel-scrollbar::-webkit-scrollbar-track {
   background: #ffffff50;
 }
