@@ -83,8 +83,7 @@ export async function createUrlProduct({ id, name, isAvailable, quantity, url, p
             isFetched: isFetched,
             category: category ? category : "No-category"
         })
-        
-        console.log(category);
+
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
     }
@@ -93,8 +92,6 @@ export async function createUrlProduct({ id, name, isAvailable, quantity, url, p
 export async function createProduct({ id, name, quantity, images, url, priceToShow, price, vendor, category, description, isAvailable, params, customParams }: CreateParams){
     try {
         connectToDB();
-
-        console.log("Custom params", customParams);
         
         await Product.create({
             id: id,
@@ -129,6 +126,8 @@ export async function createProduct({ id, name, quantity, images, url, priceToSh
         await createdProduct.save();
 
         await clearCatalogCache();
+
+        revalidatePath("/admin")
     } catch (error: any) {
         throw new Error(`Error creating new product, ${error.message}`)
     }

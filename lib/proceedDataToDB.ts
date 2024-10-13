@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { createUrlProduct, deleteProduct, deleteUrlProducts, fetchUrlProducts, updateUrlProduct } from "./actions/product.actions";
 import { clearCatalogCache } from "./actions/redis/catalog.actions";
 
@@ -86,6 +87,8 @@ export async function proceedDataToDB(data: Product[], selectedRowsIds: (string 
         }
 
         await clearCatalogCache();
+
+        revalidatePath("/")
     } catch (error: any) {
         throw new Error(`Error proceeding products to DB: ${error.message}`);
     }

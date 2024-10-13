@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Trash2, ArrowRight, AlertTriangle, MoveRight } from "lucide-react";
 import { deleteCategory, findAllProductsCategories } from "@/lib/actions/product.actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ReadOnly } from "@/lib/types/types";
 
 interface DeleteCategoryButtonProps {
     className?: string;
@@ -24,7 +25,7 @@ interface DeleteCategoryButtonProps {
     onDialogChange?: (isOpen: boolean) => void;
 }
 
-const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonProps) => {
+const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
   const [isMainDialogOpen, setIsMainDialogOpen] = useState(false);
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -35,7 +36,6 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   const [categoriesNames, setCategoriesNames] = useState<{name: string, amount:number}[]>([])
-
 
   const preventClosing = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -71,15 +71,15 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
   }
 
   const confirmMoveProducts = async () => {
-    await deleteCategory({ categoryName: categoryName, removeProducts: false, categoryToMoveProducts: newCategoryName });
+    await deleteCategory({ categoryName: props.categoryName, removeProducts: false, categoryToMoveProducts: newCategoryName });
 
     setIsMoveDialogOpen(false);
     setIsMainDialogOpen(false);
   }
 
   const confirmDeleteCategory = async (e: React.MouseEvent) => {
-    if(confirmationCategoryName == categoryName && deleteConfirmation == "DELETE"){
-        await deleteCategory({ categoryName: categoryName, removeProducts: true })
+    if(confirmationCategoryName == props.categoryName && deleteConfirmation == "DELETE"){
+        await deleteCategory({ categoryName: props.categoryName, removeProducts: true })
     } 
 
     setIsDeleteDialogOpen(false);
@@ -100,7 +100,7 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
                 onClick={handleClick}
                 className={cn(
                     "w-full h-full flex items-center text-red-500 hover:text-red-700 transition-colors duration-200",
-                    className
+                    props.className
                 )}
                 >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -220,7 +220,7 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold text-gray-800">Confirm Deletion</DialogTitle>
                     <DialogDescription className="text-gray-600 mt-2">
-                        This will permanently delete <span className="font-bold">{categoryName}</span> category and all it&apos;s products. This action can&apos;t be undone.
+                        This will permanently delete <span className="font-bold">{props.categoryName}</span> category and all it&apos;s products. This action can&apos;t be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="my-4 space-y-4">
@@ -259,7 +259,7 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
                     variant="destructive"
                     onClick={(e) => confirmDeleteCategory(e)}
                     className="w-full sm:w-auto bg-red-500 text-white"
-                    disabled={(deleteConfirmation !== "DELETE" || confirmationCategoryName !== categoryName)}
+                    disabled={(deleteConfirmation !== "DELETE" || confirmationCategoryName !== props.categoryName)}
                     >
                     Delete Category and Products
                     </Button>

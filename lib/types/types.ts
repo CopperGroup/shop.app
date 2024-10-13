@@ -1,3 +1,7 @@
+export type ReadOnly<T> = {
+    readonly [P in keyof T] : T[P]
+}
+
 export type ProductType = {
     _id: string,
     id: string,
