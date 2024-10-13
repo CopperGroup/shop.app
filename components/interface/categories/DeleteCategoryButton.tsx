@@ -220,7 +220,7 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold text-gray-800">Confirm Deletion</DialogTitle>
                     <DialogDescription className="text-gray-600 mt-2">
-                    This will permanently delete the category "{categoryName}" and all its products. This action cannot be undone.
+                        This will permanently delete <span className="font-bold">{categoryName}</span> category and all it&apos;s products. This action can&apos;t be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="my-4 space-y-4">
@@ -236,7 +236,7 @@ const DeleteCategoryButton = ({ className, categoryName }: DeleteCategoryButtonP
                     </div>
                     <div>
                     <Label htmlFor="deleteConfirmation" className="text-sm font-medium text-gray-700">
-                        Type "DELETE" to confirm
+                        Type <span className="font-semibold text-red-500">DELETE</span> to confirm
                     </Label>
                     <Input
                         id="deleteConfirmation"

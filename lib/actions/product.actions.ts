@@ -81,9 +81,10 @@ export async function createUrlProduct({ id, name, isAvailable, quantity, url, p
             description: description,
             params: params,
             isFetched: isFetched,
-            category:category,
+            category: category ? category : "No-category"
         })
         
+        console.log(category);
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
     }
@@ -150,7 +151,7 @@ export async function updateUrlProduct({_id, id, name, isAvailable, quantity, ur
             description: description,
             params: params,
             isFetched: isFetched,
-            category:category,
+            category: category ? category : "No-category"
         })
         
 
@@ -649,8 +650,6 @@ export async function fetchCategoriesProperities() {
           category,
           values: { totalProducts: value.totalProducts, totalValue: value.totalValue, averageProductPrice: parseFloat((value.totalValue / value.totalProducts).toFixed(2))}
       }))
-  
-      console.log(categoriesList);
 
       return categoriesList;
     } catch (error: any) {
