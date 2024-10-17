@@ -630,24 +630,27 @@ export async function fetchCategoriesProperities() {
     try {
       connectToDB();
   
-      const categories: { [key: string]: { totalProducts: number, totalValue: number }} = {};
+      const categories: { [key: string]: { totalProducts: number, totalValue: number, categoryProducts: ProductType[] }} = {};
   
       const categoriesAverageProductValue: { [key: string]: number } = {};
   
-      const products = await Product.find();
+      const products = await Product.find({ _id: { $ne: DELETEDPRODUCT_ID } });
 
       const productsIds = [];
       for(const product of products) {
           if(!categories[product.category]) {
-              categories[product.category] = { totalProducts: 0, totalValue: 0 };
+              categories[product.category] = { totalProducts: 0, totalValue: 0, categoryProducts: []};
           }
   
-          categories[product.category] = { totalProducts: categories[product.category].totalProducts + 1, totalValue: categories[product.category].totalValue + product.priceToShow }
+          categories[product.category].totalProducts += 1;
+          categories[product.category].totalValue += product.priceToShow;
+  
+          categories[product.category].categoryProducts.push(product);
       }
   
       const categoriesList = Object.entries(categories).map(([ category, value ]) => ({
           category,
-          values: { totalProducts: value.totalProducts, totalValue: value.totalValue, averageProductPrice: parseFloat((value.totalValue / value.totalProducts).toFixed(2))}
+          values: { totalProducts: value.totalProducts, totalValue: value.totalValue, averageProductPrice: parseFloat((value.totalValue / value.totalProducts).toFixed(2)), stringifiedProducts: JSON.stringify(value.categoryProducts)}
       }))
 
       return categoriesList;
@@ -688,6 +691,24 @@ export async function changeProductsCategory({productsIds, categoryName}: {produ
     }
 }
 
+export async function fetchCategoriesProducts(categoryName: string, type?: 'json') {
+  try {
+    connectToDB();
+
+    const products = await Product.find({ category: categoryName });
+
+
+    if(type === 'json'){
+       return JSON.stringify(products)
+    } else {
+       return products
+    }
+    
+  } catch (error: any) {
+    throw new Error(`${error.message}`)
+  }
+}
+
 type DeleteCategoryProps = {
     categoryName: string;
 } & ( { removeProducts: true } | { removeProducts: false, categoryToMoveProducts: string})
@@ -710,6 +731,8 @@ export async function deleteCategory(props: DeleteCategoryProps) {
             }
         }
 
+        console.log(productIds);
+
         if(props.removeProducts) {
             for(const _id of productIds) {
                 console.log(productIds);
@@ -729,6 +752,7 @@ export async function deleteCategory(props: DeleteCategoryProps) {
                 await order.save();
             }
         } 
+
     } catch (error: any) {
         throw new Error(`Error deleting category: ${error.message}`)
     }

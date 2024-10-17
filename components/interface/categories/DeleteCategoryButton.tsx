@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -52,6 +52,15 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
     fetchCategoriesNames();
   }, [])
 
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault()
+    }
+  }, [])
+
+  const handleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+  }, []);
 
   const handleClick = (e: React.MouseEvent) => {
     preventClosing(e);
@@ -71,6 +80,7 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
   }
 
   const confirmMoveProducts = async () => {
+    console.log("Click")
     await deleteCategory({ categoryName: props.categoryName, removeProducts: false, categoryToMoveProducts: newCategoryName });
 
     setIsMoveDialogOpen(false);
@@ -93,7 +103,7 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
   }
 
   return (
-    <div onClick={(e) => preventClosing(e)} className="w-full h-full">
+    <div onClick={(e) => preventClosing(e)} onKeyDown={handleKeyDown} className="w-full h-full">
         <Dialog open={isMainDialogOpen} onOpenChange={setIsMainDialogOpen}>
             <DialogTrigger asChild>
                 <span
@@ -161,11 +171,12 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
                         <>
                             <Label htmlFor="newCategory" className="text-sm font-medium text-gray-700">New category name</Label>
                             <Input
-                            id="newCategory"
-                            value={newCategoryName}
-                            onChange={(e) => setNewCategoryName(e.target.value)}
-                            className="mt-1"
-                            placeholder="Enter category name"
+                             id="newCategory"
+                             value={newCategoryName}
+                             onChange={(e) => setNewCategoryName(e.target.value)}
+                             onKeyDown={handleInputKeyDown}
+                             className="mt-1"
+                             placeholder="Enter category name"
                             />
                         </>
                     ): (
@@ -198,16 +209,16 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
                 </div>
                 <DialogFooter className="sm:flex-row flex-col space-y-2 sm:space-y-0 sm:space-x-2">
                     <Button
-                    variant="outline"
-                    onClick={(event) => {setIsMoveDialogOpen(false), handleCancel(event)}}
-                    className="w-full sm:w-auto"
+                     variant="outline"
+                     onClick={(event) => {setIsMoveDialogOpen(false), handleCancel(event)}}
+                     className="w-full sm:w-auto" 
                     >
                     Cancel
                     </Button>
                     <Button
-                    onClick={confirmMoveProducts}
-                    className="w-full sm:w-auto"
-                    disabled={!newCategoryName.trim()}
+                     onClick={confirmMoveProducts}
+                     className="w-full sm:w-auto"
+                     disabled={!newCategoryName.trim()}
                     >
                     Move and Delete
                     </Button>
@@ -231,6 +242,7 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
                     <Input
                         id="categoryName"
                         onChange={(e) => setConfirmationcategoryName(e.target.value)}
+                        onKeyDown={handleInputKeyDown}
                         className="mt-1"
                     />
                     </div>
@@ -242,6 +254,7 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
                         id="deleteConfirmation"
                         value={deleteConfirmation}
                         onChange={(e) => setDeleteConfirmation(e.target.value)}
+                        onKeyDown={handleInputKeyDown}
                         className="mt-1"
                         placeholder="Type DELETE"
                     />

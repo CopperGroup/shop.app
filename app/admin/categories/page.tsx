@@ -4,6 +4,7 @@ import { fetchCategoriesProperities, findAllProductsCategories } from "@/lib/act
 const Page = async () => {
 
   const categories = await fetchCategoriesProperities();
+
   return (
     <section className="w-full px-10 py-20 h-screen max-md:pb-36 max-[360px]:px-4"> 
       <h1 className="w-full text-heading1-bold drop-shadow-text-blue">Категорії</h1>

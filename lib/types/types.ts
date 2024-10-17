@@ -29,6 +29,7 @@ export type Category = {
     values: {
       totalProducts: number,
       totalValue: number,
-      averageProductPrice: number
+      averageProductPrice: number,
+      stringifiedProducts: string
     }
 }

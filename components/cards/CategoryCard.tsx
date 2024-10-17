@@ -2,9 +2,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Edit, Trash2, BarChart2 } from "lucide-react"
+import { MoreVertical, Edit, Trash2, BarChart2, Eye } from "lucide-react"
 import { Category } from "@/lib/types/types"
 import DeleteCategoryButton from "../interface/categories/DeleteCategoryButton"
+import EditCategoryButton from "../interface/categories/EditCategoryButton"
 
 function formatNumber(num: number): string {
   if (num >= 1000000) {
@@ -28,8 +29,13 @@ const CategoryCard = ({ categoryInfo }: {categoryInfo: Category}) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 bg-white">
                   <DropdownMenuItem className="cursor-pointer">
-                    <Edit className="mr-2 h-4 w-4" />
-                    <span>Редагувати</span>
+                    <Link href={`/admin/categories/${categoryInfo.category.replace(" ", "_")}`} className="w-full h-fit flex items-center p-0">
+                      <Eye className="mr-2 h-4 w-4"/>
+                      <span>View</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <EditCategoryButton categoryName={categoryInfo.category} stringifiedProducts={categoryInfo.values.stringifiedProducts}/>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex items-center text-red-500 cursor-pointer hover:text-red-700 transition-colors duration-200">
                     <DeleteCategoryButton categoryName={categoryInfo.category}/>
