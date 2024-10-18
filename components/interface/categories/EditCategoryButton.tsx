@@ -13,22 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn, sleep } from "@/lib/utils";
 import { Edit, Percent, MoveRight, Check } from "lucide-react";
 import { setCategoryDiscount, changeProductsCategory, findAllProductsCategories, fetchCategoriesProducts } from "@/lib/actions/product.actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductType, ReadOnly } from "@/lib/types/types";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import Product from "@/lib/models/product.model";
 import ProductsTable from "./ProductsTable";
+
+type OnSelectionChangeProps = 
+    | { selectType: "select-one", productId: string }
+    | { selectType: "select-all", productIds: string[] }
 
 interface EditCategoryButtonProps {
   className?: string;
@@ -47,7 +41,7 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
   const [newCategory, setNewCategory] = useState<boolean>(false);
   const [categoriesNames, setCategoriesNames] = useState<{name: string, amount:number}[]>([]);
   const [selectedProducts, setSelectedProducts] = useState(new Set<string>())
-
+  const [selectCategoryOpen, setSelectCategoryOpen] = useState<boolean>(false)
   
   const products = JSON.parse(props.stringifiedProducts)
   
@@ -64,16 +58,25 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
         e.stopPropagation();
     }
     
-    const handleSelectionChange = useCallback((productId: string) => {
+    const handleSelectionChange = useCallback((props: OnSelectionChangeProps) => {
       setSelectedProducts(prevSelected => {
-        const newSelected = new Set(prevSelected)
-        if (newSelected.has(productId)) {
-          newSelected.delete(productId)
+        let newSelected = new Set(prevSelected)
+
+        if(props.selectType == "select-all") {
+            if(newSelected.size == props.productIds.length) {
+                newSelected.clear()
+            } else {
+                newSelected = new Set(props.productIds)
+            }
+
         } else {
-          newSelected.add(productId)
+            if (newSelected.has(props.productId)) {
+                newSelected.delete(props.productId)
+            } else {
+              newSelected.add(props.productId)
+            }
         }
 
-        console.log(Array.from(newSelected))
         return newSelected
       })
 
@@ -113,14 +116,18 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
     setDiscountPercentage("");
   }
 
-//   const confirmChangeCategory = async () => {
-//     await changeProductsCategory({ productsIds: selectedProducts, categoryName: newCategoryName });
-//     setIsChangeCategoryDialogOpen(false);
-//     setIsMainDialogOpen(false);
-//     setNewCategoryName("");
-//     setSelectedProducts([]);
-//   }
+  const confirmChangeCategory = async () => {
+    await changeProductsCategory({ productsIds: Array.from(selectedProducts), categoryName: newCategoryName });
+    setIsChangeCategoryDialogOpen(false);
+    setIsMainDialogOpen(false);
+    setNewCategoryName("");
+    setSelectedProducts(new Set());
+  }
 
+  useEffect(() => {
+    console.log("Seletced products:", selectedProducts)
+  }, [selectedProducts])
+ 
   const handleCancel = (e: React.MouseEvent) => {
     preventClosing(e);
     setIsMainDialogOpen(true);
@@ -225,14 +232,14 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
         </Dialog>
 
         <Dialog open={isSelectProductsDialogOpen} onOpenChange={setIsSelectProductsDialogOpen}>
-          <DialogContent className="max-w-[95%} max-h-[90vh] flex flex-col bg-white overflow-y-scroll sm:max-w-[700px] rounded-lg max-[420px]:max-w-full">
+          <DialogContent className="max-w-[95%} max-h-[90vh] flex flex-col bg-white overflow-y-scroll sm:max-w-[700px] rounded-lg max-[420px]:max-w-full max-[390px]:px-1">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold text-gray-800">Select Products to Move</DialogTitle>
               <DialogDescription className="text-gray-600 mt-2">
                 Choose the products you want to move to a new category.
               </DialogDescription>
             </DialogHeader>
-            <div className="flex-grow overflow-y-auto my-4">
+            <div className="flex-grow overflow-y-auto my-4 max-[420px]:pl-1">
             <ProductsTable
                 stringifiedProducts={props.stringifiedProducts}
                 categoryName={props.categoryName}
@@ -319,9 +326,9 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
                 Cancel
               </Button>
               <Button
-                onClick={() => {}}
+                onClick={confirmChangeCategory}
                 className="w-full sm:w-auto"
-                disabled={!newCategoryName.trim()}
+                disabled={!newCategoryName.trim() || selectCategoryOpen}
               >
                 Change Category
               </Button>

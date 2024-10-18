@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input"
 import { ChevronLeft, ChevronRight, Search, Heart } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { ProductType } from '@/lib/types/types'
 
 type Action =
   | { type: 'SET_SEARCH', payload: string }
@@ -85,11 +86,15 @@ const filterAndSortProducts = (products: any[], state: State) => {
   return filtered
 }
 
+type OnSelectionChangeProps = 
+    | { selectType: "select-one", productId: string }
+    | { selectType: "select-all", productIds: string[] }
+
 interface ProductsTableProps {
-  stringifiedProducts: string
-  categoryName: string
-  selectedProducts: Set<string>
-  onSelectionChange: (productId: string) => void
+  stringifiedProducts: string;
+  categoryName: string;
+  selectedProducts: Set<string>;
+  onSelectionChange: (props: OnSelectionChangeProps) => void;
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({ 
@@ -98,7 +103,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   selectedProducts, 
   onSelectionChange 
 }) => {
-    
+
   const products = useMemo(() => JSON.parse(stringifiedProducts), [stringifiedProducts])
   const router = useRouter()
 
@@ -122,11 +127,14 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   })
 
   const handleProductToggle = useCallback((productId: string) => {
-    onSelectionChange(productId)
+    onSelectionChange({ selectType: "select-one", productId: productId })
   }, [onSelectionChange])
 
   const handleToggleAllProducts = useCallback(() => {
-    currentPageProducts.forEach(product => onSelectionChange(product._id))
+    const product_Ids = products.map((product: ProductType) => product._id);
+
+    console.log(product_Ids)
+    onSelectionChange({ selectType: "select-all", productIds: product_Ids });
   }, [currentPageProducts, onSelectionChange])
 
   const isAllSelected = useMemo(() => 
