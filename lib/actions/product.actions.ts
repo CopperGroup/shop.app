@@ -618,6 +618,7 @@ export async function deleteProduct(id: { productId: string} | {product_id: stri
                 console.log("Catalog cache cleared.");
             }
             revalidatePath(path);
+            revalidatePath("/admin")
         }
 
     }
@@ -670,6 +671,9 @@ export async function setCategoryDiscount(categoryName: string, percentage: numb
 
             await product.save()
         }
+
+        revalidatePath("/admin");
+        clearCatalogCache();
     } catch (error: any) {
         throw new Error(`Error changing discount for all the products in the category: ${error.message}`)
     }
@@ -686,6 +690,9 @@ export async function changeProductsCategory({productsIds, categoryName}: {produ
 
             await product.save()
         }
+
+        revalidatePath("/admin");
+        clearCatalogCache();
     } catch (error: any) {
         throw new Error(`Error changing products' category: ${error.message}`)        
     }
@@ -705,7 +712,26 @@ export async function fetchCategoriesProducts(categoryName: string, type?: 'json
     }
     
   } catch (error: any) {
-    throw new Error(`${error.message}`)
+    throw new Error(`Error fetching categories products: ${error.message}`)
+  }
+}
+
+export async function changeCategoryName({ categoryName, newName }: { categoryName: string, newName: string }) {
+  try {
+    connectToDB();
+
+    const products = await Product.find({ category: categoryName });
+
+    for(const product of products) {
+        product.category = newName;
+
+        await product.save();
+    }
+
+    revalidatePath("/admin");
+    clearCatalogCache();
+  } catch (error: any) {
+    throw new Error(`Error changing categorie's name: ${error.message}`)
   }
 }
 
@@ -753,6 +779,8 @@ export async function deleteCategory(props: DeleteCategoryProps) {
             }
         } 
 
+        revalidatePath("/admin");
+        clearCatalogCache();
     } catch (error: any) {
         throw new Error(`Error deleting category: ${error.message}`)
     }

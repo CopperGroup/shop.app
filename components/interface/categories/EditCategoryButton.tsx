@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn, sleep } from "@/lib/utils";
-import { Edit, Percent, MoveRight, Check } from "lucide-react";
-import { setCategoryDiscount, changeProductsCategory, findAllProductsCategories, fetchCategoriesProducts } from "@/lib/actions/product.actions";
+import { Edit, Percent, MoveRight, Check, Pencil } from "lucide-react";
+import { setCategoryDiscount, changeProductsCategory, findAllProductsCategories, fetchCategoriesProducts, changeCategoryName } from "@/lib/actions/product.actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductType, ReadOnly } from "@/lib/types/types";
 import ProductsTable from "./ProductsTable";
@@ -32,16 +32,17 @@ interface EditCategoryButtonProps {
 }
 
 const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
-  const [isMainDialogOpen, setIsMainDialogOpen] = useState(false);
-  const [isDiscountDialogOpen, setIsDiscountDialogOpen] = useState(false);
-  const [isChangeCategoryDialogOpen, setIsChangeCategoryDialogOpen] = useState(false);
-  const [isSelectProductsDialogOpen, setIsSelectProductsDialogOpen] = useState(false);
-  const [discountPercentage, setDiscountPercentage] = useState("");
-  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isMainDialogOpen, setIsMainDialogOpen] = useState<boolean>(false);
+  const [isDiscountDialogOpen, setIsDiscountDialogOpen] = useState<boolean>(false);
+  const [isChangeCategoryDialogOpen, setIsChangeCategoryDialogOpen] = useState<boolean>(false);
+  const [isSelectProductsDialogOpen, setIsSelectProductsDialogOpen] = useState<boolean>(false);
+  const [isChangeCategoryNameDialogOpen, setIsChangeCategoryNameDialogOpen] = useState<boolean>(false)
+  const [discountPercentage, setDiscountPercentage] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [newCategory, setNewCategory] = useState<boolean>(false);
   const [categoriesNames, setCategoriesNames] = useState<{name: string, amount:number}[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState(new Set<string>())
-  const [selectCategoryOpen, setSelectCategoryOpen] = useState<boolean>(false)
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set<string>())
+  const [focused, setFocused] = useState<boolean>(false)
   
   const products = JSON.parse(props.stringifiedProducts)
   
@@ -102,6 +103,12 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
     setIsMainDialogOpen(false);
     setIsDiscountDialogOpen(true);
   }
+  
+  const handleChangeName = (e: React.MouseEvent) => {
+    preventClosing(e);
+    setIsMainDialogOpen(false);
+    setIsChangeCategoryNameDialogOpen(true);
+  }
 
   const handleChangeCategory = (e: React.MouseEvent) => {
     preventClosing(e);
@@ -113,7 +120,7 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
     await setCategoryDiscount(props.categoryName, Number(discountPercentage));
     setIsDiscountDialogOpen(false);
     setIsMainDialogOpen(false);
-    setDiscountPercentage("");
+    setDiscountPercentage(null);
   }
 
   const confirmChangeCategory = async () => {
@@ -124,9 +131,12 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
     setSelectedProducts(new Set());
   }
 
-  useEffect(() => {
-    console.log("Seletced products:", selectedProducts)
-  }, [selectedProducts])
+  const confirmChangeCategoryName = async () => {
+    await changeCategoryName({ categoryName: props.categoryName, newName: newCategoryName })
+    setIsChangeCategoryNameDialogOpen(false);
+    setIsMainDialogOpen(false);
+    setNewCategoryName("");
+  }
  
   const handleCancel = (e: React.MouseEvent) => {
     preventClosing(e);
@@ -158,7 +168,16 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
                 Editing <span className="font-semibold">{props.categoryName}</span> category.
             </DialogDescription>
           </DialogHeader>
-          <div className="my-6 space-y-4">
+          <div className="my-6 space-y-3">
+            <Button
+              variant="outline"
+              className="w-full justify-between text-left font-normal hover:bg-gray-100"
+              onClick={handleChangeName}
+            >
+              <span className="max-[400px]:hidden">Rename category</span>
+              <span className="min-[401px]:hidden">Rename category</span>
+              <Pencil className="w-4 h-4 ml-2" />
+            </Button>
             <Button
               variant="outline"
               className="w-full justify-between text-left font-normal hover:bg-gray-100"
@@ -188,6 +207,45 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
           </DialogFooter>
         </DialogContent>
 
+        <Dialog open={isChangeCategoryNameDialogOpen} onOpenChange={setIsChangeCategoryNameDialogOpen}>
+          <DialogContent className="bg-white sm:max-w-[425px] max-w-[95%] rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-gray-800">Change Categorie&apos;s Name</DialogTitle>
+              <DialogDescription className="text-gray-600 mt-2">
+                Enter the new name for <span className="font-semibold">{props.categoryName}</span> category.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="my-4">
+              <Label htmlFor="changeName" className="text-sm font-medium text-gray-700">
+                New name
+              </Label>
+              <Input
+                id="changeName"
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyDown={handleInputKeyDown}
+                className="mt-1"
+                placeholder="Enter discount percentage"
+              />
+            </div>
+            <DialogFooter className="sm:flex-row flex-col space-y-2 sm:space-y-0 sm:space-x-2">
+              <Button
+                variant="outline"
+                onClick={(event) => {setIsChangeCategoryNameDialogOpen(false); handleCancel(event);}}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmChangeCategoryName}
+                className="w-full sm:w-auto"
+                disabled={!newCategoryName.trim()}
+              >
+                Set New Name
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={isDiscountDialogOpen} onOpenChange={setIsDiscountDialogOpen}>
           <DialogContent className="bg-white sm:max-w-[425px] max-w-[95%] rounded-lg">
             <DialogHeader>
@@ -202,13 +260,17 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
               </Label>
               <Input
                 id="discountPercentage"
-                value={discountPercentage}
-                onChange={(e) => setDiscountPercentage(e.target.value)}
+                value={discountPercentage ? (focused ? discountPercentage :  `${discountPercentage}%`) :''}
+                onChange={(e) => {
+                  const value = e.target.value.replace('%', '');
+                  if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                    setDiscountPercentage(value);
+                  }
+                }}
+                onBlur={() => setFocused(false)}
+                onFocus={() => setFocused(true)}
                 onKeyDown={handleInputKeyDown}
                 className="mt-1"
-                type="number"
-                min="0"
-                max="100"
                 placeholder="Enter discount percentage"
               />
             </div>
@@ -223,7 +285,7 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
               <Button
                 onClick={confirmSetDiscount}
                 className="w-full sm:w-auto"
-                disabled={!discountPercentage.trim() || Number(discountPercentage) < 0 || Number(discountPercentage) > 100}
+                disabled={!discountPercentage?.toString().trim() || Number(discountPercentage) < 0 || Number(discountPercentage) > 100}
               >
                 Set Discount
               </Button>
@@ -328,7 +390,7 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
               <Button
                 onClick={confirmChangeCategory}
                 className="w-full sm:w-auto"
-                disabled={!newCategoryName.trim() || selectCategoryOpen}
+                disabled={!newCategoryName.trim()}
               >
                 Change Category
               </Button>
