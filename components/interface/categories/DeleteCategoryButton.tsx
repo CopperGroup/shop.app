@@ -23,6 +23,9 @@ interface DeleteCategoryButtonProps {
     className?: string;
     categoryName: string;
     onDialogChange?: (isOpen: boolean) => void;
+    customStyles? : {
+        marginToIcon: string
+    }
 }
 
 const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
@@ -113,7 +116,7 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
                     props.className
                 )}
                 >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className={cn("w-4 h-4 mr-2", props.customStyles ? props.customStyles.marginToIcon : "")}/>
                 Delete
                 </span>
             </DialogTrigger>

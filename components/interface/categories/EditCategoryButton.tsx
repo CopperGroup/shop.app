@@ -29,6 +29,9 @@ interface EditCategoryButtonProps {
   categoryName: string;
   stringifiedProducts: string;
   onDialogChange?: (isOpen: boolean) => void;
+  customStyles? : {
+    marginToIcon: string
+  }
 }
 
 const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
@@ -154,7 +157,7 @@ const EditCategoryButton = (props: ReadOnly<EditCategoryButtonProps>) => {
               props.className
             )}
           >
-            <Edit className="w-4 h-4 mr-2" />
+            <Edit className={cn("w-4 h-4 mr-2", props.customStyles ? props.customStyles.marginToIcon : "")} />
             Edit
           </span>
         </DialogTrigger>

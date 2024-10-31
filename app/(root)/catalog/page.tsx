@@ -239,7 +239,7 @@ const catalog = async ({searchParams,data}:any) => {
             
           </div>
           
-          <PaginationForCatalog searchParams={searchParams} countOfPages={countOfPages } />
+          <PaginationForCatalog searchParams={searchParams} countOfPages={countOfPages} />
           
         </div>
       </div>

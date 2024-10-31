@@ -660,6 +660,35 @@ export async function fetchCategoriesProperities() {
     }
 }
 
+export async function fetchCategory({ categoryName }: { categoryName: string }) {
+  try {
+    connectToDB();
+
+    const products = await Product.find({ category: categoryName });
+
+    const category = { categoryName: categoryName, totalProducts: 0, totalValue: 0, averageProductPrice: 0, averageDiscountPercentage: 0}
+
+    let totalPriceWithoutDiscount = 0;
+
+    for(const product of products) {
+        category.totalProducts += 1;
+        category.totalValue += product.priceToShow;
+        totalPriceWithoutDiscount += product.price;
+    }
+
+    category.averageProductPrice = category.totalProducts != 0 ? category.totalValue / category.totalProducts : 0;
+
+    category.averageDiscountPercentage = 100 - parseInt(
+        ((totalPriceWithoutDiscount != 0 ? category.totalValue / totalPriceWithoutDiscount : 0) * 100).toFixed(0)
+    );
+
+    console.log("Price: ", totalPriceWithoutDiscount)
+    return {...category, stringifiedProducts: JSON.stringify(products)} 
+  } catch (error: any) {
+    throw new Error(`${error.message}`)
+  }
+}
+
 export async function setCategoryDiscount(categoryName: string, percentage: number) {
     try {
         connectToDB()

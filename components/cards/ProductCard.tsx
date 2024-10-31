@@ -31,7 +31,7 @@ const ProductCard = ({ id, productId, email, priceToShow, price, name, imageUrl,
     <article className="w-[100%] h-96 bg-neutral-100 rounded-2xl flex items-center justify-center  mx-auto" >     
         <div className="w-11/12 h-[90%]">
             <Link href={`/catalog/${url}`} prefetch={false}>
-                <div className="w-full h-56 flex justify-center">
+                <div className="relative w-full h-56 flex justify-center">
                     <Image src={imageUrl} width={200} height={200} alt="Product image" className="absolute rounded-2xl max-w-[200px] max-h-[200px]"/>
                     <div className="w-full h-full flex justify-between items-start">
                         <Badge price={price} priceToShow={priceToShow}/>
