@@ -5,6 +5,7 @@ import { Button } from '../ui/button'
 import { useAppContext } from '@/app/(root)/context'
 import { productAddedToCart } from '@/lib/actions/product.actions'
 import { ShoppingCart } from 'lucide-react'
+import { event } from '@/lib/fpixel'
 
 // interface CartData {
 //   id: string;
@@ -18,7 +19,7 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { 
     //@ts-ignore
     const {cartData, setCartData} = useAppContext();
 
-  
+
 
     async function AddDataToCart(){
 
@@ -41,10 +42,10 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { 
           setCartData((prev:any)=>[...prev], cartData); 
         }
         
-        
-        console.log('f', cartData);
 
         await productAddedToCart(id);
+
+        event("Purchase", { currency: "USD", value: 10 });
     }
 
     //@ts-ignore
