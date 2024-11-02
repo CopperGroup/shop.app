@@ -5,7 +5,7 @@ import { Button } from '../ui/button'
 import { useAppContext } from '@/app/(root)/context'
 import { productAddedToCart } from '@/lib/actions/product.actions'
 import { ShoppingCart } from 'lucide-react'
-import { event } from '@/lib/fpixel'
+import ReactPixel from 'react-facebook-pixel'
 
 // interface CartData {
 //   id: string;
@@ -45,7 +45,7 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { 
 
         await productAddedToCart(id);
 
-        event("Purchase", { currency: "USD", value: 10 });
+        ReactPixel.track('AddToCart', { value: priceWithoutDiscount, currency: 'UAH' });
     }
 
     //@ts-ignore

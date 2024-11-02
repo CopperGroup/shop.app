@@ -11,7 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import BannerHero from "@/components/banner/BannerHero";
 import { getSession } from "@/lib/getServerSession";
 import { fetchUserByEmail } from "@/lib/actions/user.actions";
-import { FacebookPixel } from "@/components/pixel";
+import FacebookPixel from "@/components/pixel/FacebookPixel";
 
 
 const inter = Inter({ subsets: ["latin"] });
