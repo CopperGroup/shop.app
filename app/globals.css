@@ -407,7 +407,7 @@ h1{
 
 ::-webkit-scrollbar {
   width: 7px; /* Ширина скрола */
-  height: 12px; /* Висота скрола для горизонтального скролу */
+  height: 7px; /* Висота скрола для горизонтального скролу */
 }
 
 ::-webkit-scrollbar-track {
@@ -438,6 +438,7 @@ h1{
 
 .admin-panel-scrollbar::-webkit-scrollbar {
   width: 7px;
+
 }
 
 .admin-panel-scrollbar::-webkit-scrollbar-thumb {

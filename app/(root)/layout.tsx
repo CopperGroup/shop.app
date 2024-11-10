@@ -30,6 +30,7 @@ export default async function RootLayout({
   const email = await getSession();
 
   const user = await fetchUserByEmail(email);
+  
   return (
       <html lang="en">
         <body className={inter.className}>

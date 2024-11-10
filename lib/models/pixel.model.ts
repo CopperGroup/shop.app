@@ -1,20 +1,30 @@
 import mongoose from "mongoose";
 
-const categorySchema = new mongoose.Schema({
-    pixel_type: {
+const pixelSchema = new mongoose.Schema({
+    type: {
         type: String
     },
-    pixel_name: {
+    name: {
         type: String
     },
-    pixel_id: {
+    id: {
         type: String
     },
-    pixel_secure: {
-        type: String
+    status: {
+        type: String,
+        enum: ["Active", "Deactivated"]
+    },
+    createdAt: {
+        type: Date,
+    },
+    activatedAt: {
+        type: Date,
+    },
+    deactivatedAt: {
+        type: Date
     }
 })
 
-const Category = mongoose.models.Category || mongoose.model("Category", categorySchema);
+const Pixel = mongoose.models.Pixel || mongoose.model("Pixel", pixelSchema);
 
-export default Category;
+export default Pixel;

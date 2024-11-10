@@ -10,7 +10,7 @@ const Page = async () => {
 
   return (
     <section className="px-10 py-20 w-full max-[360px]:px-4"> 
-      <h1 className="w-full text-heading1-bold drop-shadow-text-blue">Товар</h1> 
+      <h1 className="w-full text-heading1-bold drop-shadow-text-blue">Stock</h1> 
       
       <ProductsTable stringifiedProducts={JSON.stringify(products)}/>
 

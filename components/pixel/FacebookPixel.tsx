@@ -1,20 +1,23 @@
 // components/pixel/FacebookPixel.js
-"use client"; // Enables client-side rendering
+"use client";
 
-import { useEffect } from 'react';
+import { activePixelID } from '@/lib/actions/pixel.actions';
+import { useEffect, useState } from 'react';
 import ReactPixel from 'react-facebook-pixel';
+import CryptoJS from "crypto-js";
+import useFacebookPixel from '@/lib/hooks/useFacebookPixel';
+
+const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
 
 const FacebookPixel = () => {
-  const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+  const isPixelInitialized = useFacebookPixel();
 
-  useEffect(() => {
-    if (pixelId) {
-      ReactPixel.init(pixelId); // Initialize the Pixel with your Pixel ID
-      ReactPixel.pageView(); // Track the initial page view
-    }
-  }, [pixelId]);
+  // Optionally, track more events once pixel is initialized
+  if (isPixelInitialized) {
+    console.log("Facebook Pixel is active and ready for tracking.");
+  }
 
-  return null; // This component doesn’t render anything
+  return null;
 };
 
 export default FacebookPixel;

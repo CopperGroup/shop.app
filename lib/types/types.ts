@@ -33,3 +33,14 @@ export type Category = {
       stringifiedProducts: string
     }
 }
+
+export type PixelData = {
+    _id: string;
+    name: string;
+    id: string;
+    status: "Active" | "Deactivated";
+    type: "Meta" | "TikTok";
+    createdAt: string;
+    activatedAt: string | null;
+    deactivatedAt: string | null;
+}
