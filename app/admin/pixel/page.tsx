@@ -7,7 +7,7 @@ const Page = () => {
         <h1 className="w-full text-heading1-bold drop-shadow-text-blue">Pixels</h1>
         <div className="w-full flex gap-4 mt-10">
           <MetaPixelManager />
-          <TikTokPixelManager />
+          {/* <TikTokPixelManager /> */}
         </div>
       </section>
     )
