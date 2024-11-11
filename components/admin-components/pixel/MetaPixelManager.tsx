@@ -30,7 +30,7 @@ const getTimeDifference = (fromDate: string) => {
   return `${days}d ${hours}h ${minutes}m`;
 };
 
-const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+const encryptionKey = process.env.ENCRYPTION_KEY;
 
 export default async function MetaPixelManager() {
   let pixels: PixelData[] = await fetchPixels("Meta");

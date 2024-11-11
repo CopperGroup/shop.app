@@ -11,7 +11,7 @@ import { DeletePixelButton } from "@/components/interface/pixel/DeletePixelButto
 import { PixelData } from "@/lib/types/types"
 import CryptoJS from "crypto-js";
 
-const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+const encryptionKey = process.env.ENCRYPTION_KEY;
 
 export default async function TikTokPixelManager() {
     const pixels: PixelData[] = await fetchPixels("TikTok")

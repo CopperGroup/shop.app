@@ -18,7 +18,7 @@ const useFacebookPixel = () => {
         }
 
         // Decrypt the Pixel ID
-        const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+        const encryptionKey = process.env.ENCRYPTION_KEY;
         const bytes = CryptoJS.AES.decrypt(encryptedPixelID, encryptionKey as string);
         const pixelID = bytes.toString(CryptoJS.enc.Utf8);
 

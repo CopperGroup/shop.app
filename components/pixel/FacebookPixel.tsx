@@ -7,7 +7,7 @@ import ReactPixel from 'react-facebook-pixel';
 import CryptoJS from "crypto-js";
 import useFacebookPixel from '@/lib/hooks/useFacebookPixel';
 
-const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+const encryptionKey = process.env.ENCRYPTION_KEY;
 
 const FacebookPixel = () => {
   const isPixelInitialized = useFacebookPixel();
