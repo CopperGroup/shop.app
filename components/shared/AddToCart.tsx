@@ -5,7 +5,6 @@ import { Button } from '../ui/button'
 import { useAppContext } from '@/app/(root)/context'
 import { productAddedToCart } from '@/lib/actions/product.actions'
 import { ShoppingCart } from 'lucide-react'
-import ReactPixel from 'react-facebook-pixel'
 import { trackFacebookEvent } from '@/helpers/pixel'
 
 // interface CartData {

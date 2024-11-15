@@ -35,12 +35,13 @@ export default function SignupPage() {
 
     const onSignup = async () => {
         try {               
-            trackFacebookEvent("CompleteRegistration", {
-              registration_method: "email",
-            });
-            
-            const response = await axios.post("/api/users/signup", user);
-            setWasSended(false);
+          
+          const response = await axios.post("/api/users/signup", user);
+          setWasSended(true);
+          
+          trackFacebookEvent("CompleteRegistration", {
+            registration_method: "email",
+          });
         } catch (error: any) {
             console.log(error.message);
            

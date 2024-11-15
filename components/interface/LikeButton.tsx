@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import ReactPixel from "react-facebook-pixel";
  
 const LikeButton = ({ productId, productName, value, likedBy, email}: { productId: string, productName: string, value: number, likedBy: string, email:string }) => {
     const [ isLiked, setIsLiked ] = useState(false);
@@ -28,10 +27,12 @@ const LikeButton = ({ productId, productName, value, likedBy, email}: { productI
     const handleAddingLike = async (e:any) => {
         e.preventDefault()
         try {
+            
             setIsLiked(!isLiked);
-            await addLike({ productId: productId, email: email, path: pathname})
 
-            if(isLiked) {
+            // It doesn't see, that the state was updated by this time, that's why I check, whether the product wasn't liked before
+
+            if(!isLiked) {
                 trackFacebookEvent('AddToWishlist', {
                     content_name: productName,
                     content_ids: [productId],
@@ -40,6 +41,8 @@ const LikeButton = ({ productId, productName, value, likedBy, email}: { productI
                     currency: 'UAH',
                 });
             }
+
+            await addLike({ productId: productId, email: email, path: pathname});
 
         } catch (error: any) {
             throw new Error(`Error running addLike() function, ${error.message}`)

@@ -2,6 +2,7 @@
 import Provider from "../Provider";
 import { Inter } from "next/font/google";
 import "../globals.css";
+import FacebookPixel from "@/components/pixel/FacebookPixel";
 
 export const metadata = {
   title: 'Next.js',
@@ -19,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Provider>
-           
+          <FacebookPixel />
           <section>
             <div className="w-full">
                 {children}

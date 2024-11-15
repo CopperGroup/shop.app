@@ -3,7 +3,6 @@
 import { useAppContext } from "@/app/(root)/context";
 import { trackFacebookEvent } from "@/helpers/pixel";
 import { useEffect, useCallback } from "react";
-import ReactPixel from "react-facebook-pixel";
 
 const ContentView = ({
   productName,

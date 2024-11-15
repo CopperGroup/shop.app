@@ -7,7 +7,6 @@ import { Button } from '../ui/button';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { ProductType } from '@/lib/types/types';
-import ReactPixel from "react-facebook-pixel";
 import { trackFacebookEvent } from '@/helpers/pixel';
 
 
