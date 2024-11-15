@@ -39,7 +39,7 @@ export async function proceedDataToDB(data: Product[], selectedRowsIds: (string 
 
                 if (existingProductIndex !== -1) {
                     const urlProduct = urlProducts[existingProductIndex];
-                    console.log("Update: ", product.id);
+                    //console.log("Update: ", product.id);
                     
                     await updateUrlProduct({
                         _id: urlProduct._id,
@@ -58,7 +58,7 @@ export async function proceedDataToDB(data: Product[], selectedRowsIds: (string 
                         category: product.category
                     });
                 } else {
-                    console.log("Create: ", product.id);
+                    //console.log("Create: ", product.id);
 
                     await createUrlProduct({
                         id: product.id,
@@ -81,7 +81,7 @@ export async function proceedDataToDB(data: Product[], selectedRowsIds: (string 
             }
         }
 
-        console.log("Left products:", leftOverProducts);
+        //console.log("Left products:", leftOverProducts);
         for (const leftOverProduct of leftOverProducts) {
             await deleteProduct({productId: leftOverProduct.id as string}, "/catalog", "keep-catalog-cache");
         }

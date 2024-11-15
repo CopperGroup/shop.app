@@ -22,6 +22,48 @@ const pixelSchema = new mongoose.Schema({
     },
     deactivatedAt: {
         type: Date
+    },
+    events: {
+        pageView: {
+            type: Boolean,
+            default: true
+        },
+        viewContent: {
+            type: Boolean,
+            default: true
+        },
+        addToCart: {
+            type: Boolean,
+            default: true
+        },
+        addToWishlist: {
+            type: Boolean,
+            default: true
+        },
+        initiateCheckout: {
+            type: Boolean,
+            default: true
+        },
+        addPaymentInfo: {
+            type: Boolean,
+            default: true
+        },
+        purchase: {
+            type: Boolean,
+            default: true
+        },
+        search: {
+            type: Boolean,
+            default: true
+        },
+        lead: {
+            type: Boolean,
+            default: true
+        },
+        completeRegistration: {
+            type: Boolean,
+            default: true
+        },
     }
 })
 

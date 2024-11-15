@@ -37,7 +37,7 @@ export async function fetchCatalog () {
         if (!chunkCount) {
             return await fetchAndCreateCatalogChunks();
         }
-        console.log("Chunk count", chunkCount);
+        //console.log("Chunk count", chunkCount);
     
         while (chunkIndex < chunkCount) {
             const chunk = await redis.get(`catalog_chunk_${chunkIndex}`);
@@ -55,7 +55,7 @@ export async function fetchCatalog () {
             return await fetchAndCreateCatalogChunks();
         }
     
-        console.log("Fetching from redis");
+        //console.log("Fetching from redis");
 
         const combinedChunks = chunks.join('');
     

@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createPixel } from "@/lib/actions/pixel.actions";
 import CryptoJS from "crypto-js";
 
-const encryptionKey = process.env.ENCRYPTION_KEY;
+const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
 
 const CreatePixel = () => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false)

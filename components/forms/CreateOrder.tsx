@@ -17,6 +17,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { CheckCircle, Truck, CreditCard, MessageSquare, ShoppingCart, Phone, Package } from "lucide-react";
 import Confetti from 'react-confetti';
+import { trackFacebookEvent } from "@/helpers/pixel";
+
+type CartProduct = {
+  id: string; 
+  name: string; 
+  image: string; 
+  price: number; 
+  priceWithoutDiscount: number; 
+  quantity: number
+}
 
 const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
   const router = useRouter();
@@ -50,7 +60,7 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
     },
   });
 
-  const products = cartData.map((product: { id: string; name: string; image: string; price: number; priceWithoutDiscount: number; quantity: number }) => ({
+  const products = cartData.map((product: CartProduct) => ({
     product: product.id,
     amount: product.quantity,
   }));
@@ -74,6 +84,12 @@ const CreateOrder = ({ userId, email }: { userId: string; email: string }) => {
 
     const order = JSON.parse(createdOrder);
 
+    trackFacebookEvent("Purchase", {
+      value: priceToPay,
+      currency: "UAH",
+      content_ids: cartData.map((product: CartProduct) => product.id),
+    });
+    
     setCartData([]);
     setIsOrderCreated(true);
     setOrderId(order.id);

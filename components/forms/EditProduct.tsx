@@ -74,14 +74,14 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
-    console.log(files)
+    //console.log(files)
   }, [])
 
   useEffect(() => {
     if(files.length > 0) {
       startUpload(files);
     } else {
-      console.log(files.length, "No files found");
+      //console.log(files.length, "No files found");
     }
   }, [files])
 
@@ -198,25 +198,25 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
 
   useEffect(() => {
             if(discountPercentage) {
-              console.log(discountPercentage);
-              console.log(discountPrice);
+              //console.log(discountPercentage);
+              //console.log(discountPrice);
           
               const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
           
               setDiscountPrice(`${discountValue}`);
         
-              console.log("Result " + discountValue);
+              //console.log("Result " + discountValue);
             } else {
               setDiscountPercentage(0);
         
-              console.log(discountPercentage);
-              console.log(discountPrice);
+              //console.log(discountPercentage);
+              //console.log(discountPrice);
           
               const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
           
               setDiscountPrice(`${discountValue}`);
         
-              console.log("Result " + discountPrice);
+              //console.log("Result " + discountPrice);
             }
   }, [discountPercentage])
 
@@ -261,7 +261,7 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                 }
             });
 
-            console.log("Category", form.getValues("category"));
+            //console.log("Category", form.getValues("category"));
           } catch (error: any) {
             throw new Error(`Error appending existing product properities: ${error.message}`)
           }
@@ -685,7 +685,10 @@ const EditProduct = ({ productProperities }: { productProperities: string}) => {
                                 type='text'
                                 className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]"
                                 defaultValue={(parseFloat(price) - (parseFloat(price) * (discountPercentage / 100))).toFixed(2)}
-                                onChange={(e) => {setDiscountPrice(e.target.value); console.log("Discount price after: " + discountPrice)}}
+                                onChange={(e) => {
+                                  setDiscountPrice(e.target.value); 
+                                  //console.log("Discount price after: " + discountPrice)
+                                }}
                               />
                             </FormControl>
                             <FormMessage />

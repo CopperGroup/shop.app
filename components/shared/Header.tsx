@@ -16,6 +16,7 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import BurgerMenu from "./BurgerMenu";
+import { trackFacebookEvent } from "@/helpers/pixel";
 
 const Links = [
   { label: "Головна", href: "/" },
@@ -48,6 +49,12 @@ export default function Header({ email, user }: { email: string; user: string })
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
   };
+
+  const handleLead = (label: string) => {
+    trackFacebookEvent("Lead", {
+      lead_type: label,
+    });
+  }
 
   return (
     <motion.header
@@ -87,7 +94,11 @@ export default function Header({ email, user }: { email: string; user: string })
                       transition={{ duration: 0.3, delay: 0.1 * (index + 1) }}
                     >
                     <div className={`w-fit h-8 text-neutral-400 flex justify-center items-center border-neutral-400 rounded-full px-[0.885rem] ${isActive && "bg-glass text-white border"}`}>
-                      <TransitionLink href={`${href}${label === "Уподобані" ? "/" + userInfo?._id : ""}`} className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}>
+                      <TransitionLink 
+                       href={`${href}${label === "Уподобані" ? "/" + userInfo?._id : ""}`} 
+                       className={`text-small-medium font-normal hover:text-white transition-all ${isActive && "text-white"}`}
+                       onClick={() => handleLead(label)}
+                      >
                         {label}
                       </TransitionLink>
                     </div>
@@ -109,7 +120,7 @@ export default function Header({ email, user }: { email: string; user: string })
                           <MenubarContent className="min-w-[9rem] bg-[#1f1f1f] text-neutral-400 border-0 rounded-2xl">
                             {["contacts", "delivery-payment", "warranty-services", "presentations"].map((subItem, index) => (
                               <MenubarItem key={subItem} className="text-small-medium font-normal cursor-pointer hover:text-white transition-all">
-                                <TransitionLink href={`/info/${subItem}`}>
+                                <TransitionLink href={`/info/${subItem}`} onClick={() => handleLead(`/info/${subItem}`)}>
                                   {infoNames[index].split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                                 </TransitionLink>
                               </MenubarItem>

@@ -83,7 +83,6 @@ const DeleteCategoryButton = (props: ReadOnly<DeleteCategoryButtonProps>) => {
   }
 
   const confirmMoveProducts = async () => {
-    console.log("Click")
     await deleteCategory({ categoryName: props.categoryName, removeProducts: false, categoryToMoveProducts: newCategoryName });
 
     setIsMoveDialogOpen(false);

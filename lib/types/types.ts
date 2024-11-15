@@ -34,6 +34,23 @@ export type Category = {
     }
 }
 
+export enum EventNames {
+    PageView = "pageView",
+    ViewContent = "viewContent",
+    AddToCart = "addToCart",
+    AddToWishlist = "addToWishlist",
+    InitiateCheckout = "initiateCheckout",
+    AddPaymentInfo = "addPaymentInfo",
+    Purchase = "purchase",
+    Search = "search",
+    Lead = "lead",
+    CompleteRegistration = "completeRegistration",
+}
+
+export type PixelEvents = {
+    [key in EventNames]: boolean;
+};
+
 export type PixelData = {
     _id: string;
     name: string;
@@ -43,4 +60,5 @@ export type PixelData = {
     createdAt: string;
     activatedAt: string | null;
     deactivatedAt: string | null;
-}
+    events: PixelEvents;
+};

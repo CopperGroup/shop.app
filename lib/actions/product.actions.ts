@@ -154,7 +154,7 @@ export async function updateUrlProduct({_id, id, name, isAvailable, quantity, ur
         })
         
 
-        console.log(product);
+        //console.log(product);
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
     }
@@ -302,7 +302,7 @@ export async function addImagesToProduct(addedImages: string[], productId: strin
 
         addedImages.forEach((addedImage) => product.images.push(addedImage));
 
-        console.log(product.images);
+        //console.log(product.images);
 
         product.save();
     } catch (error: any) {
@@ -316,7 +316,7 @@ export async function getProductImages(productId: string) {
 
         const product = await Product.findOne({ id: productId });
 
-        console.log(product.images);
+        //console.log(product.images);
 
         if(product.images.length > 0) {
             return product.images;
@@ -359,7 +359,7 @@ export async function getProductParams(productId: string) {
 
         const productParams = await product.params;
 
-        console.log("Fetching params");
+        //console.log("Fetching params");
 
         return JSON.stringify(productParams);
     } catch (error: any) {
@@ -515,7 +515,7 @@ export async function productAddedToCart(id: string) {
 
         await product.save();
 
-        console.log(product);
+        //console.log(product);
     } catch (error: any) {
         throw new Error(`Error adding prduct to cart: ${error.message}`)
     }
@@ -545,7 +545,7 @@ export async function findAllProductsCategories(type?: "json") {
         amount,
     }))
 
-    console.log("Categories", allCategories);
+    //console.log("Categories", allCategories);
 
     if(type === "json") {
         return JSON.stringify(categories);
@@ -573,7 +573,7 @@ export async function deleteProduct(id: { productId: string} | {product_id: stri
             product = await Product.findOne({ _id: productId });
         }
 
-        console.log("Product", product);
+        //console.log("Product", product);
     
         if(product){
             
@@ -583,7 +583,7 @@ export async function deleteProduct(id: { productId: string} | {product_id: stri
                 throw new Error("Product not found");
             }
         
-            console.log("Liked by", usersWhoLikedProduct);
+            //console.log("Liked by", usersWhoLikedProduct);
         
             if(usersWhoLikedProduct){
                 for(const user of usersWhoLikedProduct) {
@@ -599,7 +599,7 @@ export async function deleteProduct(id: { productId: string} | {product_id: stri
                 for(const orderedProduct of order.products) {
                     orderedProduct.product = DELETEDPRODUCT_ID;
 
-                    console.log("Product", orderedProduct)
+                    //console.log("Product", orderedProduct)
                 }
 
                 
@@ -786,12 +786,12 @@ export async function deleteCategory(props: DeleteCategoryProps) {
             }
         }
 
-        console.log(productIds);
+        //console.log(productIds);
 
         if(props.removeProducts) {
             for(const _id of productIds) {
-                console.log(productIds);
-                console.log("Id", _id)
+                //console.log(productIds);
+                //console.log("Id", _id)
                 await deleteProduct({product_id: _id}, "/admin")
             }
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 export default function AdminHeader() {
   const handleVisitStore = () => {
     // In a real application, this would navigate to the store page
-    console.log("Navigating to store...")
+    //console.log("Navigating to store...")
   }
 
   return (

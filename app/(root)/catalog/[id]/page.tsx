@@ -1,16 +1,9 @@
 'use server'
 
-import ProdactPage from '@/components/shared/ProdactPage';
 import Product from '@/lib/models/product.model';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import { revalidatePath } from 'next/cache';
 import ProductPage from '@/components/shared/ProductPage';
 
 const Page = async (context: any) => {
-  revalidatePath(`/catalog/${context.params.id}`);
-
   function getFirstTwoWords(text: string) {
     // Trim spaces, split the string into an array of words
     const words = text.trim().split('_');

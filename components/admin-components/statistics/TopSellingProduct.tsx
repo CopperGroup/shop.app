@@ -61,7 +61,7 @@ export function TopSellingProduct() {
       setData(data);
       setTopProduct(topProduct);
 
-      console.log(topProduct.image);
+      //console.log(topProduct.image);
     }
 
     fetchTopSellingProduct();

@@ -36,7 +36,7 @@ const ProductCard = ({ id, productId, email, priceToShow, price, name, imageUrl,
                     <div className="w-full h-full flex justify-between items-start">
                         <Badge price={price} priceToShow={priceToShow}/>
                         
-                        <LikeButton  likedBy={JSON.stringify(likedBy)} productId={productId} email={email}/> 
+                        <LikeButton  likedBy={JSON.stringify(likedBy)} productId={productId} productName={name} value={priceToShow} email={email}/> 
                     </div>
                 </div>
                 <div className=" h-[76px] overflow-hidden">

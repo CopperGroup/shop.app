@@ -6,6 +6,7 @@ import { useAppContext } from '@/app/(root)/context'
 import { productAddedToCart } from '@/lib/actions/product.actions'
 import { ShoppingCart } from 'lucide-react'
 import ReactPixel from 'react-facebook-pixel'
+import { trackFacebookEvent } from '@/helpers/pixel'
 
 // interface CartData {
 //   id: string;
@@ -17,8 +18,7 @@ import ReactPixel from 'react-facebook-pixel'
 
 const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { id: string, name:string, image:string, price:number, priceWithoutDiscount: number, variant?: "full"}) => {
     //@ts-ignore
-    const {cartData, setCartData} = useAppContext();
-
+    const {cartData, setCartData, pixelEvents} = useAppContext();
 
 
     async function AddDataToCart(){
@@ -37,45 +37,23 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { 
         if(exist == 0){
           setCartData((prev:any) =>[...prev, {id: id, name: name, image: image, price: price, priceWithoutDiscount: priceWithoutDiscount, quantity: 1} ]);
 
+          await productAddedToCart(id);
+
+          if(pixelEvents.addToCart) {
+            trackFacebookEvent('AddToCart', {
+              content_name: name,
+              content_ids: id,
+              content_type: 'product',
+              value: priceWithoutDiscount,
+              currency: 'UAH',
+            });
+          
+          }
         }else{
           cartData.splice(del,1);
           setCartData((prev:any)=>[...prev], cartData); 
         }
-        
-
-        await productAddedToCart(id);
-
-        ReactPixel.track('AddToCart', { value: priceWithoutDiscount, currency: 'UAH' });
     }
-
-    //@ts-ignore
-    // const {cartData, setCartData} = useAppContext();
-
-    // console.log(id);
-
-    // function AddDataToCart(){
-
-    //   let exist = 0
-    //   let del = 0
-
-
-    //     cartData.map((data: CartData[],index:number)=>{
-    //       if (data[index].name === name){
-    //         exist = 1
-    //         del = index
-    //       }
-    //     })
-
-    //     if(exist == 0){
-    //       setCartData((prev: CartData[]) => [...prev, {id, name, image, price, amount = 1}] );
-    //     }else{
-    //       cartData.splice(del, 1);
-    //       setCartData((prev: CartData[])=>[...prev], cartData); 
-    //     }
-        
-        
-    //     console.log('f', cartData);
-    // }
 
     if(variant === "full") {
       return (

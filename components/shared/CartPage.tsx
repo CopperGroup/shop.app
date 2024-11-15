@@ -1,16 +1,19 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
-import { useAppContext } from '@/app/(root)/context'
-import Image from 'next/image'
-import { Button } from '../ui/button'
-import { useEffect } from 'react'
-import Link from 'next/link'
+import React, { useRef, useState } from 'react';
+import { useAppContext } from '@/app/(root)/context';
+import Image from 'next/image';
+import { Button } from '../ui/button';
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { ProductType } from '@/lib/types/types';
+import ReactPixel from "react-facebook-pixel";
+import { trackFacebookEvent } from '@/helpers/pixel';
 
 
 const CartPage = ({setIsOpened }: {setIsOpened: (value: boolean) => void }) => {
 //@ts-ignore
-const {cartData, setCartData, setPriceToPay} = useAppContext();
+const {cartData, setCartData, priceToPay, setPriceToPay} = useAppContext();
 
 function hideCart(){
     //@ts-ignore
@@ -67,16 +70,28 @@ function minus(index:number){
   }
 
 
-function delProduct(index: number, value: any){
+  function delProduct(index: number, value: any){
     value = Number(value);
     if(value<1){
         removeProduct(index);
-    }
-}
+   }
+  }
 
-  return (
-    
-       
+  const handleCheckout = () => {
+    hideCart();
+
+    console.log(cartData);
+
+    trackFacebookEvent('InitiateCheckout', {
+      content_name: 'Cart Checkout',
+      content_ids: cartData.map((product: ProductType) => product.id),
+      value: priceToPay,
+      currency: 'UAH',
+      num_items: cartData.length,
+    });
+  }
+
+  return (   
         < >
             <h2 className='text-[35px] m-10 font-medium'>Кошик</h2>
             <div className='w-full flex flex-col items-center gap-7 overflow-auto h-2/3 pb-20'>
@@ -110,36 +125,13 @@ function delProduct(index: number, value: any){
                   </div>
                   <div className="w-full h-[2px] rounded-full bg-neutral-500/30"></div>
                 </article>
-              // <div key={index} className='flex flex-col m-10 w-auto justify-between border border-gray-700 rounded-md p-3 relative'>
-              //     <Image width={500} height={100} alt='' className='w-[100px] h-[100px] right-10 top-5 absolute' src={data[2]}  />
-              //     <p className='text-[18px] mb-5 font-medium h-[99px] w-[138px]'>{data[1]}</p>
-              //     <div className='w-full'>
-              //         <div ><span className='font-bold text-[20px] '>{data[3]}</span> грн.</div>
-              //     </div>  
-              //     <div className='flex flex-col justify-between    '>
-              //         <Image onClick={()=>removeProduct(index)} className='ml-auto cursor-pointer' width={20} height={20} alt='' src='/assets/delete.svg'/>
-              //         <div className='flex gap-1 items-center'>
-              //             <Button onClick={()=>minus(index)} className='w-8 h-8'>-</Button>
-              //             <input className='w-8 h-8 border border-gray-700 rounded-md resize-none text-center pt-1'  value={data[4]} 
-              //             onChange={(e)=>setCount(index,e.target.value)} 
-              //             onBlur={(e)=>delProduct(index,e.target.value)} 
-              //             maxLength={3}></input>
-              //             <Button onClick={()=>plus(index)} className='w-8 h-8'>+</Button>
-              //         </div>
-              //     </div>
-              // </div>
               ))}
             </div>
 
-            
-
-
-            
-            
             <div className='w-full flex bg-neutral-100 rounded-2xl right-0 flex-col absolute bottom-0 pt-4 my-3 px-10'>
               <div className='text-body-semibold text-center border-black pb-5 text-nowrap'>Разом: <span className="font-medium">{toPay.toFixed(2)}грн.</span></div>
               <Button onClick={hideCart} variant='outline' className='mb-5'>Повернутись до кокупок</Button>
-              <Link href='/order' className='w-full'><Button onClick={hideCart} className='w-full'>Замовити</Button></Link>
+              <Link href="/order" className='w-full' ><Button onClick={handleCheckout} disabled={cartData.lenght == 0} className="w-full h-full">Замовити</Button></Link>
             </div>
         </>
  

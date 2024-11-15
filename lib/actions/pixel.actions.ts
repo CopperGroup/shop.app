@@ -9,17 +9,29 @@ export async function createPixel({ type, name, id }: { type: "Meta" | "TikTok",
   try {
     connectToDB();
 
-    console.log("Creating pixel");
+    //console.log("Creating pixel");
 
     const createdPixel = await Pixel.create({
         type: type,
         name: name,
         id: id,
         status: "Deactivated",
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        events: {
+          pageView: true,
+          viewContent: true,
+          addToCart: true,
+          addToWishlist: true,
+          initiateCheckout: true,
+          addPaymentInfo: true,
+          purchase: true,
+          search: true,
+          lead: true,
+          completeRegistration: true,
+      }
     })
     
-    console.log(createdPixel);
+    //console.log(createdPixel);
 
     revalidatePath("/admin/pixel");
   } catch (error: any) {
@@ -100,6 +112,26 @@ export async function activePixelID() {
     }
 
     return activePixel.id
+  } catch (error: any) {
+    throw new Error(`${error.message}`)
+  }
+}
+
+export async function fetchActivePixelEvents(type?: "json") {
+  try {
+    connectToDB();
+
+    const activePixel = await Pixel.findOne({ status: "Active"});
+
+    if(!activePixel) {
+      return null
+    }
+
+    if(type == "json") {
+      return JSON.stringify(activePixel.events);
+    } else {
+      return activePixel.events
+    }
   } catch (error: any) {
     throw new Error(`${error.message}`)
   }

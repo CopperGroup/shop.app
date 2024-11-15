@@ -12,6 +12,7 @@ import ProdactPage from '@/components/shared/ProdactPage'
 import { useRouter } from 'next/navigation'
 import { TransitionLink } from '../interface/TransitionLink'
 import AddToCart from './AddToCart'
+import ContentView from '../pixel/ContentView'
 
 export default function ProductPage({ productJson, colorsJson }: { productJson: string, colorsJson: string }) {
     const product = JSON.parse(productJson);
@@ -20,6 +21,7 @@ export default function ProductPage({ productJson, colorsJson }: { productJson: 
 
   return (
     <div className="px-2 sm:px-4 py-4 sm:py-8 max-w-full overflow-x-hidden">
+      <ContentView productName={product.name} productCategory={product.category} productId={product._id} contentType="product" value={product.priceToShow} currency="UAH"/>
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}

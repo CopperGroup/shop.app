@@ -16,15 +16,13 @@ const catalog = async ({searchParams,data}:any) => {
 
 
   // let filtredProducts = await fetchAllProducts();
-  
-  console.log('gh')
 
   let filtredProducts: any[] = await fetchCatalog();
   
   const email = await getSession()
 
   const category = Array.from(new Set (filtredProducts.map(item => item.category))).filter(function(item) {return item !== '';});
-  console.log(category)
+  //console.log(category)
 
 
   if(searchParams.category){
@@ -77,7 +75,7 @@ const catalog = async ({searchParams,data}:any) => {
     }
   });
 
-  console.log("Vendor count:", vendorCount);
+  //console.log("Vendor count:", vendorCount);
    
   if(searchParams.sort === 'low_price'){
     filtredProducts = filtredProducts.sort((a,b) => a.price - b.price)

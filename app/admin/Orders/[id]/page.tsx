@@ -19,7 +19,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
 
     const order = await fetchOrder(params.id);
 
-    console.log(order.products);
+    //console.log(order.products);
 
     return (
         <section className="px-10 py-20 w-full max-[1100px]:pb-5">

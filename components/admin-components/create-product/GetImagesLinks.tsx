@@ -60,7 +60,7 @@ const GetImagesLinks = ({ productId }: { productId: string }) => {
         const fethcProductImages = async () => {
             const productImages = await getProductImages(productId);
 
-            console.log(productImages);
+            //console.log(productImages);
 
             setAddedImages(productImages);
 
@@ -144,7 +144,7 @@ const GetImagesLinks = ({ productId }: { productId: string }) => {
                         <UploadButton
                             endpoint="imageUploader"
                             onClientUploadComplete={(res) => {
-                                console.log("Files: ", res);
+                                //console.log("Files: ", res);
                                 setAddedImages([...addedImages, res[0].url])
                             }}
                             onUploadError={(error: Error) => {

@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 export default function GoogleSignIn({ className, label }: { className: string | undefined, label: string }) {
+
   return (
     <button
       onClick={() => signIn("google")}

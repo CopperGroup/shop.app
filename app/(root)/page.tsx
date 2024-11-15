@@ -1,16 +1,9 @@
 "use server"
 
 import Categories from "@/components/shared/Categories";
-import { fetchLastProducts } from "@/lib/actions/product.actions";
-import Latest from "@/components/shared/Latest";
 import Map from "@/components/shared/Map";
-import Banner from "@/components/shared/Banner";
 import Divider from "@/components/shared/Divider";
-import Test from '@/components/Test'
 import AboutUs from "@/components/shared/AboutUs";
-import Header from "@/components/shared/Header";
-import StickyCart from "@/components/shared/StickyCart";
-import Footer from "@/components/shared/Footer";
 import BannerHero from "@/components/banner/BannerHero";
 
 export default async function Home() {

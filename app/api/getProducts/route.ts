@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
       const {url} = body
 
-      console.log(url)
+      //console.log(url)
 
       const response = await fetch(url, { cache: 'no-store'});
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
       const data = await response.text();
       const fetchedProducts = await xmlParse(data);
-      console.log('dfssdfsd')
+      //console.log('dfssdfsd')
   
       
       

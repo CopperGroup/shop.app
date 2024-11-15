@@ -12,6 +12,7 @@ import BannerHero from "@/components/banner/BannerHero";
 import { getSession } from "@/lib/getServerSession";
 import { fetchUserByEmail } from "@/lib/actions/user.actions";
 import FacebookPixel from "@/components/pixel/FacebookPixel";
+import PageView from "@/components/pixel/PageView";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -38,6 +39,7 @@ export default async function RootLayout({
           <Provider>
               <Header email={email} user={JSON.stringify(user)}/>
               <AppWrapper>
+                <PageView />
                 <main className = "main-container">
                   <div className = "w-full max-w-[1680px] px-5">
                     {children}

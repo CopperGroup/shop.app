@@ -1,5 +1,7 @@
 'use client'
 
+import { fetchActivePixelEvents } from "@/lib/actions/pixel.actions";
+import { PixelData } from "@/lib/types/types";
 import { createContext, useState, useContext, useEffect, ReactNode } from "react";
 
 
@@ -17,6 +19,9 @@ export function AppWrapper({ children }: { children: ReactNode }) {
     const [isClient, setIsClient] = useState(false);
     const [priceToPay, setPriceToPay] = useState<any[]>([]);
 
+    const [pixelEvents, setPixelEvents] = useState<PixelData["events"]>();
+    const [isPixelActive, setIsPixelActive] = useState<boolean>(false);
+
     useEffect(() => {
         if (typeof window !== "undefined") {
             const savedCartData = localStorage.getItem("cartData");
@@ -33,6 +38,18 @@ export function AppWrapper({ children }: { children: ReactNode }) {
         }
     }, [cartData, isClient]);
 
+    useEffect(() => {
+        async function fetchPixelEvents() {
+            const events = await fetchActivePixelEvents("json")
+
+            setPixelEvents(JSON.parse(events));
+
+            setIsPixelActive(true);
+        }
+
+        fetchPixelEvents();
+    }, [])
+
     return (
         <AppContext.Provider value={{
             catalogData,
@@ -40,7 +57,8 @@ export function AppWrapper({ children }: { children: ReactNode }) {
             cartData,
             setCartData,
             priceToPay,
-            setPriceToPay
+            setPriceToPay,
+            pixelEvents: {...pixelEvents, active: isPixelActive}
         }}>
             {children}
         </AppContext.Provider>

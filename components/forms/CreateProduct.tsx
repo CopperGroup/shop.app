@@ -74,14 +74,14 @@ const CreateProduct = () => {
   
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
-    console.log(files)
+    //console.log(files)
   }, [])
   
   useEffect(() => {
     if(files.length > 0) {
       startUpload(files);
     } else {
-      console.log(files.length, "No files found");
+      //console.log(files.length, "No files found");
     }
   }, [files])
 
@@ -155,7 +155,7 @@ const CreateProduct = () => {
   }
 
   const onSubmit = async (values: z.infer<typeof ProductValidation>) => {
-    console.log("Submitting");
+    //console.log("Submitting");
     
     await createProduct({
       id: values.id,
@@ -250,25 +250,25 @@ const CreateProduct = () => {
 
   useEffect(() => {
       if(discountPercentage) {
-        console.log(discountPercentage);
-        console.log(discountPrice);
+        //console.log(discountPercentage);
+        //console.log(discountPrice);
     
         const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
     
         setDiscountPrice(`${discountValue}`);
 
-        console.log("Result " + discountValue);
+        //console.log("Result " + discountValue);
       } else {
         setDiscountPercentage(0);
 
-        console.log(discountPercentage);
-        console.log(discountPrice);
+        //console.log(discountPercentage);
+        //console.log(discountPrice);
     
         const discountValue = parseFloat(price) - ((discountPercentage / 100) * parseFloat(price));
     
         setDiscountPrice(`${discountValue}`);
 
-        console.log("Result " + discountPrice);
+        //console.log("Result " + discountPrice);
       }
   }, [discountPercentage])
 
@@ -281,8 +281,8 @@ const CreateProduct = () => {
   }
 
   useEffect(() => {
-    console.log("Price", price);
-    console.log("Form price", form.getValues("price"));
+    //console.log("Price", price);
+    //console.log("Form price", form.getValues("price"));
   }, [price])
 
   return (
@@ -640,7 +640,10 @@ const CreateProduct = () => {
                                 type='text'
                                 className="text-small-regular text-gray-700 text-[13px] bg-neutral-100 ml-1 focus-visible:ring-black focus-visible:ring-[1px]"
                                 defaultValue={(parseFloat(price) - (parseFloat(price) * (discountPercentage / 100))).toFixed(2)}
-                                onChange={(e) => {setDiscountPrice(e.target.value); console.log("Discount price after: " + discountPrice)}}
+                                onChange={(e) => {
+                                  setDiscountPrice(e.target.value); 
+                                  //console.log("Discount price after: " + discountPrice)
+                                }}
                               />
                             </FormControl>
                             <FormMessage />
@@ -881,7 +884,7 @@ const CreateProduct = () => {
                         className="size-3 rounded-[4px] border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"
                         checked={isChecked}
                         onCheckedChange={(checked) => {
-                          console.log(checked)
+                          //console.log(checked)
                           setIsChecked(checked as boolean); // Update the state when checked state changes
                           field.onChange(checked); // Call field onChange to update form state
                         }}

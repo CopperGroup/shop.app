@@ -18,13 +18,15 @@ import {
 } from "@/components/ui/select"
 import { useAppContext } from '@/app/(root)/context'
 import Image from 'next/image'
+import { trackFacebookEvent } from '@/helpers/pixel'
 
+type SortParams = "default" | "low_price" | "hight_price"
 
 const Search = ({searchParams}:any) => {
     const router = useRouter();
     const {catalogData, setCatalogData} = useAppContext();
-    const [sort, setSort] = useState('default');
-    const [searchText, setSearchText] = useState();
+    const [sort, setSort] = useState<SortParams>('default');
+    const [searchText, setSearchText] = useState<string>("");
     const [debounce] = useDebounce(searchText,200)
 
    
@@ -36,6 +38,12 @@ const Search = ({searchParams}:any) => {
 
      useEffect(()=>{
       setCatalogData({...catalogData, search:debounce, sort:sort});
+
+      if(searchText.trim() != "") {
+        trackFacebookEvent("Search", {
+          search_string: debounce,
+        });
+      }
     },[debounce,sort])
 
 
@@ -52,7 +60,7 @@ const Search = ({searchParams}:any) => {
         />
         <Input type='text' onChange={textFromInput}  placeholder='Пошук товару' />
       </div>
-      <Select onValueChange={(element)=>setSort(element)} >
+      <Select onValueChange={(element: SortParams) => setSort(element)} >
         <SelectTrigger className="w-[240px] max-[600px]:hidden">
           <SelectValue placeholder="Звичайне" />
         </SelectTrigger>

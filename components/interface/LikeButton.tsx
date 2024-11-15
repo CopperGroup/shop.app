@@ -1,24 +1,15 @@
 "use client";
 
+import { trackFacebookEvent } from "@/helpers/pixel";
 import { addLike } from "@/lib/actions/product.actions";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import ReactPixel from "react-facebook-pixel";
  
-const LikeButton = ({ productId, likedBy, email}: { productId: string,  likedBy: string, email:string }) => {
+const LikeButton = ({ productId, productName, value, likedBy, email}: { productId: string, productName: string, value: number, likedBy: string, email:string }) => {
     const [ isLiked, setIsLiked ] = useState(false);
-   
-    
-
- 
-
-    
-    // const email = session.data?.user.email
-      
-    
- 
-    
 
     let likes = []
 
@@ -39,6 +30,16 @@ const LikeButton = ({ productId, likedBy, email}: { productId: string,  likedBy:
         try {
             setIsLiked(!isLiked);
             await addLike({ productId: productId, email: email, path: pathname})
+
+            if(isLiked) {
+                trackFacebookEvent('AddToWishlist', {
+                    content_name: productName,
+                    content_ids: [productId],
+                    content_type: 'product',
+                    value,
+                    currency: 'UAH',
+                });
+            }
 
         } catch (error: any) {
             throw new Error(`Error running addLike() function, ${error.message}`)

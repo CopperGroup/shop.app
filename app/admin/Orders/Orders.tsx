@@ -58,7 +58,7 @@ const Orders = ({orders}:{orders:string}) => {
     const [filtredOrders, setFiltredOrders] = useState([]);
 
     const Orders = JSON.parse(orders)
-    console.log('fd',orders)
+    //console.log('fd',orders)
     
 
     const payment = Array.from(new Set (Orders.map((item:Order) => item.paymentStatus))).filter(function(item) {return item !== '';});
@@ -72,7 +72,7 @@ const Orders = ({orders}:{orders:string}) => {
         setFiltredOrders(Orders);
    },[])
 
-    console.log('ff',filtredOrders)
+    //console.log('ff',filtredOrders)
 
 
     useEffect(()=>{

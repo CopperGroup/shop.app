@@ -142,7 +142,6 @@ export async function createOrder({ products, userId, value, name, surname, phon
             await orderedProduct.save();
         }
 
-        console.log(type)
         if(type === "json") {
           return JSON.stringify(createdOrder)
         } else {
@@ -1009,7 +1008,7 @@ function adjustToDivisionBy5(duration: number) {
       daysToSubtract = 0;
   }
 
-  console.log(daysToSubtract);
+  //console.log(daysToSubtract);
   return daysToSubtract;
 }
 
@@ -1031,7 +1030,7 @@ function adjustToDivisionBy6(duration: number) {
     return 0;
   }
 
-  console.log("Nearest previous:", nearestPrevious);
+  //console.log("Nearest previous:", nearestPrevious);
   
   return duration - nearestPrevious;
 }
@@ -1054,7 +1053,7 @@ function adjustToDivisionBy3(duration: number) {
     return 0;
   }
 
-  console.log("Nearest previous:", nearestPrevious);
+  //console.log("Nearest previous:", nearestPrevious);
   
   return duration - nearestPrevious;
 }
@@ -1065,10 +1064,10 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
   const periods: { dateName: string }[] = [];
 
   if (to) {
-    console.log(from, to);
+    //console.log(from, to);
     const startMoment = moment(from);
     const endMoment = moment(to);
-    console.log(startMoment, endMoment);
+    //console.log(startMoment, endMoment);
     
     const startYear = startMoment.year();
     const startMonth = startMoment.month();
@@ -1079,9 +1078,9 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
     const durationInDays = endMoment.diff(startMoment, 'days') + 1;
     const durationInHours = endMoment.diff(startMoment, 'hours') + 24;
 
-    console.log(durationInDays);
-    console.log(durationInHours);
-    console.log(monthsDuration);
+    //console.log(durationInDays);
+    //console.log(durationInHours);
+    //console.log(monthsDuration);
 
     if (durationInDays > 5) {
       if (durationInDays <= 31) {
@@ -1370,7 +1369,7 @@ function calculatePeriods(from: Date | undefined, to: Date | undefined) {
     }
   }
 
-  console.log(periods.length);
+  //console.log(periods.length);
   return periods;
 }
 
@@ -1534,7 +1533,7 @@ function groupOrdersByPeriods(orders: Order[], periods: { dateName: string}[]) {
         const startDate = moment(start, format);
         let endDate = moment(end, format);
 
-        console.log("Start date", startDate);
+        //console.log("Start date", startDate);
 
         if(format === 'YYYY-MM-DD HH:00') {
           endDate = endDate.endOf('hour');
@@ -1556,7 +1555,7 @@ function groupOrdersByPeriods(orders: Order[], periods: { dateName: string}[]) {
 
         const date = moment(periodKey, format);
 
-        console.log("Start date", date);
+        //console.log("Start date", date);
         // console.log(orderDate, date, orderDate.isSame(date, 'day'));
         if (
           (format === 'YYYY-MM-DD HH:00' && orderDate.isSame(date, 'hour')) ||
@@ -1590,12 +1589,12 @@ export async function findAverageOrderValue(from: Date | undefined, to: Date | u
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -1647,17 +1646,17 @@ export async function findAverageOrderValue(from: Date | undefined, to: Date | u
       }
     }
 
-    console.log(averageData);
+    //console.log(averageData);
     const transformedData = Object.entries(averageData).map(([dateName, averageValue]) => ({
       dateName,
       value: averageValue
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     const averageOverall = totalRevenue !== 0  ? totalRevenue / totalOrders : 0;
 
@@ -1679,12 +1678,12 @@ export async function findTotalOrders(from: Date | undefined, to: Date | undefin
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -1726,18 +1725,18 @@ export async function findTotalOrders(from: Date | undefined, to: Date | undefin
       ordersOverall += ordersInPeriod.length;
     }
 
-    console.log(totalOrders);
+    //console.log(totalOrders);
 
     const transformedData = Object.entries(totalOrders).map(([dateName, orders]) => ({
       dateName,
       value: orders
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return {data: reformatedData, overall: ordersOverall};
   } catch (error: any) {
@@ -1756,12 +1755,12 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
     if(from && to) {
       const startDay = new Date(from);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -1808,18 +1807,18 @@ export async function findTotalRevenue(from: Date | undefined, to: Date | undefi
       }
     }
 
-    console.log(totalRevenue);
+    //console.log(totalRevenue);
 
     const transformedData = Object.entries(totalRevenue).map(([dateName, revenue]) => ({
       dateName,
       value: revenue
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return {data: reformatedData, overall: revenueOverall};
   } catch (error: any) {
@@ -1839,12 +1838,12 @@ export async function findTopSellingProduct(from: Date | undefined, to: Date | u
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -1935,18 +1934,18 @@ export async function findTopSellingProduct(from: Date | undefined, to: Date | u
       totalTopSellingProductInfo = await Product.findById(totalTopProduct) as any;
     }
 
-    console.log(topSellingProduct);
+    //console.log(topSellingProduct);
 
     const transformedData = Object.entries(topSellingProduct).map(([dateName, product]) => ({
       dateName,
       value: product
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, topProduct: { name: totalTopSellingProductInfo.name, image: totalTopSellingProductInfo.images[0], searchParam: totalTopSellingProductInfo.params[0].value, amount: totalMaxAmount } };
   } catch (error: any) {
@@ -1966,12 +1965,12 @@ export async function findLeastSellingProduct(from: Date | undefined, to: Date |
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2049,20 +2048,20 @@ export async function findLeastSellingProduct(from: Date | undefined, to: Date |
       }
     }
 
-    console.log(totalLowProduct);
+    //console.log(totalLowProduct);
 
-    console.log(leastSellingProducts);
+    //console.log(leastSellingProducts);
 
     const transformedData = Object.entries(leastSellingProducts).map(([dateName, product]) => ({
       dateName,
       value: product,
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return {data: reformatedData, totalLowProduct};
   } catch (error: any) {
@@ -2082,12 +2081,12 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2162,7 +2161,7 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
       Object.keys(totalMostPopularCategory)[0] || "None"
     );
 
-    console.log(salesByCategory);
+    //console.log(salesByCategory);
 
     const transformedData = Object.entries(salesByCategory).map(([dateName, sales]) => ({
       dateName,
@@ -2172,11 +2171,11 @@ export async function findSalesByCategory(from: Date | undefined, to: Date | und
       }
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return {data: reformatedData, topCategory: mostPopularCategoryOverall};
   } catch (error: any) {
@@ -2196,12 +2195,12 @@ export async function findMostPopularRegion(from: Date | undefined, to: Date | u
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2371,9 +2370,9 @@ export async function findMostPopularRegion(from: Date | undefined, to: Date | u
       Object.keys(totalMostPopularRegion)[0] || "None"
     );
   
-    console.log(`Most popular region overall: ${mostPopularRegionOverall}`);
+    //console.log(`Most popular region overall: ${mostPopularRegionOverall}`);
 
-    console.log(regionOrders);
+    //console.log(regionOrders);
 
     const transformedData = Object.entries(regionOrders).map(([dateName, orders]) => ({
       dateName,
@@ -2383,11 +2382,11 @@ export async function findMostPopularRegion(from: Date | undefined, to: Date | u
       }
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return {data: reformatedData, topRegion: mostPopularRegionOverall};
   } catch (error: any) {
@@ -2407,12 +2406,12 @@ export async function findSuccessfulOrders(from: Date | undefined, to: Date | un
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2456,18 +2455,18 @@ export async function findSuccessfulOrders(from: Date | undefined, to: Date | un
       successfulOrdersOverall += ordersInPeriod.length;
     }
 
-    console.log(successfulOrders);
+    //console.log(successfulOrders);
 
     const transformedData = Object.entries(successfulOrders).map(([dateName, orders]) => ({
       dateName,
       value: orders
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, overall: successfulOrdersOverall };
   } catch (error: any) {
@@ -2488,12 +2487,12 @@ export async function findDeclinedOrders(from: Date | undefined, to: Date | unde
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2536,18 +2535,18 @@ export async function findDeclinedOrders(from: Date | undefined, to: Date | unde
       declinedOrdersOverall += ordersInPeriod.length;
     }
 
-    console.log(declinedOrders);
+    //console.log(declinedOrders);
 
     const transformedData = Object.entries(declinedOrders).map(([dateName, orders]) => ({
       dateName,
       value: orders
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, overall: declinedOrdersOverall };
   } catch (error: any) {
@@ -2567,12 +2566,12 @@ export async function findFulfilledOrders(from: Date | undefined, to: Date | und
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2615,18 +2614,18 @@ export async function findFulfilledOrders(from: Date | undefined, to: Date | und
       fulfilledOrdersOverall += ordersInPeriod.length;
     }
 
-    console.log(fulfilledOrders);
+    //console.log(fulfilledOrders);
 
     const transformedData = Object.entries(fulfilledOrders).map(([dateName, orders]) => ({
       dateName,
       value: orders
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, overall: fulfilledOrdersOverall };
   } catch (error: any) {
@@ -2646,12 +2645,12 @@ export async function findCanceledOrders(from: Date | undefined, to: Date | unde
       const startDay = new Date(from);
       // startDay.setDate(startDay.getDate() + 1);
 
-      console.log(startDay);
+      //console.log(startDay);
 
       const endDay = new Date(to);
       endDay.setDate(endDay.getDate() + 1);
 
-      console.log(endDay);
+      //console.log(endDay);
 
       orders = await Order.find({
         data: {
@@ -2696,18 +2695,18 @@ export async function findCanceledOrders(from: Date | undefined, to: Date | unde
       canceledOrdersOverall += ordersInPeriod.length;
     }
 
-    console.log(canceledOrders);
+    //console.log(canceledOrders);
 
     const transformedData = Object.entries(canceledOrders).map(([dateName, orders]) => ({
       dateName,
       value: orders
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, overall: canceledOrdersOverall };
   } catch (error: any) {
@@ -2780,18 +2779,18 @@ export async function findAddedToCart(from: Date | undefined, to: Date | undefin
       })
     })
 
-    console.log(productsAddedToCart);
+    //console.log(productsAddedToCart);
 
     const transformedData = Object.entries(productsAddedToCart).map(([dateName, addedToCart]) => ({
       dateName,
       value: addedToCart
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, overall: addedToCartOverall };
   } catch (error: any) {
@@ -2840,7 +2839,7 @@ export async function findNewCustomers(from: Date | undefined, to: Date | undefi
     }
 
 
-    console.log(users);
+    //console.log(users);
 
     let firstOrders: Order[] = [];
 
@@ -2865,18 +2864,18 @@ export async function findNewCustomers(from: Date | undefined, to: Date | undefi
       newCustomersOverall += ordersInPeriod.length;
     }
 
-    console.log("New customers", newCustomerOrders);
+    //console.log("New customers", newCustomerOrders);
 
     const transformedData = Object.entries(newCustomerOrders).map(([dateName, customer]) => ({
       dateName,
       value: customer
     }))
 
-    console.log(transformedData);
+    //console.log(transformedData);
 
     const reformatedData = reformat(transformedData);
 
-    console.log(reformatedData);
+    //console.log(reformatedData);
 
     return { data: reformatedData, overall: newCustomersOverall };
   } catch (error: any) {

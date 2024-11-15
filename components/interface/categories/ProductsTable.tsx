@@ -133,7 +133,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   const handleToggleAllProducts = useCallback(() => {
     const product_Ids = products.map((product: ProductType) => product._id);
 
-    console.log(product_Ids)
+    //console.log(product_Ids)
     onSelectionChange({ selectType: "select-all", productIds: product_Ids });
   }, [currentPageProducts, onSelectionChange])
 
