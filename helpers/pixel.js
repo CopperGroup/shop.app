@@ -1,16 +1,23 @@
-import { activePixelID } from "@/lib/actions/pixel.actions";
+import { activePixelID, fetchActivePixel } from "@/lib/actions/pixel.actions";
 import CryptoJS from "crypto-js";
+
+let activeEvents = []
 
 export async function initializeFacebookPixel() {
   try {
-    const encryptedPixelID = await activePixelID();
+    const response = await fetchActivePixel("json");
+
+    const activePixel = JSON.parse(response);
+
+    activeEvents = activePixel.events;
+
+    const encryptedPixelID = activePixel.id;
     if (!encryptedPixelID) {
       console.error("Failed to fetch Pixel ID.");
       return;
     }
 
     const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-    console.error(encryptionKey);
 
     const bytes = CryptoJS.AES.decrypt(encryptedPixelID, encryptionKey);
     const pixelID = bytes.toString(CryptoJS.enc.Utf8).replace(" ", "");
@@ -21,6 +28,7 @@ export async function initializeFacebookPixel() {
     }
 
     // Inject the Pixel script into the page
+    
     (function(f, b, e, v, n, t, s) {
       if (f.fbq) return;
       n = f.fbq = function() {
@@ -37,11 +45,17 @@ export async function initializeFacebookPixel() {
       s = b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t, s);
     })(window, document, 'script');
-
+    
     // Initialize the pixel with the decrypted ID
+    console.log(window.fbq.queue);
+    
     fbq('init', pixelID);
+    
+    if(typeof fbq == "undefined") {
+      console.log("No fbq")
+    }
 
-    console.log(`Facebook Pixel initialized with ID: ${pixelID}`);
+    console.log(`Facebook pixel initialized`);
   } catch (error) {
     console.error("Error initializing Facebook Pixel:", error);
   }
@@ -49,6 +63,10 @@ export async function initializeFacebookPixel() {
 
 export function trackFacebookEvent(eventName, eventData = {}) {
   if (typeof window !== "undefined" && window.fbq) {
+    if(!activeEvents[eventName.charAt(0).toLowerCase() + eventName.slice(1)]) {
+      return null
+    }
+
     fbq("track", eventName, eventData);
     console.log(`Tracked event: ${eventName}`, eventData);
   } else {

@@ -1,7 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, Clock, Calendar, Info } from "lucide-react";
+import { AlertCircle, Clock, Calendar, Info } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { FaMeta } from "react-icons/fa6";
 import { fetchPixels } from "@/lib/actions/pixel.actions";
@@ -11,6 +11,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import CreatePixel from "@/components/forms/CreatePixel";
 import CryptoJS from "crypto-js";
 import { PixelData } from "@/lib/types/types";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleString(undefined, {
@@ -43,15 +45,15 @@ export default async function MetaPixelManager() {
   })
 
   return (
-    <Card className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-fit shadow-lg border-0 overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <Card className="w-full min-w-[280px] h-fit shadow-lg border-0 overflow-hidden transition-all duration-300 hover:shadow-xl">
       <CardHeader className="pb-2 bg-[#F0F6FF]">
         <div className="flex items-center space-x-2">
-          <FaMeta className="size-8 text-white bg-[#0668E1] rounded-full p-1"/>
+          <FaMeta className="size-6 sm:size-8 text-white bg-[#0668E1] rounded-full p-1"/>
           <div>
-            <CardTitle className="text-heading4-medium text-[#0668E1]">
+            <CardTitle className="text-lg sm:text-xl md:text-2xl text-[#0668E1]">
               Meta Pixels
             </CardTitle>
-            <CardDescription className="text-base-regular text-muted-foreground">
+            <CardDescription className="text-xs sm:text-sm md:text-base text-muted-foreground">
               Manage your tracking pixels
             </CardDescription>
           </div>
@@ -64,22 +66,23 @@ export default async function MetaPixelManager() {
             variant="default"
             className="mb-4 bg-[#F0F6FF] border-[#0668E1] text-[#0668E1]"
           >
-            <AlertCircle className="h-5 w-5" />
-            <AlertTitle className="text-base-semibold">No pixels connected</AlertTitle>
-            <AlertDescription className="text-base-regular">
+            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+            <AlertTitle className="text-sm sm:text-base font-semibold">No pixels connected</AlertTitle>
+            <AlertDescription className="text-xs sm:text-sm">
               Add your first Meta pixel to start tracking.
             </AlertDescription>
           </Alert>
         ) : (
           <ScrollArea className="h-[200px] w-full rounded-md border border-muted p-2 mb-4">
-            <div className="w-full overflow-auto">
+            <div className="w-full overflow-x-auto">
               <table className="w-full min-w-[600px]">
                 <thead>
                   <tr className="border-b border-muted">
-                    <th className="text-left p-2 text-small-semibold text-muted-foreground">Pixel Name</th>
-                    <th className="text-left p-2 text-small-semibold text-muted-foreground">Pixel ID</th>
-                    <th className="p-2 text-small-semibold text-muted-foreground">Status</th>
-                    <th className="text-right p-2 text-small-semibold text-muted-foreground">Action</th>
+                    <th className="text-left p-2 text-xs sm:text-sm font-semibold text-muted-foreground">Pixel Name</th>
+                    <th className="text-left p-2 text-xs sm:text-sm font-semibold text-muted-foreground">Pixel ID</th>
+                    <th className="p-2 text-xs sm:text-sm font-semibold text-muted-foreground">Status</th>
+                    <th className="p-2 text-xs sm:text-sm font-semibold text-muted-foreground">View</th>
+                    <th className="text-right p-2 text-xs sm:text-sm font-semibold text-muted-foreground">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -90,15 +93,20 @@ export default async function MetaPixelManager() {
                           <tr
                             className="border-b border-muted last:border-b-0 transition-colors hover:bg-gray-50"
                           >
-                            <td className="h-12 p-2 flex items-center text-small-regular">
+                            <td className="h-10 sm:h-12 p-2 flex items-center text-xs sm:text-sm">
                               <FaMeta className="text-[#0668E1] flex-shrink-0"/>
                               <span className="ml-2">{pixel.name}</span>
                             </td>
-                            <td className="text-small-regular p-2">
+                            <td className="text-xs sm:text-sm p-2">
                               {pixel.id}
                             </td>
                             <td className="text-right flex justify-center">
                               <SetPixelStatusButton _id={pixel._id} status={pixel.status}/>
+                            </td>
+                            <td className="text-center">
+                              <Link href={`/admin/pixel/${pixel._id}`}>
+                                <Button className="h-6 text-[11px] sm:text-[13px] border border-black rounded-lg p-1 px-1.5">View</Button>
+                              </Link>
                             </td>
                             <td className="text-right p-2">
                               <DeletePixelButton _id={pixel._id} type="Meta"/> 
@@ -111,32 +119,32 @@ export default async function MetaPixelManager() {
                           className="w-64 p-0 bg-white rounded-lg shadow-xl"
                         >
                           <div className="p-3 bg-[#F0F6FF] rounded-t-lg">
-                            <h3 className="text-base-semibold text-[#0668E1] mb-0.5">{pixel.name}</h3>
-                            <p className="text-small-regular text-gray-600">ID: {pixel.id}</p>
+                            <h3 className="text-sm sm:text-base font-semibold text-[#0668E1] mb-0.5">{pixel.name}</h3>
+                            <p className="text-xs sm:text-sm text-gray-600">ID: {pixel.id}</p>
                           </div>
                           <div className="p-3 space-y-1.5">
                             <div className="flex items-center">
-                                <Info className="w-3.5 h-3.5 mr-1.5 text-[#0668E1]" />
-                                <div className="flex gap-1 items-center text-small-regular">
+                                <Info className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1.5 text-[#0668E1]" />
+                                <div className="flex gap-1 items-center text-xs sm:text-sm">
                                     <span>Type: </span>
                                     <FaMeta className="text-[#0668E1] ml-1"/>
                                     <span>{pixel.type}</span>
                                 </div>
                             </div>
                             <div className="flex items-center">
-                              <Calendar className="w-3.5 h-3.5 mr-1.5 text-[#0668E1]" />
-                              <span className="text-small-regular">Created: {formatDate(pixel.createdAt)}</span>
+                              <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1.5 text-[#0668E1]" />
+                              <span className="text-xs sm:text-sm">Created: {formatDate(pixel.createdAt)}</span>
                             </div>
                             <div className="flex items-center">
-                              <Clock className="w-3.5 h-3.5 mr-1.5 text-[#0668E1]" />
-                              <span className="text-small-regular">
+                              <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1.5 text-[#0668E1]" />
+                              <span className="text-xs sm:text-sm">
                                 {pixel.status === "Active" 
                                   ? `Active for: ${getTimeDifference(pixel.activatedAt || pixel.createdAt)}`
                                   : `Deactivated: ${formatDate(pixel.deactivatedAt || '')}`
                                 }
                               </span>
                             </div>
-                            <div className={`text-small-semibold ${pixel.status === "Active" ? "text-green-600" : "text-red-600"}`}>
+                            <div className={`text-xs sm:text-sm font-semibold ${pixel.status === "Active" ? "text-green-600" : "text-red-600"}`}>
                               Status: {pixel.status}
                             </div>
                           </div>

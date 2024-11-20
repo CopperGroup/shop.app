@@ -113,7 +113,7 @@ export async function activePixelID() {
 
     return activePixel.id
   } catch (error: any) {
-    throw new Error(`${error.message}`)
+    throw new Error(`Error fetching active pixel's id: ${error.message}`)
   }
 }
 
@@ -121,7 +121,7 @@ export async function fetchActivePixelEvents(type?: "json") {
   try {
     connectToDB();
 
-    const activePixel = await Pixel.findOne({ status: "Active"});
+    const activePixel = await Pixel.findOne({ status: "Active" });
 
     if(!activePixel) {
       return null
@@ -132,6 +132,56 @@ export async function fetchActivePixelEvents(type?: "json") {
     } else {
       return activePixel.events
     }
+  } catch (error: any) {
+    throw new Error(`Error fetching active events: ${error.message}`)
+  }
+}
+
+export async function fetchPixel({ _id }: { _id: string }) {
+  try {
+    connectToDB();
+
+    const pixel = await Pixel.findById(_id);
+
+    return pixel;
+  } catch (error: any) {
+    throw new Error(`Error fetching pixel: ${error.message}`)
+  }
+}
+
+export async function updatePixelEvents({ _id, events }: { _id: string, events: Record<string, boolean>}): Promise<{ success: boolean; message?: string }> {
+  try {
+    connectToDB();
+
+    console.log(events);
+
+    const pixel = await Pixel.findByIdAndUpdate(_id, { events: events });
+
+    if (!pixel) {
+      return { success: false, message: "Update failed, pixel not found" };
+    }
+    
+    return { success: true, message: "Pixel events updated successfully." };
+  } catch (error: any) {
+
+    throw new Error(`Error updating pixel events: ${error.message}`)
+  }
+}
+
+export async function fetchActivePixel(type: "json") {
+  try {
+    const activePixel = await Pixel.findOne({ status: "Active" });
+
+
+    if (!activePixel) {
+      return { id: "", events: [] }
+    }
+
+    if (type == "json") {
+      return JSON.stringify(activePixel);
+    }
+
+    return activePixel;
   } catch (error: any) {
     throw new Error(`${error.message}`)
   }

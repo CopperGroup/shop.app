@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import MobileAdminSidebar from "@/components/shared/MobileAdminSidebar";
 import AdminHeader from "@/components/shared/AdminHeader";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: 'Next.js',
@@ -30,9 +31,8 @@ export default function RootLayout({
           </div>
         </section>
         <MobileAdminSidebar/>
+        <Toaster />
       </main>
-
- 
       </Provider>
     </body>
   </html>

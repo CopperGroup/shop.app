@@ -224,12 +224,24 @@ module.exports = {
         },
         "spin":{
           '0%, 100%': { transform: 'rotate(360deg)' },
+        },
+        'construction-1': {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(3deg)' },
+          '75%': { transform: 'rotate(-3deg)' }
+        },
+        'construction-2': {
+          '0%, 100%': { transform: 'rotate(0deg)', opacity: 0 },
+          '25%': { transform: 'rotate(-3deg)', opacity: 1 },
+          '75%': { transform: 'rotate(3deg)', opacity: 1 }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "spin": 'spin 1s linear infinite',
+        'construction-1': 'construction-1 2s ease-in-out infinite',
+        'construction-2': 'construction-2 2s ease-in-out infinite'
       },
     },
   },

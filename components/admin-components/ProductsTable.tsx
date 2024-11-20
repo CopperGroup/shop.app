@@ -82,10 +82,7 @@ const ProductsTable =  ({stringifiedProducts}:{stringifiedProducts:string}) => {
  
 
   return (
-    <>
-
-      
-        
+    <> 
         <div className="flex gap-5 items-center mt-12 max-[425px]:flex-col">
           <Input
             className=" w-full"
