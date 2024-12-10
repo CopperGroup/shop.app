@@ -85,7 +85,7 @@
   }
 
   .leftsidebar {
-    @apply sticky left-0 top-0 z-20 flex h-screen min-w-fit flex-col justify-between overflow-auto border-r text-black border-r-muted-normal pb-5 pt-5 max-md:hidden;
+    @apply sticky left-0 top-0 z-20 flex h-screen min-w-fit flex-col justify-between overflow-auto border-r text-black border-r-muted-normal pb-5 pt-5 max-lg:hidden;
   }
 
   .leftsidebar_link {
@@ -128,6 +128,19 @@
     background: -webkit-linear-gradient(60deg, rgba(29,39,55,1) 0%, rgba(17,25,38,1) 100%);
     background: linear-gradient(60deg, rgba(29,39,55,1) 0%, rgba(17,25,38,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#1d2737",endColorstr="#111926",GradientType=1);
+  }
+
+  .glassmorphism-1 {
+    background: rgba( 17, 16, 16, 0.7 );
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+  }
+
+  .shadow-text {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -552,4 +565,26 @@ h1{
   --admonition-note-rgb-value: 138, 180, 248;
   --admonition-warning-rgb-value: 253, 186, 116;
   --admonition-danger-rgb-value: 220, 38, 38;
+}
+@layer base {
+  :root {
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
 }

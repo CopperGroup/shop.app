@@ -17,7 +17,7 @@ import { trackFacebookEvent } from '@/helpers/pixel'
 
 const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { id: string, name:string, image:string, price:number, priceWithoutDiscount: number, variant?: "full"}) => {
     //@ts-ignore
-    const {cartData, setCartData, pixelEvents} = useAppContext();
+    const { cartData, setCartData } = useAppContext();
 
 
     async function AddDataToCart(){
@@ -38,17 +38,14 @@ const AddToCart = ({ id, name, image, price, priceWithoutDiscount, variant }: { 
 
           await productAddedToCart(id);
 
-          if(pixelEvents.addToCart) {
-            trackFacebookEvent('AddToCart', {
-              content_name: name,
-              content_ids: id,
-              content_type: 'product',
-              value: priceWithoutDiscount,
-              currency: 'UAH',
-            });
-          
-          }
-        }else{
+          trackFacebookEvent('AddToCart', {
+            content_name: name,
+            content_ids: id,
+            content_type: 'product',
+            value: priceWithoutDiscount,
+            currency: 'UAH',
+          });
+        } else{
           cartData.splice(del,1);
           setCartData((prev:any)=>[...prev], cartData); 
         }

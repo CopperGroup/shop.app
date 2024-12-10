@@ -66,12 +66,12 @@ export async function deletePixel({ _id }: { _id: string }) {
   }
 }
 
-export async function activatePixel({ _id }: { _id: string }) {
+export async function activatePixel({ _id, type }: { _id: string, type: PixelData["type"] }) {
   try {
     connectToDB();
 
     const pixel = await Pixel.findById({ _id: _id });
-    const currentlyActivePixel = await Pixel.findOne({ status: "Active"});
+    const currentlyActivePixel = await Pixel.findOne({ status: "Active", type: type});
 
     if(!currentlyActivePixel) {
         pixel.status = "Active";

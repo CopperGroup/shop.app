@@ -6,6 +6,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Store } from "lucide-react";
+// import { useState } from "react";
+// import { Store, ChevronDown, LayoutDashboard, BarChart3, Package, LinkIcon, ShoppingCart, Users, CreditCard, BarChart4, FolderTree, Code, Receipt, Ticket, PlusCircle } from 'lucide-react';
 
 
 const AdminSidebar = () => {
@@ -60,3 +62,85 @@ const AdminSidebar = () => {
 };
 
 export default AdminSidebar;
+
+// import { useState } from "react";
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import { Store, ChevronDown, LayoutDashboard, BarChart3, Package, LinkIcon, ShoppingCart, Users, CreditCard, BarChart4, FolderTree, Code, Receipt, Ticket, PlusCircle } from 'lucide-react';
+
+// const AdminSidebar = () => {
+//     const pathname = usePathname();
+//     const [openGroups, setOpenGroups] = useState<string[]>([]);
+
+//     const toggleGroup = (title: string) => {
+//         setOpenGroups((prev) =>
+//             prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+//         );
+//     }
+
+//     return (
+//         <section className="bg-white shadow-md leftsidebar overflow-y-hidden">
+//             <div className="flex w-full flex-1 flex-col">
+//                 <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
+//                     <Link href="/" className="flex items-center gap-3 text-black">
+//                         <div className="bg-gray-900 p-1.5 rounded-md">
+//                             <Store className="size-5 text-white" />
+//                         </div>
+//                         <span className="text-lg font-semibold">SANTEHVAN</span>
+//                     </Link>
+//                 </div>
+//                 <nav className="mt-4 pb-24 px-4 overflow-y-auto flex-1" style={{ maxHeight: 'calc(100vh - 60px)' }}>
+//                     <p className="text-xs font-bold text-gray-400 mb-4 uppercase tracking-wider">Admin Panel</p>
+//                     {sidebarLinks.map((group) => (
+//                         <div key={group.title} className="mb-4">
+//                             <button
+//                                 className="w-60 flex items-center justify-between py-2 px-3 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-all duration-200 rounded-md"
+//                                 onClick={() => toggleGroup(group.title)}
+//                             >
+//                                 <span className="truncate">{group.title}</span>
+//                                 <ChevronDown 
+//                                     className={`size-4 text-gray-400 transition-transform duration-300 ease-in-out ${
+//                                         openGroups.includes(group.title) ? 'transform rotate-180' : ''
+//                                     }`} 
+//                                 />
+//                             </button>
+//                             <div
+//                                 className={`mt-1 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
+//                                     openGroups.includes(group.title) ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+//                                 }`}
+//                             >
+//                                 {group.items.map((item) => {
+//                                     const isActive =
+//                                         pathname === item.href ||
+//                                         (item.href.length > 1 && pathname.startsWith(item.href));
+//                                     return (
+//                                         <Link
+//                                             key={item.label}
+//                                             href={item.href}
+//                                             className={`
+//                                                 flex items-center px-3 py-2 text-sm transition-all duration-200 rounded-md
+//                                                 ${
+//                                                     isActive
+//                                                         ? 'bg-gray-100 text-gray-900 font-medium'
+//                                                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+//                                                 }
+//                                             `}
+//                                         >
+//                                             <div className={`mr-3 p-1.5 rounded-full ${isActive ? 'bg-gray-900' : 'bg-gray-200'}`}>
+//                                                 <item.icon className={`size-4 ${isActive ? 'text-white' : 'text-gray-600'}`} />
+//                                             </div>
+//                                             <span className="truncate">{item.label}</span>
+//                                         </Link>
+//                                     );
+//                                 })}
+//                             </div>
+//                         </div>
+//                     ))}
+//                 </nav>
+//             </div>
+//         </section>
+//     );
+// };
+
+// export default AdminSidebar;
+

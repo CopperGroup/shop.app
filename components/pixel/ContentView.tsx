@@ -1,6 +1,5 @@
 "use client";
 
-import { useAppContext } from "@/app/(root)/context";
 import { trackFacebookEvent } from "@/helpers/pixel";
 import { useEffect, useCallback } from "react";
 
@@ -19,11 +18,10 @@ const ContentView = ({
   value: number;
   currency: string;
 }) => {
-  const { pixelEvents } = useAppContext();
 
   const trackViewContent = useCallback(() => {
     const key = `viewContentTracked-${productId}`;
-    if (pixelEvents?.viewContent && !sessionStorage.getItem(key)) {
+    if (!sessionStorage.getItem(key)) {
       trackFacebookEvent("ViewContent", {
         content_name: productName,
         content_category: productCategory,
@@ -35,7 +33,6 @@ const ContentView = ({
       sessionStorage.setItem(key, "true");
     }
   }, [
-    pixelEvents.active,
     productName,
     productCategory,
     productId,

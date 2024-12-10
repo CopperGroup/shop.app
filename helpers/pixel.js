@@ -74,7 +74,6 @@ export function trackFacebookEvent(eventName, eventData = {}) {
   }
 }
 
-// helpers/trackPageView.js
 export function trackPageView() {
   if (typeof window !== "undefined" && window.fbq) {
     fbq("track", "PageView");

@@ -15,7 +15,6 @@ const CartPage = ({setIsOpened }: {setIsOpened: (value: boolean) => void }) => {
 const {cartData, setCartData, priceToPay, setPriceToPay} = useAppContext();
 
 function hideCart(){
-    //@ts-ignore
     setIsOpened(false);
   }
 

@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import LinkButton from "../interface/LinkButton"
+import AbstractBackground from "../shared/AbstractBackground"
 
 export default function BannerHero({ children }: { children?: React.ReactNode }) {
   const sectionRef = useRef<HTMLElement>(null)
@@ -18,12 +19,13 @@ export default function BannerHero({ children }: { children?: React.ReactNode })
   return (
     <motion.section
       ref={sectionRef}
-      className="w-full flex justify-center items-center bg-black rounded-3xl py-20"
+      className="w-full flex justify-center items-center bg-black rounded-3xl py-20 relative overflow-hidden"
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="w-full max-w-[1680px] flex flex-col lg:flex-row justify-between items-center px-12 max-lg:px-9 max-[500px]:px-7">
+      <AbstractBackground />
+      <div className="w-full max-w-[1680px] flex flex-col lg:flex-row justify-between items-center px-12 max-lg:px-9 max-[500px]:px-7 relative z-10">
         <motion.div 
           className="flex flex-col items-start space-y-6 lg:w-1/2"
           initial={{ opacity: 0, x: -50 }}
@@ -88,3 +90,4 @@ export default function BannerHero({ children }: { children?: React.ReactNode })
     </motion.section>
   )
 }
+

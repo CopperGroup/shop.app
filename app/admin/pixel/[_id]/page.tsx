@@ -55,7 +55,7 @@ const Page = async ({ params }: { params: { _id: string }}) => {
                 <CardDescription className="text-small-regular text-gray-700">ID: {decryptedPixelID}</CardDescription>
               </div>
             </div>
-            <SetPixelStatusButton _id={pixel._id} status={pixel.status} className="text-xs px-2 py-1"/>
+            <SetPixelStatusButton _id={pixel._id} status={pixel.status} type={pixel.type} className="text-xs px-2 py-1"/>
           </div>
         </CardHeader>
         <CardContent className="p-6">
