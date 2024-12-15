@@ -44,7 +44,8 @@ const adminPaths = [
 ] as const;
 
 export default async function clearCache(functionName: typeof adminPaths[number]["name"]) {
-    const path = adminPaths.filter(({name, values}) => name == "createProduct")
+    const path = adminPaths.filter(({name, values}) => name == functionName)
 
+    console.log(path)
     path[0].values.forEach((value: string) => revalidatePath(value))
 }

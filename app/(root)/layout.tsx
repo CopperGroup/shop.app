@@ -13,6 +13,7 @@ import { getSession } from "@/lib/getServerSession";
 import { fetchUserByEmail } from "@/lib/actions/user.actions";
 import FacebookPixel from "@/components/pixel/FacebookPixel";
 import PageView from "@/components/pixel/PageView";
+import { Analytics } from "@vercel/analytics/react"
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -35,6 +36,7 @@ export default async function RootLayout({
   return (
       <html lang="en">
         <body className={inter.className}>
+          {/* <Analytics /> */}
           <FacebookPixel />
           <Provider>
               <Header email={email} user={JSON.stringify(user)}/>
