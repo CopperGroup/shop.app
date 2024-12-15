@@ -160,7 +160,6 @@ export const sidebarLinks = [
   }
 ]
 
-
 export const headerLinks = [
     {
         label: "Головна",

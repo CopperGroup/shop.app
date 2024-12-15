@@ -7,7 +7,7 @@ import User from "../models/user.model";
 import mongoose from 'mongoose';
 import { revalidatePath } from "next/cache";
 import moment from "moment";
-import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
+import clearCache from "./cache";
 
 interface CreateOrderParams {
     products: {
@@ -81,17 +81,6 @@ function generateUniqueId() {
     return randomPart + timestampPart; // Concatenate both parts to form an 8-digit ID
 }
 
-function generateRandomDateWithinYear() {
-    const today = moment();
-    const oneYearAgo = today.clone().subtract(1, 'years');
-
-    // Get a random number of days between 0 and 365
-    const randomDays = Math.floor(Math.random() * 366); // 365 days + 1 to include today
-
-    // Add the random number of days to one year ago to get a random date within the past year
-    return oneYearAgo.add(randomDays, 'days').toDate();
-}
-
 export async function createOrder({ products, userId, value, name, surname, phoneNumber, email, paymentType, deliveryMethod, city, adress, postalCode, comment }: CreateOrderParams, type?: "json") {
     try {
         connectToDB();
@@ -142,6 +131,7 @@ export async function createOrder({ products, userId, value, name, surname, phon
             await orderedProduct.save();
         }
 
+        await clearCache("createOrder")
         if(type === "json") {
           return JSON.stringify(createdOrder)
         } else {

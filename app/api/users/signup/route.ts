@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import User from "@/lib/models/user.model";
 import { sendEmail } from "@/helpers/mailer";
+import { createUser } from "@/lib/actions/user.actions";
 require('jsonwebtoken');
 export async function POST(request: NextRequest) {
     try {
@@ -24,15 +25,7 @@ export async function POST(request: NextRequest) {
         const salt = await bcryptjs.genSalt(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
 
-        // Create a new user object
-        const newUser = new User({
-            username,
-            email,
-            password: hashedPassword
-        });
-
-        // Save the new user to the database
-        const savedUser = await newUser.save();
+        const savedUser = await createUser({ username, email, password: hashedPassword})
 
         //Send verefy token
 

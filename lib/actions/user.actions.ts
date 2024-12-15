@@ -2,6 +2,23 @@
 
 import User from "../models/user.model"
 import { connectToDB } from "@/lib/mongoose"
+import clearCache from "./cache";
+
+export async function createUser({ username, email, password }: { username: string, email: string, password: string }) {
+    try {
+        const newUser = await User.create({
+            username,
+            email,
+            password
+        })
+
+        clearCache("createUser")
+
+        return newUser
+    } catch (error: any) {
+        throw new Error(`Error creating new user: ${error.message}`)
+    }
+}
 
 export async function fetchUserByEmail(email: string){
     try {

@@ -8,6 +8,7 @@ import Value from "../models/value.model";
 import { ProductType } from "../types/types";
 import { clearCatalogCache } from "./redis/catalog.actions";
 import Order from "../models/order.model";
+import clearCache from "./cache";
 
 interface CreateUrlParams {
     _id?: string,
@@ -84,6 +85,7 @@ export async function createUrlProduct({ id, name, isAvailable, quantity, url, p
             category: category ? category : "No-category"
         })
 
+        clearCache("createProduct")
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
     }
@@ -127,7 +129,7 @@ export async function createProduct({ id, name, quantity, images, url, priceToSh
 
         await clearCatalogCache();
 
-        revalidatePath("/admin")
+        clearCache("createProduct")
     } catch (error: any) {
         throw new Error(`Error creating new product, ${error.message}`)
     }
@@ -153,7 +155,7 @@ export async function updateUrlProduct({_id, id, name, isAvailable, quantity, ur
             category: category ? category : "No-category"
         })
         
-
+        clearCache("updateProduct")
         //console.log(product);
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
@@ -165,6 +167,8 @@ export async function deleteUrlProducts(){
         connectToDB();
 
         await Product.deleteMany({ isFetched: true});
+
+        clearCache("deleteProduct")
     } catch (error: any) {
         throw new Error(`Error deleting fetched products, ${error.message}`)
     }
@@ -215,10 +219,6 @@ export async function fetchProducts(){
     }
 }
 
-
-
-
- 
 export async function fetchLastProducts() {
     try {
         connectToDB();
@@ -269,6 +269,7 @@ export async function addLike({ productId, email, path }: InterfaceProps) {
             revalidatePath(`/liked/${currentUser._id}`);
         }
 
+        clearCache("likeProduct")
     } catch (error: any) {
         throw new Error(`Error adding like to the product, ${error.message}`)
     }
@@ -288,98 +289,6 @@ export async function fetchLikedProducts(userId: string){
         return likedProducts;
     } catch (error: any) {
         throw new Error(`Error fecthing liked posts, ${error.message}`)
-    }
-}
-
-
-export async function addImagesToProduct(addedImages: string[], productId: string) {
-    try {
-        connectToDB();
-
-        const product = await Product.findOne({ id: productId });
-
-        product.images = [];
-
-        addedImages.forEach((addedImage) => product.images.push(addedImage));
-
-        //console.log(product.images);
-
-        product.save();
-    } catch (error: any) {
-        throw new Error(`Error adding images to product: ${error.message}`)
-    }
-}
-
-export async function getProductImages(productId: string) {
-    try {
-        connectToDB();
-
-        const product = await Product.findOne({ id: productId });
-
-        //console.log(product.images);
-
-        if(product.images.length > 0) {
-            return product.images;
-        } else {
-            return [];
-        }
-    } catch (error: any) {
-        throw new Error(`Error fetching product images: ${error.message}`)
-    }
-}
-
-// export async function addParamsToProduct({ productId, params }: GetParams) {
-//     try {
-//         connectToDB();
-
-//         const product = await Product.findOne({ id: productId });
-
-//         product.params = [];
-        
-//         await product.params.push({ name: "Товар", value: params.Model.replace(/ /g, '_') });
-//         await product.params.push({ name: "Ширина, см", value: params.Width });
-//         await product.params.push({ name: "Висота, см", value: params.Height });
-//         await product.params.push({ name: "Глибина, см", value: params.Depth });
-//         await product.params.push({ name: "Вид", value: params.Type });
-//         await product.params.push({ name: "Колір", value: params.Color });
-
-//         for(const customParam of params.customParams){
-//             await product.params.push({ name: customParam.name, value: customParam.value });
-//         }
-
-//         await product.save();
-//     } catch (error: any) {
-//         throw new Error(`Error adding params to product: ${error.message}`)
-//     }
-// }
-
-export async function getProductParams(productId: string) {
-    try {
-        const product = await Product.findOne({ id: productId });
-
-        const productParams = await product.params;
-
-        //console.log("Fetching params");
-
-        return JSON.stringify(productParams);
-    } catch (error: any) {
-        throw new Error(`Error getting product params: ${error.message}`)
-    }
-}
-
-export async function getProduct(productId: string, type?: "json"){
-    try {
-        connectToDB();
-
-        const product = await Product.findOne({ id: productId });
-
-        if(type === "json") {
-            return JSON.stringify(product);
-        } else {
-            return product;
-        }
-    } catch (error: any) {
-        throw new Error(`Error fetching product: ${error.message}`)
     }
 }
 
@@ -485,23 +394,10 @@ export async function editProduct({ id, name, quantity, images, url, priceToShow
         await createdProduct.save();
 
         await clearCatalogCache();
-        revalidatePath(`/admin/createProduct/list/${id}`)
+
+        clearCache("updateProduct")
     } catch (error: any) {
         throw new Error(`Error creating url-product, ${error.message}`)
-    }
-}
-
-export async function listProduct(productId: string) {
-    try {
-        connectToDB();
-
-        const product = await Product.findOne({ id: productId });
-
-        product.isAvailable = true;
-
-        product.save();
-    } catch (error: any) {
-        throw new Error(`Error listing product: ${error.message}`)
     }
 }
 
@@ -516,6 +412,8 @@ export async function productAddedToCart(id: string) {
         await product.save();
 
         //console.log(product);
+
+        clearCache("addToCart")
     } catch (error: any) {
         throw new Error(`Error adding prduct to cart: ${error.message}`)
     }
@@ -618,7 +516,8 @@ export async function deleteProduct(id: { productId: string} | {product_id: stri
                 console.log("Catalog cache cleared.");
             }
             revalidatePath(path);
-            revalidatePath("/admin")
+            
+            clearCache("deleteProduct")
         }
 
     }
@@ -682,7 +581,6 @@ export async function fetchCategory({ categoryName }: { categoryName: string }) 
         ((totalPriceWithoutDiscount != 0 ? category.totalValue / totalPriceWithoutDiscount : 0) * 100).toFixed(0)
     );
 
-    console.log("Price: ", totalPriceWithoutDiscount)
     return {...category, stringifiedProducts: JSON.stringify(products)} 
   } catch (error: any) {
     throw new Error(`${error.message}`)
@@ -701,8 +599,9 @@ export async function setCategoryDiscount(categoryName: string, percentage: numb
             await product.save()
         }
 
-        revalidatePath("/admin");
-        clearCatalogCache();
+        await clearCatalogCache();
+
+        clearCache("updateProduct")
     } catch (error: any) {
         throw new Error(`Error changing discount for all the products in the category: ${error.message}`)
     }
@@ -720,8 +619,9 @@ export async function changeProductsCategory({productsIds, categoryName}: {produ
             await product.save()
         }
 
-        revalidatePath("/admin");
-        clearCatalogCache();
+        await clearCatalogCache();
+
+        clearCache("updateProduct")
     } catch (error: any) {
         throw new Error(`Error changing products' category: ${error.message}`)        
     }
@@ -757,8 +657,9 @@ export async function changeCategoryName({ categoryName, newName }: { categoryNa
         await product.save();
     }
 
-    revalidatePath("/admin");
-    clearCatalogCache();
+    await clearCatalogCache();
+
+    clearCache("updateProduct")
   } catch (error: any) {
     throw new Error(`Error changing categorie's name: ${error.message}`)
   }
@@ -808,8 +709,9 @@ export async function deleteCategory(props: DeleteCategoryProps) {
             }
         } 
 
-        revalidatePath("/admin");
-        clearCatalogCache();
+        await clearCatalogCache();
+
+        clearCache("updateProduct")
     } catch (error: any) {
         throw new Error(`Error deleting category: ${error.message}`)
     }
