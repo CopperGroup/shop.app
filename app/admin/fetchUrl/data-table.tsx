@@ -41,9 +41,9 @@ import {
 } from "@/components/ui/table"
 import { proceedDataToDB } from "@/lib/proceedDataToDB"
 import Image from "next/image"
-import { findMaxId } from "@/lib/actions/value.actions"
 
 export type Product = {
+  _id: string
   id: string | null,
   name: string | null,
   isAvailable: boolean,
@@ -124,9 +124,6 @@ export function DataTable<TData extends Product, TValue>({
       setTimeout(() => {
         setProceedingState("Зберегти")
       }, 2000)
-
-
-      await findMaxId();
     }
   }
 

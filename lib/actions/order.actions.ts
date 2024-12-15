@@ -142,52 +142,6 @@ export async function createOrder({ products, userId, value, name, surname, phon
     }
 }
 
-// export async function createOrder({ products, userId, value, name, surname, phoneNumber, email, paymentType, deliveryMethod, city, adress, postalCode, comment }: CreateOrderParams) {
-//     try {
-//         connectToDB();
-
-//         const ordersToCreate = 10; // Number of orders to create
-
-//         for (let i = 0; i < ordersToCreate; i++) {
-//             const uniqueId = generateUniqueId();
-
-//             // Generate a random date within the current year
-//             const randomDateWithinYear = generateRandomDateWithinCurrentYear();
-
-//             const createdOrder = await Order.create({
-//                 id: uniqueId,
-//                 products: products,
-//                 user: userId,
-//                 value: value,
-//                 name: name,
-//                 surname: surname,
-//                 phoneNumber: phoneNumber,
-//                 email: email,
-//                 paymentType: paymentType,
-//                 deliveryMethod: deliveryMethod,
-//                 city: city,
-//                 adress: adress,
-//                 postalCode: postalCode,
-//                 comment: comment ? comment : "",
-//                 paymentStatus: "Success",
-//                 deliveryStatus: "Fulfilled",
-//                 date: randomDateWithinYear // Set the random date
-//             });
-
-//             for (const product of products) {
-//                 const orderedProduct = await Product.findById(product.product);
-
-//                 orderedProduct.quantity = orderedProduct.quantity - product.amount;
-
-//                 await orderedProduct.save();
-//             }
-//         }
-//     } catch (error: any) {
-//         throw new Error(`Error creating order: ${error.message}`)
-//     }
-// }
-
-
 export async function fetchOrders() {
     try {
         connectToDB();
