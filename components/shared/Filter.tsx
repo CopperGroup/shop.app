@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { cn } from '@/lib/utils'
+import { capitalize, cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useRouter } from "next/navigation"
 import { useDebounce } from 'use-debounce'
@@ -32,7 +32,14 @@ import { Label } from '../ui/label'
 interface Props {
   maxPrice:number,
   minPrice:number, 
-  maxMin:Array<number>, 
+  maxMin: {
+    minWidth: number;
+    maxWidth: number;
+    minHeight: number;
+    maxHeight: number;
+    minDepth: number;
+    maxDepth: number;
+  }, 
   vendors:Array<string>, 
   series:Array<string>, 
   color:Array<string>, 
@@ -48,42 +55,72 @@ interface Props {
   } 
 }
 
+type ParamsName = "width" | "height" | "depth";
+
+type CheckParams = "vendor" | "series" | "color" | "type";
+
+type Filter = {
+  price: number[],
+  width: {
+    min: number,
+    max: number
+  },
+  height: {
+    min: number,
+    max: number
+  },
+  depth: {
+    min: number,
+    max: number
+  },
+  vendor: string[],
+  series: string[],
+  color: string[],
+  type: string[]
+}
+
 const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, category, categories, counts}: Props) => {
-    const {catalogData, setCatalogData} = useAppContext();
-    const [filter, setFilter] = useState({
-      price:[minPrice, maxPrice],
-      width:[maxMin[1], maxMin[0]],
-      height:[maxMin[3], maxMin[2]],
-      deep:[maxMin[5], maxMin[4]],
-      vendor:[],
-      series:[],
-      color:[],
-      type:[]
-    })
-    const [ screenWidth, setScreenWidth ] = useState(0);
-    const filterButtonRef = useRef<HTMLButtonElement>(null);
-    const [sort, setSort] = useState('default');
-   
+  const {catalogData, setCatalogData} = useAppContext();
+  const [filter, setFilter] = useState<Filter>({
+    price:[minPrice, maxPrice],
+    width: {
+        min: maxMin.minWidth, 
+        max: maxMin.maxWidth,
+    },
+    height: {
+      min: maxMin.minHeight, 
+      max: maxMin.maxHeight,
+    },
+    depth: {
+      min: maxMin.minDepth, 
+      max: maxMin.maxDepth,
+    },
+    vendor:[],
+    series:[],
+    color:[],
+    type:[]
+  })
+  const [screenWidth, setScreenWidth] = useState(0);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const [sort, setSort] = useState('default');
 
-     useEffect(()=>{
-      setCatalogData({...catalogData, sort:sort});
-    },[sort])
+  useEffect(()=>{
+    setCatalogData({...catalogData, sort:sort});
+  },[sort])
 
+  const router = useRouter()
 
-    const router = useRouter()
-
-    const [debounce] = useDebounce(filter,200)
+  const [debounce] = useDebounce(filter,200)
   
-    useEffect(()=>{
-        
-       router.push(`/catalog?${'page=1'}${catalogData.sort!=''?'&sort='+ catalogData.sort:''}${filter.color.length>0?'&color='+ filter.color:''}${filter.type.length>0?'&type='+ filter.type:''}${catalogData.search?'&search='+ catalogData.search:''}${filter.vendor.length>0?'&vendor='+filter.vendor:''}${filter.series.length>0?'&series='+filter.series:''}${filter.price[0]!=minPrice || filter.price[1]!=maxPrice ?'&minPrice='+ filter.price[0]+'&maxPrice='+ filter.price[1]:''}${filter.width[0]!= maxMin[1] || filter.width[1]!=maxMin[0] ?'&minWidth='+ filter.width[0]+'&maxWidth='+ filter.width[1]:''}${filter.height[0]!= maxMin[3] || filter.height[1]!=maxMin[2] ?'&minHeight='+ filter.height[0]+'&maxHeight='+ filter.height[1]:''}${filter.deep[0]!= maxMin[5] || filter.deep[1]!=maxMin[4] ?'&minDeep='+ filter.deep[0]+'&maxDeep='+ filter.deep[1]:''}${category?'&category='+category:''}
-       `      
-      ) 
-    },[debounce, catalogData.sort, catalogData.search, category]) 
+  useEffect(()=>{
+     router.push(`/catalog?${'page=1'}${catalogData.sort!=''?'&sort='+ catalogData.sort:''}${filter.color.length>0?'&color='+ filter.color:''}${filter.type.length>0?'&type='+ filter.type:''}${catalogData.search?'&search='+ catalogData.search:''}${filter.vendor.length>0?'&vendor='+filter.vendor:''}${filter.series.length>0?'&series='+filter.series:''}${filter.price[0]!=minPrice || filter.price[1]!=maxPrice ?'&minPrice='+ filter.price[0]+'&maxPrice='+ filter.price[1]:''}${filter.width.min!= maxMin.minWidth || filter.width.max!=maxMin.maxWidth ?'&minWidth='+ filter.width.min+'&maxWidth='+ filter.width.max:''}${filter.height.min!= maxMin.minHeight || filter.height.max!=maxMin.maxHeight ?'&minHeight='+ filter.height.min+'&maxHeight='+ filter.height.max:''}${filter.depth.min!= maxMin.minDepth || filter.depth.max!=maxMin.maxDepth ?'&minDepth='+ filter.depth.min+'&maxDepth'+ filter.depth.max:''}${category?'&category='+category:''}
+     `      
+    ) 
+  },[debounce, catalogData.sort, catalogData.search, category]) 
 
   useEffect(()=>{
         
-   router.push(`/catalog?${'page='+ catalogData.pNumber}${catalogData.sort!=''?'&sort='+ catalogData.sort:''}${filter.color.length>0?'&color='+ filter.color:''}${filter.type.length>0?'&type='+ filter.type:''}${catalogData.search?'&search='+ catalogData.search:''}${filter.vendor.length>0?'&vendor='+filter.vendor:''}${filter.series.length>0?'&series='+filter.series:''}${filter.price[0]!=minPrice || filter.price[1]!=maxPrice ?'&minPrice='+ filter.price[0]+'&maxPrice='+ filter.price[1]:''}${filter.width[0]!= maxMin[1] || filter.width[1]!=maxMin[0] ?'&minWidth='+ filter.width[0]+'&maxWidth='+ filter.width[1]:''}${filter.height[0]!= maxMin[3] || filter.height[1]!=maxMin[2] ?'&minHeight='+ filter.height[0]+'&maxHeight='+ filter.height[1]:''}${filter.deep[0]!= maxMin[5] || filter.deep[1]!=maxMin[4] ?'&minDeep='+ filter.deep[0]+'&maxDeep='+ filter.deep[1]:''}${category?'&category='+category:''}
+   router.push(`/catalog?${'page='+ catalogData.pNumber}${catalogData.sort!=''?'&sort='+ catalogData.sort:''}${filter.color.length>0?'&color='+ filter.color:''}${filter.type.length>0?'&type='+ filter.type:''}${catalogData.search?'&search='+ catalogData.search:''}${filter.vendor.length>0?'&vendor='+filter.vendor:''}${filter.series.length>0?'&series='+filter.series:''}${filter.price[0]!=minPrice || filter.price[1]!=maxPrice ?'&minPrice='+ filter.price[0]+'&maxPrice='+ filter.price[1]:''}${filter.width.min!= maxMin.minWidth || filter.width.max!=maxMin.maxWidth ?'&minWidth='+ filter.width.min+'&maxWidth='+ filter.width.max:''}${filter.height.min!= maxMin.minHeight || filter.height.max!=maxMin.maxHeight ?'&minHeight='+ filter.height.min+'&maxHeight='+ filter.height.max:''}${filter.depth.min!= maxMin.minDepth || filter.depth.max!=maxMin.maxDepth ?'&minDepth='+ filter.depth.min+'&maxDepth'+ filter.depth.max:''}${category?'&category='+category:''}
  
      `)
   },[catalogData.pNumber])
@@ -95,96 +132,27 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
   }, [])
     
   useEffect(()=>{
-    setFilter({...filter, price:[minPrice, maxPrice],height:[maxMin[3], maxMin[2]],width:[maxMin[1], maxMin[0]],deep:[maxMin[5], maxMin[4]]});
+    setFilter({...filter, price:[minPrice, maxPrice], height: { min: maxMin.minHeight, max: maxMin.maxHeight }, width: { min: maxMin.minWidth, max: maxMin.maxWidth }, depth:{ min:maxMin.minDepth, max: maxMin.maxDepth }});
   },[category])
 
    
 
-    const handleChange = (newValue: [number, number]) => {
-      setFilter({...filter, price:newValue})
-    };
+  const handleChange = (newValue: [number, number]) => {
+    setFilter({...filter, price:newValue})
+  };
 
-    const handleCheckboxChange = (v:any) => {
-      const selectedVendor = v; // Assuming the value of checkbox is the vendor name
-      //@ts-ignore
-      const isChecked = filter.vendor.includes(v);
-  
-      setFilter((prevFilter):any => {
-        if (!isChecked) {
-          // If checkbox is checked, add the selected vendor to the array
-          return {
-            ...prevFilter,
-            vendor: [...prevFilter.vendor, selectedVendor]
-          };
-        } else {
-          // If checkbox is unchecked, remove the selected vendor from the array
-          return {
-            ...prevFilter,
-            vendor: prevFilter.vendor.filter(vendor => vendor !== selectedVendor)
-          };
-        }
-      });
-    };
+  const handleCheckboxChange = (checkParam: CheckParams, value: string) => {
+    const isChecked = filter[checkParam].includes(value);
 
-    const handleSeries = (v:any) => {
-      const selectedSeria = v; 
-      //@ts-ignore
-      const isChecked = filter.series.includes(v);
-  
-      setFilter((prevFilter):any => {
-        if (!isChecked) {
-          return {
-            ...prevFilter,
-            series: [...prevFilter.series, selectedSeria]
-          };
-        } else {
-          return {
-            ...prevFilter,
-            series: prevFilter.series.filter(series => series !== selectedSeria)
-          };
-        }
-      });
-    };
+    setFilter((prevFilter):any => {
+      if (!isChecked) {
+        return {...prevFilter, [checkParam]: [...prevFilter[checkParam], value]};
+      } else {
+        return {...prevFilter, [checkParam]: prevFilter[checkParam].filter(param => param !== value)};
+      }
+    });
+  };
 
-    const handleColor = (v:any) => {
-      const selectedColor = v; 
-      //@ts-ignore
-      const isChecked = filter.color.includes(v);
-  
-      setFilter((prevFilter):any => {
-        if (!isChecked) {
-          return {
-            ...prevFilter,
-            color: [...prevFilter.color, selectedColor]
-          };
-        } else {
-          return {
-            ...prevFilter,
-            color: prevFilter.color.filter(color => color !== selectedColor)
-          };
-        }
-      });
-    };
-
-    const handleType = (v:any) => {
-      const selectedType = v; 
-      //@ts-ignore
-      const isChecked = filter.type.includes(v);
-  
-      setFilter((prevFilter):any => {
-        if (!isChecked) {
-          return {
-            ...prevFilter,
-            type: [...prevFilter.type, selectedType]
-          };
-        } else {
-          return {
-            ...prevFilter,
-            type: prevFilter.type.filter(type => type !== selectedType)
-          };
-        }
-      });
-    };
   const divRef = useRef<HTMLDivElement>(null);
   const [bodyOverflow, setBodyOverflow] = useState(false);
   const toggleOverflow = (e:any) =>{
@@ -218,12 +186,27 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
     setBodyOverflow(!bodyOverflow);
   };
 
+  function handleSlider(paramName: ParamsName, setting: "min" | "max", value: string) {
+   if (value !== "") {
+    const floatedValue = parseFloat(value)
+    setFilter((prev) => ({...prev, [paramName]: { ...prev[paramName], [setting]: floatedValue}}))
+   } else {
+    setFilter((prev) => ({...prev, [paramName]: { ...prev[paramName], [setting]: 0}}));
+   }
+  }
 
-  // useEffect(()=>{
-    
-  //   
-   
-  // },[maxPrice, minPrice,  maxMin])
+  const handleInputUnfocus = (paramName: ParamsName, setting: 'min' | "max") => {
+    const capitalizedParamName = capitalize(paramName);
+
+    const minValue = maxMin[`min${capitalizedParamName}` as keyof typeof maxMin];
+    const maxValue = maxMin[`max${capitalizedParamName}` as keyof typeof maxMin];
+
+    const currentValue = filter[paramName][setting];
+
+    if(currentValue < minValue || currentValue > maxValue) {
+      setFilter((prev) => ({...prev, [paramName]: {...prev[paramName], [setting]: maxMin[(setting + capitalizedParamName) as keyof typeof maxMin]}}))
+    }
+  }
 
   return (
     <>
@@ -296,7 +279,7 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                     {vendors.map((vendor, index)=>(
                       <div key={index} className="w-full h-fit flex justify-between items-center">
                       <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={vendor} onCheckedChange={(e)=> handleCheckboxChange(vendor)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
+                        <Checkbox id={vendor} onCheckedChange={()=> handleCheckboxChange("vendor", vendor)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={vendor}
                           className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -343,7 +326,7 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                     {Type.map((type, index)=>(
                       <div key={index} className="w-full h-fit flex justify-between items-center">
                         <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={type} onCheckedChange={()=>handleType(type)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
+                        <Checkbox id={type} onCheckedChange={() => handleCheckboxChange("type", type)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={type}
                           className="text-sm leading-[103%] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -367,7 +350,7 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                     {series.map((seria, index)=>(
                       <div key={index} className="w-full h-fit flex justify-between items-center">
                         <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={seria} onCheckedChange={()=>handleSeries(seria)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
+                        <Checkbox id={seria} onCheckedChange={() => handleCheckboxChange("series", seria)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={seria}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -391,7 +374,7 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                     {color.map((color, index)=>(
                       <div key={index} className="w-full h-fit flex justify-between items-center">
                         <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={color} onCheckedChange={()=>handleColor(color)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
+                        <Checkbox id={color} onCheckedChange={() => handleCheckboxChange("color", color)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
                         <label
                           htmlFor={color}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -413,21 +396,33 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">Ширина</AccordionTrigger>
                   <AccordionContent className="flex flex-col items-center shrink-0 px-3">
                     <Slider
-                        value={filter.width}
-                        onValueChange={([min,max])=>{setFilter({...filter, width:[min,max]})}}
-                        max={maxMin[0]}
-                        min={maxMin[1]}
+                        value={Object.values(filter.width)}
+                        onValueChange={([min,max])=>{setFilter({...filter, width:{ min, max }})}}
+                        max={maxMin.maxWidth}
+                        min={maxMin.minWidth}
                         step={1}
                         className={cn("w-full mt-4")}
                       />
                       <div className='flex justify-between mt-7 w-full'>
                         <div>
                           <label htmlFor="minWidth">Від</label>
-                          <input className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' onChange={(e) => setFilter({...filter, width: [e.target.value !== "" ? parseFloat(e.target.value.slice(1)) : 0, maxMin[0]]})} value={`${filter.width[0]}`} id="minWidth"/>
+                          <input 
+                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
+                           onChange={(e) => handleSlider("width", "min", e.target.value)} 
+                           value={`${filter.width.min}`} 
+                           onBlur={() => handleInputUnfocus("width", "min")} 
+                           id="minWidth"
+                          />
                         </div>
                         <div>
                           <label htmlFor="maxWidth">До</label>
-                          <input className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' onChange={(e) => setFilter({...filter, width: [maxMin[1], e.target.value !== "" ? parseFloat(e.target.value.slice(1)): 0]})} value={`${filter.width[1]}`} id="maxWidth"/>
+                          <input 
+                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
+                           onChange={(e) => handleSlider("width", "max", e.target.value)}  
+                           value={`${filter.width.max}`} 
+                           onBlur={() => handleInputUnfocus("width", "max")} 
+                           id="maxWidth"
+                          />
                         </div>
                       </div>
                   </AccordionContent>
@@ -441,21 +436,33 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">Висота</AccordionTrigger>
                   <AccordionContent className="flex flex-col items-center shrink-0 px-3">
                     <Slider
-                        value={filter.height}
-                        onValueChange={([min,max])=>{setFilter({...filter, height:[min,max]})}}
-                        max={maxMin[2]}
-                        min={maxMin[3]}
+                        value={Object.values(filter.height)}
+                        onValueChange={([min,max])=>{setFilter({...filter, height:{ min, max }})}}
+                        max={maxMin.maxHeight}
+                        min={maxMin.minHeight}
                         step={1}
                         className={cn("w-full mt-4")}
                       />
                       <div className='flex justify-between mt-7 w-full'>
                         <div>
                           <label htmlFor="minHeight">Від</label>
-                          <input className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' onChange={(e) => setFilter({...filter, height: [e.target.value !== "" ? parseFloat(e.target.value.slice(1)) : 0, maxMin[2]]})} value={`${filter.height[0]}`} id="minHeight"/>
+                          <input 
+                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
+                           onChange={(e) => handleSlider("height", "min", e.target.value)} 
+                           value={`${filter.height.min}`} 
+                           onBlur={() => handleInputUnfocus("height", "min")} 
+                           id="minHeight"
+                          />
                         </div>
                         <div>
                           <label htmlFor="maxHeight">До</label>
-                          <input className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' onChange={(e) => setFilter({...filter, height: [maxMin[3], e.target.value !== "" ? parseFloat(e.target.value.slice(1)): 0]})} value={`${filter.height[1]}`} id="maxHeight"/>
+                          <input 
+                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
+                           onChange={(e) => handleSlider("height", "max", e.target.value)} 
+                           value={`${filter.height.max}`} 
+                           onBlur={() => handleInputUnfocus("height", "max")} 
+                           id="maxHeight"
+                          />
                         </div>
                       </div>
                   </AccordionContent>
@@ -469,21 +476,32 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                   <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">Глибина</AccordionTrigger>
                   <AccordionContent className="flex flex-col items-center shrink-0 px-3">
                     <Slider
-                        value={filter.deep}
-                        onValueChange={([min,max])=>{setFilter({...filter, deep:[min,max]})}}
-                        max={maxMin[4]}
-                        min={maxMin[5]}
+                        value={Object.values(filter.depth)}
+                        onValueChange={([min,max])=>{setFilter({...filter, depth:{ min, max }})}}
+                        max={maxMin.maxDepth}
+                        min={maxMin.minDepth}
                         step={1}
                         className={cn("w-full mt-4")}
                       />
                       <div className='flex justify-between mt-7 w-full'>
                         <div>
-                          <label htmlFor="minDeep">Від</label>
-                          <input className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' onChange={(e) => setFilter({...filter, deep: [e.target.value !== "" ? parseFloat(e.target.value.slice(1)) : 0, maxMin[4]]})} value={`${filter.deep[0]}`} id="minDeep"/>
+                          <label htmlFor="mindepth">Від</label>
+                          <input 
+                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
+                           onChange={(e) => handleSlider("depth", "min", e.target.value)} 
+                           value={`${filter.depth.min}`} 
+                           onBlur={() => handleInputUnfocus("depth", "min")} 
+                           id="minDepth"
+                          />
                         </div>
                         <div>
-                          <label htmlFor="maxDeep">До</label>
-                          <input className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' onChange={(e) => setFilter({...filter, deep: [maxMin[5], e.target.value !== "" ? parseFloat(e.target.value.slice(1)): 0]})} value={`${filter.deep[1]}`} id="maxDeep"/>
+                          <label htmlFor="maxdepth">До</label>
+                          <input 
+                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
+                           onChange={(e) => handleSlider("depth", "max", e.target.value)} 
+                           value={`${filter.depth.max}`} 
+                           onBlur={() => handleInputUnfocus("depth", "max")} id="maxDepth"
+                          />
                         </div>
                       </div>
                   </AccordionContent>

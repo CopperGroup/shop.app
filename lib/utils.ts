@@ -70,3 +70,7 @@ export function replaceDescription(str: string) {
     .replace(/&mdash;/g, '—')   
     .replace(/&ndash;/g, '–');  
 }
+
+export function capitalize(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1)
+}

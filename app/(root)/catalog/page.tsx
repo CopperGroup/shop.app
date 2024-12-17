@@ -87,57 +87,30 @@ const catalog = async ({searchParams,data}:any) => {
   const minPrice = Math.min(...filtredProducts.map(item => item.priceToShow));
   const vendors = Array.from(new Set (filtredProducts.map(item => item.vendor))).filter(function(item) {return item !== '';});
   
+  const maxMin = () => {
+    const allParams = filtredProducts.map(item => item.params);
+    const widths = [];
+    const heights = [];
+    const depths = [];
   
-  
-  
-
-
-   const maxMin = () => {
-    const widths = filtredProducts.map(item => item.params);
-  
-    let maxWidth = 0, minWidth = Infinity;
-    let maxHeight = 0, minHeight = Infinity;
-    let maxDeep = 0, minDeep = Infinity;
-  
-    for (const arr of widths) {
-      for (const param of arr) {
-        const { name, value } = param || {};
-        const currentValue = parseFloat(value);
-  
-        if (isNaN(currentValue)) continue;
-  
-        switch (name) {
-          case 'Ширина, см':
-            maxWidth = Math.max(maxWidth, currentValue);
-            minWidth = Math.min(minWidth, currentValue);
-            break;
-          case 'Висота, см':
-            maxHeight = Math.max(maxHeight, currentValue);
-            minHeight = Math.min(minHeight, currentValue);
-            break;
-          case 'Глибина, см':
-            maxDeep = Math.max(maxDeep, currentValue);
-            minDeep = Math.min(minDeep, currentValue);
-            break;
-          default:
-            break;
+    for(const params of allParams) {
+      for(const param of params) {
+        if (!isNaN(param.value)) {
+          if (['Ширина, см', "Width, cm"].includes(param.name)) {
+            widths.push(parseFloat(param.value))
+          } else if(['Висота, см', "Height, cm"].includes(param.name)) {
+            heights.push(parseFloat(param.value))
+          } else if(['Глибина, см', "Depth, cm"].includes(param.name)) {
+            depths.push(parseFloat(param.value))
+          }
         }
       }
     }
-  
-    return [maxWidth, minWidth, maxHeight, minHeight, maxDeep, minDeep];
+
+    return { minWidth: Math.min(...widths), maxWidth: Math.max(...widths), minHeight: Math.min(...heights), maxHeight: Math.max(...heights), minDepth: Math.min(...depths), maxDepth: Math.max(...depths)} as const
   }
   
   const maxMinRes = maxMin();
- 
-  
-  
-
-
-
-
-  
-   
 
   if(searchParams.search){
     filtredProducts =filtredProducts.filter((product) => product.name.toLowerCase().indexOf(searchParams.search?.toLowerCase()) !== -1)
