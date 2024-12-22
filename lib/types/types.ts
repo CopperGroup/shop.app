@@ -1,6 +1,9 @@
+export const TypeScriptPrimitiveTypes = ["bigint", "boolean", "function", "number", "object", "string", "symbol", "undefined"] as const;
+
 export type ReadOnly<T> = {
     readonly [P in keyof T] : T[P]
 }
+
 
 export type ProductType = {
     _id: string,

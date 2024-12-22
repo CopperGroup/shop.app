@@ -1,13 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
-import { capitalize, cn } from '@/lib/utils'
+import React, { ChangeEvent, Dispatch, SetStateAction, useState } from 'react'
+import { capitalize, cn, createSearchString } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useDebounce } from 'use-debounce'
 import { useEffect } from 'react'
 import { useAppContext } from "@/app/(root)/context"
-import FilterButton from '@/components/shared/FilterButton'
 import { useRef } from 'react';
 import { Button } from '../ui/button'
 
@@ -19,15 +18,9 @@ import {
 } from "@/components/ui/accordion"
 import Link from 'next/link'
 import { Slider } from '../ui/slider'
-import { Select, 
-  SelectContent, 
-  SelectGroup, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '../ui/select'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Label } from '../ui/label'
+import ClearFilterButton from '../interface/ClearFilterButton'
 
 interface Props {
   maxPrice:number,
@@ -40,27 +33,34 @@ interface Props {
     minDepth: number;
     maxDepth: number;
   }, 
-  vendors:Array<string>, 
-  series:Array<string>, 
-  color:Array<string>, 
-  Type:Array<string>, 
+  checkParams: {
+    vendors: string[], 
+    series: string[], 
+    colors: string[], 
+    types: string[], 
+    categories: string[],
+  },
   category:any, 
-  categories:Array<string>,
   counts: {
-    vendorCount: { [key: string]: number },
-    categoryCount: { [key: string]: number },
-    typeCount: { [key: string]: number },
+    categoriesCount: { [key: string]: number },
+    vendorsCount: { [key: string]: number },
+    typesCount: { [key: string]: number },
     seriesCount: { [key: string]: number },
-    colorCount: { [key: string]: number}
+    colorsCount: { [key: string]: number}
   } 
 }
 
-type ParamsName = "width" | "height" | "depth";
+const params = ["width", "height", "depth"] as const;
+const paramsUa = { width: "Ширина", height: "Висота", depth: "Глибина" };
+type ParamsName = typeof params[number];
 
-type CheckParams = "vendor" | "series" | "color" | "type";
+const checkParamsNames = ["categories", "vendors", "series", "colors", "types"] as const;
+const checkParamsNamesUa = { categories: "Категорії", vendors: "Виробник", series: "Серія", colors: "Колір", types: "Вид" };
+type CheckParams = typeof checkParamsNames[number];
 
-type Filter = {
-  price: number[],
+type FilterType = {
+  page: string,
+  price: [number, number],
   width: {
     min: number,
     max: number
@@ -73,15 +73,17 @@ type Filter = {
     min: number,
     max: number
   },
-  vendor: string[],
+  categories: string[]
+  vendors: string[],
   series: string[],
-  color: string[],
-  type: string[]
+  colors: string[],
+  types: string[]
 }
 
-const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, category, categories, counts}: Props) => {
+const Filter = ({ maxPrice, minPrice, maxMin, checkParams, category, counts }: Props) => {
   const {catalogData, setCatalogData} = useAppContext();
-  const [filter, setFilter] = useState<Filter>({
+  const [filter, setFilter] = useState<FilterType>({
+    page: "1",
     price:[minPrice, maxPrice],
     width: {
         min: maxMin.minWidth, 
@@ -95,50 +97,83 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
       min: maxMin.minDepth, 
       max: maxMin.maxDepth,
     },
-    vendor:[],
+    categories: [],
+    vendors:[],
     series:[],
-    color:[],
-    type:[]
+    colors:[],
+    types:[]
   })
   const [screenWidth, setScreenWidth] = useState(0);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const [sort, setSort] = useState('default');
+  const [debounce] = useDebounce(filter, 200);
 
+  const router = useRouter();
+  const search = useSearchParams();
+  const page = useSearchParams().get("page");
+  
   useEffect(()=>{
     setCatalogData({...catalogData, sort:sort});
   },[sort])
-
-  const router = useRouter()
-
-  const [debounce] = useDebounce(filter,200)
   
-  useEffect(()=>{
-     router.push(`/catalog?${'page=1'}${catalogData.sort!=''?'&sort='+ catalogData.sort:''}${filter.color.length>0?'&color='+ filter.color:''}${filter.type.length>0?'&type='+ filter.type:''}${catalogData.search?'&search='+ catalogData.search:''}${filter.vendor.length>0?'&vendor='+filter.vendor:''}${filter.series.length>0?'&series='+filter.series:''}${filter.price[0]!=minPrice || filter.price[1]!=maxPrice ?'&minPrice='+ filter.price[0]+'&maxPrice='+ filter.price[1]:''}${filter.width.min!= maxMin.minWidth || filter.width.max!=maxMin.maxWidth ?'&minWidth='+ filter.width.min+'&maxWidth='+ filter.width.max:''}${filter.height.min!= maxMin.minHeight || filter.height.max!=maxMin.maxHeight ?'&minHeight='+ filter.height.min+'&maxHeight='+ filter.height.max:''}${filter.depth.min!= maxMin.minDepth || filter.depth.max!=maxMin.maxDepth ?'&minDepth='+ filter.depth.min+'&maxDepth'+ filter.depth.max:''}${category?'&category='+category:''}
-     `      
-    ) 
-  },[debounce, catalogData.sort, catalogData.search, category]) 
-
-  useEffect(()=>{
-        
-   router.push(`/catalog?${'page='+ catalogData.pNumber}${catalogData.sort!=''?'&sort='+ catalogData.sort:''}${filter.color.length>0?'&color='+ filter.color:''}${filter.type.length>0?'&type='+ filter.type:''}${catalogData.search?'&search='+ catalogData.search:''}${filter.vendor.length>0?'&vendor='+filter.vendor:''}${filter.series.length>0?'&series='+filter.series:''}${filter.price[0]!=minPrice || filter.price[1]!=maxPrice ?'&minPrice='+ filter.price[0]+'&maxPrice='+ filter.price[1]:''}${filter.width.min!= maxMin.minWidth || filter.width.max!=maxMin.maxWidth ?'&minWidth='+ filter.width.min+'&maxWidth='+ filter.width.max:''}${filter.height.min!= maxMin.minHeight || filter.height.max!=maxMin.maxHeight ?'&minHeight='+ filter.height.min+'&maxHeight='+ filter.height.max:''}${filter.depth.min!= maxMin.minDepth || filter.depth.max!=maxMin.maxDepth ?'&minDepth='+ filter.depth.min+'&maxDepth'+ filter.depth.max:''}${category?'&category='+category:''}
- 
-     `)
-  },[catalogData.pNumber])
+  useEffect(() => {
+    const searchParams = Object.fromEntries(search.entries());
+    
+    setFilter((...prev) => ({
+      ...prev,
+      page: page || "1",
+      price: [
+        parseFloat(searchParams.minPrice || minPrice.toString()),
+        parseFloat(searchParams.maxPrice || maxPrice.toString()),
+      ],
+      width: {
+        min: parseFloat(searchParams.minWidth || maxMin.minWidth.toString()),
+        max: parseFloat(searchParams.maxWidth || maxMin.maxWidth.toString()),
+      },
+      height: {
+        min: parseFloat(searchParams.minHeight || maxMin.minHeight.toString()),
+        max: parseFloat(searchParams.maxHeight || maxMin.maxHeight.toString()),
+      },
+      depth: {
+        min: parseFloat(searchParams.minDepth || maxMin.minDepth.toString()),
+        max: parseFloat(searchParams.maxDepth || maxMin.maxDepth.toString()),
+      },
+      categories: searchParams.category ? searchParams.category.split(","): [],
+      colors: searchParams.color ? searchParams.color.split(',') : [],
+      types: searchParams.type ? searchParams.type.split(',') : [],
+      vendors: searchParams.vendor ? searchParams.vendor.split(',') : [],
+      series: searchParams.series ? searchParams.series.split(',') : [],
+    }))
+    
+    setSort(searchParams.sort || "default")
+  }, [search, minPrice, maxPrice, maxMin, checkParams, category, counts]);
+  
 
   useEffect(() => {
-    const currentScreenWidth = window.screen.width;
-
-    setScreenWidth(currentScreenWidth);
-  }, [])
-    
-  useEffect(()=>{
-    setFilter({...filter, price:[minPrice, maxPrice], height: { min: maxMin.minHeight, max: maxMin.maxHeight }, width: { min: maxMin.minWidth, max: maxMin.maxWidth }, depth:{ min:maxMin.minDepth, max: maxMin.maxDepth }});
-  },[category])
-
-   
+    // Handle filter changes, reset to page 1
+    const searchString = createSearchString({
+      pNumber: filter.page, // Reset to page 1 on filter change
+      sort,
+      categories: filter.categories,
+      colors: filter.colors,
+      types: filter.types,
+      vendors: filter.vendors,
+      series: filter.series,
+      search: catalogData.search,
+      price: filter.price,
+      width: filter.width,
+      height: filter.height,
+      depth: filter.depth,
+      category,
+      minPrice,
+      maxPrice,
+      maxMin,
+    });
+    router.push(`/catalog?${searchString}`);
+  }, [debounce, sort, catalogData.search, category]);  
 
   const handleChange = (newValue: [number, number]) => {
-    setFilter({...filter, price:newValue})
+    setFilter({...filter, page: "1", price:newValue})
   };
 
   const handleCheckboxChange = (checkParam: CheckParams, value: string) => {
@@ -146,9 +181,9 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
 
     setFilter((prevFilter):any => {
       if (!isChecked) {
-        return {...prevFilter, [checkParam]: [...prevFilter[checkParam], value]};
+        return {...prevFilter, page: "1", [checkParam]: [...prevFilter[checkParam], value]};
       } else {
-        return {...prevFilter, [checkParam]: prevFilter[checkParam].filter(param => param !== value)};
+        return {...prevFilter, page: "1", [checkParam]: prevFilter[checkParam].filter(param => param !== value)};
       }
     });
   };
@@ -186,35 +221,13 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
     setBodyOverflow(!bodyOverflow);
   };
 
-  function handleSlider(paramName: ParamsName, setting: "min" | "max", value: string) {
-   if (value !== "") {
-    const floatedValue = parseFloat(value)
-    setFilter((prev) => ({...prev, [paramName]: { ...prev[paramName], [setting]: floatedValue}}))
-   } else {
-    setFilter((prev) => ({...prev, [paramName]: { ...prev[paramName], [setting]: 0}}));
-   }
-  }
-
-  const handleInputUnfocus = (paramName: ParamsName, setting: 'min' | "max") => {
-    const capitalizedParamName = capitalize(paramName);
-
-    const minValue = maxMin[`min${capitalizedParamName}` as keyof typeof maxMin];
-    const maxValue = maxMin[`max${capitalizedParamName}` as keyof typeof maxMin];
-
-    const currentValue = filter[paramName][setting];
-
-    if(currentValue < minValue || currentValue > maxValue) {
-      setFilter((prev) => ({...prev, [paramName]: {...prev[paramName], [setting]: maxMin[(setting + capitalizedParamName) as keyof typeof maxMin]}}))
-    }
-  }
-
   return (
     <>
     <Button ref={filterButtonRef} onClick={(e)=>toggleOverflow(e)} className="fixed duration-300 left-0 top-36 rounded-none rounded-r md:hidden transition-all"><i className="fa fa-filter pointer-events-none"></i></Button>
     <div ref={divRef} className='transition-all duration-300 w-[25%] border-[1.5px] shadow-small px-5 rounded-3xl max-[1023px]:w-[30%] max-[850px]:w-[35%] max-[1080px]:px-3 max-[880px]:px-2 max-md:w-[300px] max-md:rounded-l-none max-md:fixed max-md:bg-white  max-md:flex max-md:flex-col justify-center z-50 items-center max-md:overflow-y-scroll overflow-x-hidden max-md:h-full  max-md:translate-x-[-100%] max-[360px]:w-full max-[360px]:rounded-none top-0  left-0 ' >
       <div className='h-full max-md:w-[270px] py-10'>
           <div className="w-full h-fit flex justify-between"> 
-            <h2 className='text-[28px]'>{category?category.replace(/_/g, ' '):'Фільтр'}</h2>
+            <h2 className='text-[28px]'>Фільтр</h2>
             <Button onClick={(e)=>toggleOverflow(e)} className="duration-300 size-12 rounded-full md:hidden transition-all min-[361px]:hidden"><i className="fa fa-filter pointer-events-none"></i></Button>
           </div>
             
@@ -245,7 +258,6 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
                 </AccordionItem>
               </Accordion>
             </div>
-
             
             <div className='mt-4 pb-4 w-full min-[601px]:hidden'>
               <Accordion type="single" collapsible className="w-full">
@@ -271,285 +283,135 @@ const Filter = ({maxPrice, minPrice, maxMin, vendors, series, color, Type, categ
               </Accordion>
             </div>
 
-            <div className='mt-4 pb-4 w-full'>
-              <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Виробник</AccordionTrigger>
-                  <AccordionContent className="pl-3">
-                    {vendors.map((vendor, index)=>(
-                      <div key={index} className="w-full h-fit flex justify-between items-center">
-                      <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={vendor} onCheckedChange={()=> handleCheckboxChange("vendor", vendor)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
-                        <label
-                          htmlFor={vendor}
-                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {vendor}
-                        </label>
-                        </div>
-                        <p className="w-fit text-small-medium text-blue drop-shadow-xl mt-3 px-4">{counts.vendorCount[vendor]}</p>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-
-            <div className='mt-4 pb-4 w-full'>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Категорія</AccordionTrigger>
-                  <AccordionContent className="mt-3 pl-3">
-                    <Link href='/catalog?category=' className='hover:underline max-lg:underline'>Всі категорії</Link>
-                    {categories.map((category, index)=>(
-                      <div className="w-full flex justify-between items-center space-x-2 mt-4" key={index}>
-                        <Link  href={'/catalog?category='+category.replace(/ /g, '_')} className='leading-[103%] hover:underline max-lg:underline'>{category}</Link>
-                        <p className="w-fit text-small-medium text-end text-blue drop-shadow-xl px-4">{counts.categoryCount[category]}</p>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-
-
-
-
-
-
-
-            <div className='mt-4 pb-4 w-full'>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Вид</AccordionTrigger>
-                  <AccordionContent className="pl-3">
-                    {Type.map((type, index)=>(
-                      <div key={index} className="w-full h-fit flex justify-between items-center">
+            {checkParamsNames.map((param) => (
+              <div key={param} className='mt-4 pb-4 w-full'>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>{checkParamsNamesUa[param]}</AccordionTrigger>
+                    <AccordionContent className="pl-3">
+                      {checkParams[param].map((value, index)=>(
+                        <div key={index} className="w-full h-fit flex justify-between items-center">
                         <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={type} onCheckedChange={() => handleCheckboxChange("type", type)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
-                        <label
-                          htmlFor={type}
-                          className="text-sm leading-[103%] peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {type}
-                        </label>
+                          <Checkbox 
+                           id={value} 
+                           className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"
+                           onCheckedChange={()=> handleCheckboxChange(param, value)} 
+                           checked={filter[param].includes(value)}
+                          />
+                          <label
+                            htmlFor={value}
+                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {value}
+                          </label>
+                          </div>
+                          <p className="w-fit text-small-medium text-blue drop-shadow-xl mt-3 px-4">{counts[`${param}Count` as keyof typeof counts][value]}</p>
                         </div>
-                        <p className="w-fit text-small-medium text-blue drop-shadow-xl mt-3 px-4">{counts.typeCount[type]}</p>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            ))}
 
-            <div className='w-full mt-4 pb-4'>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Серія</AccordionTrigger>
-                  <AccordionContent className="pl-3">
-                    {series.map((seria, index)=>(
-                      <div key={index} className="w-full h-fit flex justify-between items-center">
-                        <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={seria} onCheckedChange={() => handleCheckboxChange("series", seria)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
-                        <label
-                          htmlFor={seria}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {seria}
-                        </label>
-                        </div>
-                        <p className="w-fit text-small-medium text-blue drop-shadow-xl mt-3 px-4">{counts.seriesCount[seria]}</p>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
+          {params.map((param, index) => {
+            const capitalizedParam = capitalize(param);
 
-            <div className='w-full mt-4 pb-4'>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>Колір</AccordionTrigger>
-                  <AccordionContent className="pl-3">
-                    {color.map((color, index)=>(
-                      <div key={index} className="w-full h-fit flex justify-between items-center">
-                        <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox id={color} onCheckedChange={() => handleCheckboxChange("color", color)} className="size-5 rounded-md border-neutral-600 data-[state=checked]:bg-black data-[state=checked]:text-white"/>
-                        <label
-                          htmlFor={color}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {color}
-                        </label>
+            return (
+              <div className='mt-4 pb-4 w-full' key={index}>
+                <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">{paramsUa[param]}</AccordionTrigger>
+                    <AccordionContent className="flex flex-col items-center shrink-0 px-3">
+                      <Slider
+                          value={Object.values(filter[param])}
+                          onValueChange={([min,max])=>{setFilter({...filter, [param]:{ min, max }})}}
+                          max={maxMin[("max" + capitalizedParam) as keyof typeof maxMin]}
+                          min={maxMin[("min" + capitalizedParam) as keyof typeof maxMin]}
+                          step={1}
+                          className={cn("w-full mt-4")}
+                        />
+                        <div className='flex justify-between mt-7 w-full'>
+                          <FilterInput
+                          paramName={param}
+                          setting="min"
+                          maxMin={maxMin}
+                          filter={filter}
+                          setFilter={setFilter}
+                          />
+                          <FilterInput
+                          paramName={param}
+                          setting="max"
+                          maxMin={maxMin}
+                          filter={filter}
+                          setFilter={setFilter}
+                          />
                         </div>
-                        <p className="w-fit text-small-medium text-blue drop-shadow-xl mt-3 px-4">{counts.colorCount[color]}</p>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            )
+          })}
 
-            <div className='mt-4 pb-4 w-full'>
-              <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">Ширина</AccordionTrigger>
-                  <AccordionContent className="flex flex-col items-center shrink-0 px-3">
-                    <Slider
-                        value={Object.values(filter.width)}
-                        onValueChange={([min,max])=>{setFilter({...filter, width:{ min, max }})}}
-                        max={maxMin.maxWidth}
-                        min={maxMin.minWidth}
-                        step={1}
-                        className={cn("w-full mt-4")}
-                      />
-                      <div className='flex justify-between mt-7 w-full'>
-                        <div>
-                          <label htmlFor="minWidth">Від</label>
-                          <input 
-                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
-                           onChange={(e) => handleSlider("width", "min", e.target.value)} 
-                           value={`${filter.width.min}`} 
-                           onBlur={() => handleInputUnfocus("width", "min")} 
-                           id="minWidth"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="maxWidth">До</label>
-                          <input 
-                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
-                           onChange={(e) => handleSlider("width", "max", e.target.value)}  
-                           value={`${filter.width.max}`} 
-                           onBlur={() => handleInputUnfocus("width", "max")} 
-                           id="maxWidth"
-                          />
-                        </div>
-                      </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-
-            <div className='mt-4 pb-4 w-full'>
-              <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">Висота</AccordionTrigger>
-                  <AccordionContent className="flex flex-col items-center shrink-0 px-3">
-                    <Slider
-                        value={Object.values(filter.height)}
-                        onValueChange={([min,max])=>{setFilter({...filter, height:{ min, max }})}}
-                        max={maxMin.maxHeight}
-                        min={maxMin.minHeight}
-                        step={1}
-                        className={cn("w-full mt-4")}
-                      />
-                      <div className='flex justify-between mt-7 w-full'>
-                        <div>
-                          <label htmlFor="minHeight">Від</label>
-                          <input 
-                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
-                           onChange={(e) => handleSlider("height", "min", e.target.value)} 
-                           value={`${filter.height.min}`} 
-                           onBlur={() => handleInputUnfocus("height", "min")} 
-                           id="minHeight"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="maxHeight">До</label>
-                          <input 
-                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
-                           onChange={(e) => handleSlider("height", "max", e.target.value)} 
-                           value={`${filter.height.max}`} 
-                           onBlur={() => handleInputUnfocus("height", "max")} 
-                           id="maxHeight"
-                          />
-                        </div>
-                      </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-
-            <div className='mt-4 pb-4 w-full'>
-              <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3">Глибина</AccordionTrigger>
-                  <AccordionContent className="flex flex-col items-center shrink-0 px-3">
-                    <Slider
-                        value={Object.values(filter.depth)}
-                        onValueChange={([min,max])=>{setFilter({...filter, depth:{ min, max }})}}
-                        max={maxMin.maxDepth}
-                        min={maxMin.minDepth}
-                        step={1}
-                        className={cn("w-full mt-4")}
-                      />
-                      <div className='flex justify-between mt-7 w-full'>
-                        <div>
-                          <label htmlFor="mindepth">Від</label>
-                          <input 
-                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
-                           onChange={(e) => handleSlider("depth", "min", e.target.value)} 
-                           value={`${filter.depth.min}`} 
-                           onBlur={() => handleInputUnfocus("depth", "min")} 
-                           id="minDepth"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="maxdepth">До</label>
-                          <input 
-                           className='w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl' 
-                           onChange={(e) => handleSlider("depth", "max", e.target.value)} 
-                           value={`${filter.depth.max}`} 
-                           onBlur={() => handleInputUnfocus("depth", "max")} id="maxDepth"
-                          />
-                        </div>
-                      </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-            {/* <div className='mt-4 border-b-2 pb-4 w-[90%] border-dashed '>
-                <h3 className='text-[23px]'>Акції</h3>
-                <div className="flex items-center space-x-2 mt-4">
-                  <Checkbox id="5%"></Checkbox>
-                  <label
-                    htmlFor="5%"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Знижка 5%
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2 mt-4">
-                  <Checkbox id="10%" />
-                  <label
-                    htmlFor="10%"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Знижка 10%
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2 mt-4">
-                  <Checkbox id="15%" />
-                  <label
-                    htmlFor="15%"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Знижка 15%
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2 mt-4">
-                  <Checkbox id="20%" />
-                  <label
-                    htmlFor="20%"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Знижка 20%
-                  </label>
-                </div>
-            </div> */}
-            </div>
-        </div></>
+          <div className="pb-5">
+            <ClearFilterButton />
+          </div>
+          </div>
+        </div>
+    </>
   )
 }
 
 export default Filter
+
+const FilterInput = ({ paramName, setting, maxMin, filter, setFilter }: { paramName: ParamsName, setting: "min" | "max", maxMin: Props["maxMin"], filter: FilterType, setFilter: Dispatch<SetStateAction<FilterType>>}) => {
+  const [inputValue, setInputValue] = useState<string>(filter[paramName][setting].toString());
+
+  // Track the input change in local state
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  useEffect(() => {
+    setInputValue(filter[paramName][setting].toString());
+  }, [filter[paramName][setting]]);
+
+  const handleInputUnfocus = () => {
+    const floatedValue = parseFloat(inputValue);
+    const capitalizedParamName = capitalize(paramName);
+
+    const minValue = maxMin[`min${capitalizedParamName}` as keyof typeof maxMin];
+    const maxValue = maxMin[`max${capitalizedParamName}` as keyof typeof maxMin];
+
+    const currentValue = filter[paramName][setting];
+
+    // If the value is outside bounds or invalid, reset to the boundary value
+    if (floatedValue < minValue || floatedValue > maxValue || isNaN(floatedValue)) {
+      const boundaryValue = maxMin[(setting + capitalizedParamName) as keyof typeof maxMin];
+      setFilter((prev) => ({
+        ...prev,
+        [paramName]: { ...prev[paramName], [setting]: boundaryValue }
+      }));
+      setInputValue(boundaryValue.toString());
+    } else {
+      setFilter((prev) => ({
+        ...prev,
+        [paramName]: { ...prev[paramName], [setting]: floatedValue }
+      }));
+    }
+  };
+
+  return (
+    <div>
+      <label htmlFor={`${setting}-${paramName}`}>{setting === "min" ? "Від" : "До"}</label>
+      <input
+        className="w-20 h-8 mt-2 text-center border flex items-center justify-center rounded-2xl"
+        value={inputValue} // Bind inputValue to the input field
+        onChange={handleChange} // Update local state on change
+        onBlur={handleInputUnfocus} // Update global filter state on blur
+        id={`${setting}-${paramName}`}
+      />
+    </div>
+  );
+};
