@@ -288,7 +288,7 @@ const Filter = ({ maxPrice, minPrice, maxMin, checkParams, category, counts }: P
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="item-1">
                     <AccordionTrigger className='text-[18px] bg-zinc-100 rounded-3xl font-medium py-[6px] px-3'>{checkParamsNamesUa[param]}</AccordionTrigger>
-                    <AccordionContent className="pl-3">
+                    <AccordionContent className="pl-3 max-h-[300px] overflow-y-auto">
                       {checkParams[param].map((value, index)=>(
                         <div key={index} className="w-full h-fit flex justify-between items-center">
                         <div className="flex items-center space-x-2 mt-4">
