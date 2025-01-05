@@ -172,6 +172,13 @@ const Filter = ({ maxPrice, minPrice, maxMin, checkParams, category, counts }: P
     router.push(`/catalog?${searchString}`);
   }, [debounce, sort, catalogData.search, category]);  
 
+  
+  useEffect(() => {
+    const currentScreenWidth = window.screen.width;
+
+    setScreenWidth(currentScreenWidth);
+  }, [])
+  
   const handleChange = (newValue: [number, number]) => {
     setFilter({...filter, page: "1", price:newValue})
   };
